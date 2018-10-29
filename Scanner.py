@@ -1,36 +1,37 @@
 import nmap
 
-IP_LOOPBACK = '127.0.0.1'
-COMMON_PORTS = '0-1023'
+class Scanner:
+    """Scanner class wraps nmap scans for quick scan types"""
+    _ips = ''
+    _ports = ''
+    _scanner = None
 
-scanner = nmap.PortScanner()
+    def __init__(self, ips, ports):
+        self._ips  = ips
+        self._ports = ports
+        self._scanner = nmap.PortScanner()
 
-# Quick scan of the most common ports stored in var
-#result = scanner.scan(IP_LOOPBACK, COMMON_PORTS)
+    def host_discover(self):
+        """Scans for live host that respond to pings"""
+        return self._scanner.scan(self._ips, self._ports, arguments='-sP')
 
-# Function for fun
-def get_command(scan):
-    return scan.command_line()
+    # Won't run from pycharm because stealth scans require sudo and pycharm doesn't have a
+    # console to ask for password. Researching further.
+    def full_scan(self):
+        """Performs a full TCP scan with service discovery, good for initial scans"""
+        return self._scanner.scan(self._ips, self._ports, arguments='-sV -sS -T4', sudo=True)
 
-# Conducts ping scan -- host discovery without port scan
-scanner.scan('192.168.1.0/24', arguments='-sn')
+    def script_scan(self):
+        """Runs default scripts without host discovery. All host assumed up."""
+        return _scanner.scan(_ips, _ports, arguments='-Pn -sn -sC')
 
-# Print found host and state
-for host in scanner.all_hosts():
-    print('Host: %s \tState: %s' % (host, scanner[host].state()))
+    def udp_scan(self):
+        """Runs a UDP scan good for DNS, SNMP, and DHCP. Typically takes longer than a TCP scan"""
+        return _scanner.scan(_ips, _ports, arguments='-sU')
 
-#########################
-# Trying out Async scans
 
-scanner2 = nmap.PortScannerAsync()
 
-def callback_when_done(host, result):
-    print('-------------------------')
-    print('%s is all done being scanned!' % host)
-
-scanner2.scan('192.168.1.0/28', arguments='-sn', callback=callback_when_done)
-
-while scanner2.still_scanning():
-    print("Still scanning...")
-    # Make scanner wait a second after each host
-    scanner2.wait(1)
+testScan = Scanner('192.168.1.0/28', '7-1024')
+# Won't run from pycharm because it requires sudo and needs password
+results = testScan.full_scan()
+print(results)
