@@ -5,7 +5,7 @@ class Scanner:
     _ips = ''
     _ports = ''
     _scanner = None
-    _scanned = False;
+    _scanned = False
 
     def __init__(self, ips, ports):
         self._ips  = ips
@@ -27,7 +27,7 @@ class Scanner:
     def script_scan(self):
         """Runs default scripts without host discovery. All host assumed up."""
         self._scanned = True
-        return self._scanner.scan(grp9cap18, self._ports, arguments='-Pn -sn -sC')
+        return self._scanner.scan(self._ips, self._ports, arguments='-Pn -sn -sC')
 
     def udp_scan(self):
         """Runs a UDP scan good for DNS, SNMP, and DHCP. Typically takes longer than a TCP scan"""
@@ -39,10 +39,17 @@ class Scanner:
         self._scanned = True
         return self._scanner.scan(self._ips, '21-443')
 
+    def detect_os_service_scan(self):
+        """Runs scan to detemine OS and running service of given host"""
+        self._scanned = True
+        return self._scanner.scan(self._ips, self._ports, arguments='-A')
+
     def get_hosts(self):
         """Return all hosts found during scan"""
         if self._scanned:
             return self._scanner.all_hosts()
+        else:
+            raise ScannerError("ERROR: A scan has not yet been conducted!")
 
     def get_csv(self):
         """Return lastest scan information in csv format"""
@@ -65,10 +72,23 @@ class Scanner:
                     for port in ports:
                         print('Port: %s\tState: %s' %(port, self._scanner[host][pro][port]['state']))
 
+class ScannerError(Exception):
+    """Raised when Scanner encounters a possible error to be handled accordingly"""
+    pass
 
 
 
-testScan = Scanner('192.168.1.0/28', '7-1024')
+# TESTING
+testScan = Scanner('192.168.1.1', '7-1024')
+try:
+    all_hosts = testScan.get_hosts()
+except ScannerError as err:
+    print(err)
+
 testScan.fast_scan()
 print(testScan.get_hosts())
 testScan.print_scan()
+
+testScan.detect_os_service_scan()
+testScan.print_scan()
+
