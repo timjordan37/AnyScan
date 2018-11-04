@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+# Pycharm project files
+.idea/
+__pycache__
+=======
 
 # MacOS Settings
 .DS_Store
@@ -5,3 +10,4 @@
 # Intelli-J Settings Folder
 .idea
 venv/
+>>>>>>> develop
