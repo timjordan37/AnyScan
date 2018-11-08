@@ -1,4 +1,9 @@
 import tkinter as tk
+import nmap
+from scanner_app.helpers.EntryValidator import Validator
+
+from scanner_app.helpers.Scanner import Scanner
+from scanner_app.helpers.Scanner import ScannerError
 
 # Main method to handle setting up and managing the UI
 
@@ -29,7 +34,8 @@ def main():
 
     # Click Handlers
     def on_scan():
-        print("User clicked 'Scan'")
+        scanner.host_discover()
+        print(scanner.get_hosts())
 
     def on_check_vulnerabilities():
         print("User clicked 'check vulnerabilities'")
@@ -43,6 +49,7 @@ def main():
     # Variables
     devices = []
     vulnerabilities = []
+    scanner = Scanner('127.0.0.1', '22-30')
 
     # Setup root ui
     root = tk.Tk()
@@ -69,9 +76,31 @@ def main():
     devices_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
     reload_devices_listbox()
 
+    ## Setup scan port label frame
+    scan_port_label_frame = tk.Frame(left_frame)
+    scan_port_label_frame.grid(row=2, column=0)
+
+    ## Setup scan port label
+    port_start_label = tk.Label(scan_port_label_frame, text="Start Port")
+    port_start_label.grid(row=0, column=0, padx=(0, 8))
+
+    port_end_label = tk.Label(scan_port_label_frame, text="End Port")
+    port_end_label.grid(row=0, column=1, padx=(8, 0))
+
+    ## Setup scan port frame
+    scan_port_frame = tk.Frame(left_frame)
+    scan_port_frame.grid(row=3, column=0)
+
+    ## Setup scan port entries
+    port_start_entry = tk.Entry(scan_port_frame, width=4)
+    port_start_entry.grid(row=0, column=0, padx=(0, 16))
+
+    port_end_entry = tk.Entry(scan_port_frame, width=4)
+    port_end_entry.grid(row=0, column=1, padx=(16, 0))
+
     # Setup Left frame scan button
     scan_button = tk.Button(left_frame, text="Scan", command=on_scan)
-    scan_button.grid(row=2, column=0, pady=(8, 8))
+    scan_button.grid(row=4, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
