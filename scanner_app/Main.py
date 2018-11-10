@@ -1,15 +1,18 @@
 import tkinter as tk
-import nmap
-from scanner_app.helpers.EntryValidator import Validator
+import random
 
 from scanner_app.helpers.Scanner import Scanner
-from scanner_app.helpers.Scanner import ScannerError
+from scanner_app.util.SThread import SThread
+from scanner_app.util.STime import STimer
 
 # Main method to handle setting up and managing the UI
 
 
+# Constants
+HOME_IP = '127.0.0.1'
+
 def main():
-    print("Main method called")
+    print("Scanner App Started...")
 
     # UI Updating Method
     def update_left_header_label(value):
@@ -22,6 +25,21 @@ def main():
             # else
             left_frame_header_label_var.set(value)
 
+    def update_left_header_label_random_waiting_msg():
+        random_waiting_responses = [
+            "This may take a while...",
+            "I'm sorry this will be a while...",
+            "Scanning...",
+            "Scanning in Process..."
+        ]
+        update_left_header_label(random.choice(random_waiting_responses))
+
+
+    def reset_left_header_label():
+        device_count = len(devices)
+        device_count_text = f"({device_count}) Devices Scanned".format()
+        left_frame_header_label_var.set(device_count_text)
+
     def reload_devices_listbox():
         devices_listbox.delete(0, tk.END)
         for device in devices:
@@ -32,10 +50,30 @@ def main():
         for vulnerability in vulnerabilities:
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
+    def scan_thread_completion():
+        update_left_header_label("Scan in process...")
+        scan_button.config(state="disabled")
+        waiting_scanner1 = STimer.do_after(update_left_header_label_random_waiting_msg, 15)
+        waiting_scanner2 = STimer.do_after(update_left_header_label_random_waiting_msg, 30)
+        waiting_scanner3 = STimer.do_after(update_left_header_label_random_waiting_msg, 45)
+
+        ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
+        scanner = Scanner(HOME_IP, ports)
+        scanner.fast_scan()
+        scanner.host_discover()
+        scanner.print_scan()
+        scan_button.config(state="normal")
+        update_left_header_label("Scan finished")
+        STimer.do_after(reset_left_header_label, 2)
+        waiting_scanner1.cancel()
+        waiting_scanner2.cancel()
+        waiting_scanner3.cancel()
+
     # Click Handlers
     def on_scan():
-        scanner.host_discover()
-        print(scanner.get_hosts())
+        # MAKE SURE TO VALIDATE INPUT
+        scan_thread = SThread(0, "SCAN_THREAD_1", 5, scan_thread_completion)
+        scan_thread.start()
 
     def on_check_vulnerabilities():
         print("User clicked 'check vulnerabilities'")
@@ -49,7 +87,6 @@ def main():
     # Variables
     devices = []
     vulnerabilities = []
-    scanner = Scanner('127.0.0.1', '22-30')
 
     # Setup root ui
     root = tk.Tk()
@@ -92,10 +129,14 @@ def main():
     scan_port_frame.grid(row=3, column=0)
 
     ## Setup scan port entries
-    port_start_entry = tk.Entry(scan_port_frame, width=4)
+    port_start_entry_var = tk.StringVar()
+    port_start_entry_var.set("21")
+    port_start_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_start_entry_var)
     port_start_entry.grid(row=0, column=0, padx=(0, 16))
 
-    port_end_entry = tk.Entry(scan_port_frame, width=4)
+    port_end_entry_var = tk.StringVar()
+    port_end_entry_var.set("30")
+    port_end_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_end_entry_var)
     port_end_entry.grid(row=0, column=1, padx=(16, 0))
 
     # Setup Left frame scan button

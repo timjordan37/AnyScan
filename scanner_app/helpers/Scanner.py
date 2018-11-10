@@ -15,7 +15,8 @@ class Scanner:
     def host_discover(self):
         """Scans for live host that respond to pings"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports, arguments='-sP')
+        return self._scanner.scan(self._ips, self._ports)
+        # return self._scanner.scan(self._ips, self._ports, arguments='-sP')
 
     # Won't run from pycharm because stealth scans require sudo and pycharm doesn't have a
     # console to ask for password. Researching further.
@@ -36,8 +37,8 @@ class Scanner:
 
     def fast_scan(self):
         """Quick scan of small port range with default arguments"""
+        return self._scanner.scan(self._ips, self._ports)
         self._scanned = True
-        return self._scanner.scan(self._ips, '21-443')
 
     def detect_os_service_scan(self):
         """Runs scan to detemine OS and running service of given host"""
