@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+
+<title>DatabaseTemplate</title>
+<link rel="stylesheet" href = "{{ url_for('static', filename = 'style.css') }}" />
+
+<p>DatabaseTemplate, {{ name }}!</p>
+<nav><a href = "{{ url_for('DatabaseTemplate_pdf', name = name) }}">Get as PDF</a></nav>
+
 <html>
     <body>
         <table border = 1>
