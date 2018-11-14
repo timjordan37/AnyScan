@@ -1,5 +1,7 @@
 import nmap
 
+from scanner_app.models.Host import Host
+
 class Scanner:
     """Scanner class wraps nmap scans for quick scan types"""
     _ips = ''
@@ -57,6 +59,18 @@ class Scanner:
         if self._scanned:
             return self._scanner.csv()
 
+    def get_host_details(self):
+        if self._scanned:
+            hosts = []
+            # for each host scanned
+            for host in self._scanner.all_hosts():
+                # print the ip and associated hostname if available and state
+                hosts.append(Host(host, self._scanner[host].state()))
+                print('\nIP: %s\t State: %s' % (host, self._scanner[host].state()))
+
+            return hosts
+
+
     def print_scan(self):
         """Print a scan result to the console with relevant information"""
         if self._scanned:
@@ -64,6 +78,7 @@ class Scanner:
             for host in self._scanner.all_hosts():
                 # print the ip and associated hostname if available and state
                 print('\nIP: %s\t State: %s' % (host, self._scanner[host].state()))
+                print("CHECK:",self._scanner[host])
                 # for each protocol of the given host
                 for pro in self._scanner[host].all_protocols():
                     # print the protocol and all the port responses
