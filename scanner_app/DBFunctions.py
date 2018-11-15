@@ -23,7 +23,7 @@ class DBFunctions():
     def save_vulnerability(Model, cpeName, cpe22URI, cpe23URI, versionsAffected,
                            description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
-                           availabilityImpact, baseScore, baseSeverity, exploitabilityScore):
+                           baseScore, baseSeverity, exploitabilityScore):
 
 
         cursor.execute('SELECT MAX(VulnID) FROM Vulnerabilities')
@@ -35,10 +35,10 @@ class DBFunctions():
         vulnerability_info = [vulnID, Model, cpeName, cpe22URI, cpe23URI, versionsAffected,
                            description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
-                           availabilityImpact, baseScore, baseSeverity, exploitabilityScore]
+                           baseScore, baseSeverity, exploitabilityScore]
         try:
             cursor.execute('INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
-                           '?, ?, ?, ?, ?, ?,)', vulnerability_info)
+                           '?, ?, ?, ?, ?,)', vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return "That device already exists in the database."

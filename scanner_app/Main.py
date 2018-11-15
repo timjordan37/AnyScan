@@ -44,7 +44,76 @@ def main():
         print("adding a new device")
 
     def new_vuln_popup():
-        print("Adding a new Vuln")
+        model = ""
+        cpe_name = ""
+        cpe_uri = ""
+        description = ""
+        versions_affected = ""
+        cvss_score = ""
+        attack_vector = ""
+        attack_complexity = ""
+        privileges_required  = ""
+        user_interaction = ""
+        confidentiality_impact = ""
+        integrity_impact = ""
+        availability_impact = ""
+        base_score = ""
+        base_severity = ""
+        exploitability_score = ""
+
+        vuln_popup = tk.Toplevel(padx=10, pady=10)
+        vuln_popup.wm_title("Add Vulnerability")
+        vuln_popup.geometry("500x500")
+
+        related_mod = tk.Entry(vuln_popup, textvariable=model)
+        related_mod.grid(column=0, row=0, padx=5, pady=5)
+
+        cpe_name_entry = tk.Entry(vuln_popup, textvariable=cpe_name)
+        cpe_name_entry.grid(column=0, row=1, padx=5, pady=5)
+
+        cpe_uri_entry = tk.Entry(vuln_popup, textvariable=cpe_uri)
+        cpe_uri_entry.pack()
+
+        description_entry = tk.Entry(vuln_popup, textvariable=description)
+        description_entry.pack()
+
+        versions_affected_entry = tk.Entry(vuln_popup, textvariable=versions_affected)
+        versions_affected_entry.pack()
+
+        cvss_score_entry = tk.Entry(vuln_popup, textvariable=cvss_score)
+        cvss_score_entry.pack()
+
+        attack_vector_entry = tk.Entry(vuln_popup, textvariable=attack_vector)
+        attack_vector_entry.pack()
+
+        attack_complexity_entry = tk.Entry(vuln_popup, textvariable=attack_complexity)
+        attack_complexity_entry.pack()
+
+        privileges_required_entry = tk.Entry(vuln_popup, textvariable=privileges_required)
+        privileges_required_entry.pack()
+
+        user_interaction_entry = tk.Entry(vuln_popup, textvariable=user_interaction)
+        user_interaction_entry.pack()
+
+        confidentiality_impact_entry = tk.Entry(vuln_popup, textvariable=confidentiality_impact)
+        confidentiality_impact_entry.pack()
+
+        integrity_impact_entry = tk.Entry(vuln_popup, textvariable=integrity_impact)
+        integrity_impact_entry.pack()
+
+        availability_impact_entry = tk.Entry(vuln_popup, textvariable=availability_impact)
+        availability_impact_entry.pack()
+
+        base_score_entry = tk.Entry(vuln_popup, textvariable=base_score)
+        base_score_entry.pack()
+
+        base_severity_entry = tk.Entry(vuln_popup, textvariable=base_severity)
+        base_severity_entry.pack()
+
+        exploitability_score_entry = tk.Entry(vuln_popup, textvariable=exploitability_score)
+        exploitability_score_entry.pack()
+
+
 
     # Variables
     devices = []
