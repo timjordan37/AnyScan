@@ -64,6 +64,7 @@ class Scanner:
             hosts = []
             # for each host scanned
             for host in self._scanner.all_hosts():
+                print("H: ", self._scanner[host])
                 # print the ip and associated hostname if available and state
                 hosts.append(Host(host, self._scanner[host].state()))
                 print('\nIP: %s\t State: %s' % (host, self._scanner[host].state()))

@@ -18,7 +18,7 @@ def main():
     def update_left_header_label(value):
         if value is None:
             # if the provided value is none, then update to the default header
-            host_count = len(hosts)
+            host_count = len(scanned_hosts)
             host_count_text = f"({host_count}) Hosts Scanned".format()
             left_frame_header_label_var.set(host_count_text)
         else:
@@ -35,13 +35,13 @@ def main():
         update_left_header_label(random.choice(random_waiting_responses))
 
     def reset_left_header_label():
-        host_count = len(hosts)
+        host_count = len(scanned_hosts)
         host_count_text = f"({host_count}) Hosts Scanned".format()
         left_frame_header_label_var.set(host_count_text)
 
     def reload_hosts_listbox():
         hosts_listbox.delete(0, tk.END)
-        for host in hosts:
+        for host in scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_name())
 
     def reload_vulnerabilities_listbox():
@@ -57,12 +57,13 @@ def main():
         waiting_scanner3 = STimer.do_after(update_left_header_label_random_waiting_msg, 45)
 
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
-        scanner = Scanner(HOME_IP, ports)
+        hosts = scan_host_entry_var.get()
+        scanner = Scanner(hosts, ports)
         scanner.fast_scan()
         scanner.host_discover()
         scanner.print_scan()
         print("GET: ", scanner.get_hosts())
-        nonlocal hosts
+        nonlocal scanned_hosts
         set_host(scanner.get_host_details())
         scan_button.config(state="normal")
         update_left_header_label("Scan finished")
@@ -72,8 +73,8 @@ def main():
         waiting_scanner3.cancel()
 
     def set_host(h):
-        nonlocal hosts
-        hosts = h
+        nonlocal scanned_hosts
+        scanned_hosts = h
         reload_hosts_listbox()
 
     # Click Handlers
@@ -93,7 +94,7 @@ def main():
 
     # Variables
     vulnerabilities = []
-    hosts = []
+    scanned_hosts = []
 
     # Setup root ui
     root = tk.Tk()
@@ -120,9 +121,23 @@ def main():
     hosts_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
     reload_hosts_listbox()
 
+    # Setup scan host frame
+    scan_host_frame = tk.Frame(left_frame)
+    scan_host_frame.grid(row=2, column=0)
+
+    # Setup scan host label
+    scan_host_label = tk.Label(scan_host_frame, text="Hosts:")
+    scan_host_label.grid(row=0, column=0)
+
+    # Setup scan host entry
+    scan_host_entry_var = tk.StringVar()
+    scan_host_entry_var.set("192.168.1.0/28")
+    scan_host_entry = tk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
+    scan_host_entry.grid(row=0, column=1)
+
     ## Setup scan port label frame
     scan_port_label_frame = tk.Frame(left_frame)
-    scan_port_label_frame.grid(row=2, column=0)
+    scan_port_label_frame.grid(row=3, column=0)
 
     ## Setup scan port label
     port_start_label = tk.Label(scan_port_label_frame, text="Start Port")
@@ -133,7 +148,7 @@ def main():
 
     ## Setup scan port frame
     scan_port_frame = tk.Frame(left_frame)
-    scan_port_frame.grid(row=3, column=0)
+    scan_port_frame.grid(row=4, column=0)
 
     ## Setup scan port entries
     port_start_entry_var = tk.StringVar()
@@ -148,7 +163,7 @@ def main():
 
     # Setup Left frame scan button
     scan_button = tk.Button(left_frame, text="Scan", command=on_scan)
-    scan_button.grid(row=4, column=0, pady=(8, 8))
+    scan_button.grid(row=5, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
@@ -218,8 +233,8 @@ def main():
     vulnerability_report_button.grid(row=0, column=1)
 
     # Run the program with UI
-    root.geometry("600x400")
-    root.minsize(600, 400)
+    root.geometry("600x500")
+    root.minsize(600, 500)
     root.mainloop()
 
 
