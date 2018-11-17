@@ -20,7 +20,7 @@ class DBFunctions():
 
     #Saving a Vulnerability to the database
 
-    def save_vulnerability(Model, cpeName, cpe22URI, cpe23URI, versionsAffected,
+    def save_vulnerability(Model, cpeName, cpe23URI, versionsAffected,
                            description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore):
@@ -32,7 +32,7 @@ class DBFunctions():
         maxID = maxIDTuple[0]
         vulnID = maxID + 1
 
-        vulnerability_info = [vulnID, Model, cpeName, cpe22URI, cpe23URI, versionsAffected,
+        vulnerability_info = [vulnID, Model, cpeName, cpe23URI, versionsAffected,
                            description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore]
