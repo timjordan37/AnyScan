@@ -92,6 +92,16 @@ def main():
     def on_report():
         print("User clicked 'Report'")
 
+    def on_host_listbox_select(evt):
+        print("This happened")
+        # Note here that Tkinter passes an event object to onselect()
+        listbox = evt.widget
+        index = int(listbox.curselection()[0])
+        selected_host = scanned_hosts[index].get_ip()
+        print("HOST: ", selected_host)
+        host_name_entry_var.set(selected_host)
+
+
     # Variables
     vulnerabilities = []
     scanned_hosts = []
@@ -119,6 +129,7 @@ def main():
     # Setup Left frame HostListbox
     hosts_listbox = tk.Listbox(left_frame, width="30")
     hosts_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
+    hosts_listbox.bind('<<ListboxSelect>>', on_host_listbox_select)
     reload_hosts_listbox()
 
     # Setup scan host frame
@@ -185,7 +196,9 @@ def main():
     host_name_label = tk.Label(host_name_frame, text="Host Name:")
     host_name_label.grid(row=0, column=0, padx=(16, 0))
 
-    host_name_text_entry = tk.Entry(host_name_frame)
+    host_name_entry_var = tk.StringVar()
+    host_name_entry_var.set("")
+    host_name_text_entry = tk.Entry(host_name_frame, textvariable=host_name_entry_var)
     host_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
     #  MAC Address UI

@@ -9,3 +9,6 @@ class Host:
 
     def get_display_name(self):
         return f"IP: {self._ip}    State: {self._state}"
+
+    def get_ip(self):
+        return self._ip
