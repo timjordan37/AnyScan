@@ -23,9 +23,11 @@ class VulnPopup():
         base_severity = ""
         exploitability_score = ""
 
+        # Creating the Popup Window
         vuln_popup = tk.Toplevel(padx=10, pady=10)
         vuln_popup.wm_title("Add Vulnerability")
 
+        # Adding the fields to the popup
         related_mod = tk.Entry(vuln_popup, textvariable=model)
         related_mod_label = tk.Label(vuln_popup, text="Model")
         related_mod_label.grid(column=0, row=0, padx=5, pady=5)
@@ -109,6 +111,7 @@ class VulnPopup():
         exploitability_score_label.grid(column=0, row=15, padx=5, pady=5)
         exploitability_score_entry.grid(column=1, row=15, padx=5, pady=5)
 
+        # Function to call the save vulnerability function
         def save_vuln():
             df.DBFunctions.save_vulnerability(model, cpe_name, cpe_uri, description, versions_affected, cvss_score,
                                               attack_vector, attack_complexity,
@@ -116,5 +119,6 @@ class VulnPopup():
                                               integrity_impact, availability_impact, base_score, base_severity,
                                               exploitability_score)
 
+        # Adding the save button to the popup window
         save_button = tk.Button(vuln_popup, text="Save", command=save_vuln)
         save_button.grid(columnspan=2, row=16, padx=5, pady=5)

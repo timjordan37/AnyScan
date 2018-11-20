@@ -1,5 +1,8 @@
 import tkinter as tk
 import scanner_app.VulnPopup as vp
+import scanner_app.DevicePopup as dp
+import scanner_app.DBFunctions as df
+from pathlib import Path
 # Main method to handle setting up and managing the UI
 
 
@@ -41,7 +44,7 @@ def main():
         print("User clicked 'Report'")
 
     def new_device_popup():
-        print("adding a new device")
+        dp.DevicePopup.new_popup()
 
     def new_vuln_popup():
         vp.VulnPopup.new_popup()
@@ -170,4 +173,8 @@ def main():
 
 #  Runs the main method if this file is called to run
 if __name__ == '__main__':
+    db_location = Path("vulnDB.db")
+    if not db_location.exists():
+        print("you got here")
+        df.DBFunctions.build_db()
     main()
