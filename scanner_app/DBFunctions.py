@@ -7,13 +7,11 @@ class DBFunctions():
     def save_device(deviceName, deviceManufacturer, cpeURI):
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        device_info = [deviceName, deviceManufacturer, cpeURI]
+        device_info = (deviceName, deviceManufacturer, cpeURI)
 
         try:
-            cursor.execute('INSERT INTO Devices VALUES(?, ?, ?)', device_info)
-            conn.commit()
+            cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
         except sqlite3.IntegrityError as e:
-            print(e)
             return False
 
         return True
@@ -33,13 +31,13 @@ class DBFunctions():
         maxID = maxIDTuple[0]
         vulnID = maxID + 1
 
-        vulnerability_info = [vulnID, Model, cpeName, cpe23URI, versionsAffected,
+        vulnerability_info = (vulnID, Model, cpeName, cpe23URI, versionsAffected,
                            description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
-                           baseScore, baseSeverity, exploitabilityScore]
+                           baseScore, baseSeverity, exploitabilityScore)
         try:
-            cursor.execute('INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
-                           '?, ?, ?, ?, ?,)', vulnerability_info)
+            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
+                           '?, ?, ?, ?, ?,)''', vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return "That device already exists in the database."
@@ -56,7 +54,7 @@ class DBFunctions():
         maxID = maxIDTuple[0]
         scanID = maxID + 1
 
-        scan_info = [scanID, Date, Model, Duration]
+        scan_info = (scanID, Date, Model, Duration)
         cursor.execute('INSERT INTO  VALUES(?, ?, ?, ?', scan_info)
         conn.commit()
 

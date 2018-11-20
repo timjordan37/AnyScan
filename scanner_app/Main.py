@@ -175,6 +175,5 @@ def main():
 if __name__ == '__main__':
     db_location = Path("vulnDB.db")
     if not db_location.exists():
-        print("you got here")
         df.DBFunctions.build_db()
     main()
