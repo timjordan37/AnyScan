@@ -1,6 +1,9 @@
 import tkinter as tk
+import scanner_app.VulnPopup as vp
+import scanner_app.DevicePopup as dp
+import scanner_app.DBFunctions as df
+from pathlib import Path
 import random
-
 from scanner_app.helpers.Scanner import Scanner
 from scanner_app.util.SThread import SThread
 from scanner_app.util.STime import STimer
@@ -91,6 +94,16 @@ def main():
 
     def on_report():
         print("User clicked 'Report'")
+
+    def new_device_popup():
+        dp.DevicePopup.new_popup()
+
+    def new_vuln_popup():
+        vp.VulnPopup.new_popup()
+
+
+
+
 
     # Variables
     vulnerabilities = []
@@ -232,6 +245,18 @@ def main():
     vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report", command=on_report)
     vulnerability_report_button.grid(row=0, column=1)
 
+    #################
+    # Setup File Menu
+    #################
+
+    # Creating the menu
+    file_menu = tk.Menu(root)
+    file_menu.add_command(label="Add new Device", command=new_device_popup)
+    file_menu.add_command(label="Add new Vulnerability", command=new_vuln_popup)
+
+    # Display the menu
+    root.config(menu=file_menu)
+
     # Run the program with UI
     root.geometry("600x500")
     root.minsize(600, 500)
@@ -240,4 +265,7 @@ def main():
 
 #  Runs the main method if this file is called to run
 if __name__ == '__main__':
+    db_location = Path("vulnDB.db")
+    if not db_location.exists():
+        df.DBFunctions.build_db()
     main()
