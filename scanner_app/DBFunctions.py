@@ -58,6 +58,22 @@ class DBFunctions():
         cursor.execute('INSERT INTO  VALUES(?, ?, ?, ?', scan_info)
         conn.commit()
 
+    # Saves a scan to the database
+    @staticmethod
+    def save_host(Date, Model, Duration, ):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT MAX(ScanID) FROM History')
+        conn.commit()
+        maxIDTuple = cursor.fetchone()
+        maxID = maxIDTuple[0]
+        scanID = maxID + 1
+
+        scan_info = (scanID, Date, Model, Duration)
+        cursor.execute('INSERT INTO  VALUES(?, ?, ?, ?', scan_info)
+        conn.commit()
+
     # Builds the database
     @staticmethod
     def build_db():
@@ -72,6 +88,8 @@ class DBFunctions():
             baseScore TEXT, baseSeverity TEXT, exploitabilityScore INTEGER, FOREIGN KEY(Model) REFERENCES Devices(Model))''')
         cursor.execute(
             '''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, Model TEXT, ScanDate TEXT, Duration INTEGER)''')
+        cursor.execute(
+            '''CREATE TABLE Hosts (HostID INTEGER PRIMARY KEY, ip TEXT, macAddress TEXT, osFamily TEXT, osGen TEXT, name TEXT, vendor TEXT)''')
         conn.commit()
         cursor.execute(
             '''CREATE TABLE Parameters (ScanID INTEGER, ParameterValue TEXT, ParameterType TEXT, PRIMARY KEY(ScanID, ParameterType))''')

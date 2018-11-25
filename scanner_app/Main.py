@@ -1,13 +1,13 @@
 import tkinter as tk
-import scanner_app.VulnPopup as vp
-import scanner_app.DevicePopup as dp
-import scanner_app.DBFunctions as df
+import VulnPopup as vp
+import DevicePopup as dp
+import DBFunctions as df
 from pathlib import Path
 import random
-from scanner_app.helpers.Scanner import Scanner
-from scanner_app.util.SThread import SThread
-from scanner_app.util.STime import STimer
-
+from helpers.Scanner import Scanner
+from util.SThread import SThread
+from util.STime import STimer
+import datetime
 # Main method to handle setting up and managing the UI
 
 
@@ -53,23 +53,33 @@ def main():
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
     def scan_thread_completion():
+        scan_start_date = datetime.datetime.now()
         update_left_header_label("Scan in process...")
         scan_button.config(state="disabled")
         waiting_scanner1 = STimer.do_after(update_left_header_label_random_waiting_msg, 15)
         waiting_scanner2 = STimer.do_after(update_left_header_label_random_waiting_msg, 30)
         waiting_scanner3 = STimer.do_after(update_left_header_label_random_waiting_msg, 45)
 
-        ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
-        hosts = scan_host_entry_var.get()
-        scanner = Scanner(hosts, ports)
-        scanner.fast_scan()
-        scanner.host_discover()
-        scanner.print_scan()
-        print("GET: ", scanner.get_hosts())
+        # ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
+        # hosts = scan_host_entry_var.get()
+        # scanner = Scanner(hosts, ports)
+        scanner = Scanner('192.168.1.0/28', '7-300')
+        print("Scan start")
+        result = scanner.host_discover()
+        print("MAC: ", result)
+        result = scanner.get_os_service_scan_details()
+        print("OS: ", result)
+        print("Scan END")
+
+        # scanner.fast_scan()
+        # scanner.host_discover()
         nonlocal scanned_hosts
-        set_host(scanner.get_host_details())
+        set_host(scanner.get_os_service_scan_details())
         scan_button.config(state="normal")
-        update_left_header_label("Scan finished")
+        scan_end_date = datetime.datetime.now()
+        timedelta = scan_end_date - scan_start_date
+        timedelta.total_seconds()
+        update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
         waiting_scanner1.cancel()
         waiting_scanner2.cancel()
@@ -96,12 +106,10 @@ def main():
         print("User clicked 'Report'")
 
     def on_host_listbox_select(evt):
-        print("This happened")
         # Note here that Tkinter passes an event object to onselect()
         listbox = evt.widget
         index = int(listbox.curselection()[0])
         selected_host = scanned_hosts[index].get_ip()
-        print("HOST: ", selected_host)
         host_name_entry_var.set(selected_host)
 
     def new_device_popup():
