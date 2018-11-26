@@ -8,6 +8,7 @@ from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
+from DBFunctions import DBFunctions
 # Main method to handle setting up and managing the UI
 
 
@@ -45,7 +46,7 @@ def main():
     def reload_hosts_listbox():
         hosts_listbox.delete(0, tk.END)
         for host in scanned_hosts:
-            hosts_listbox.insert(tk.END, host.get_display_name())
+            hosts_listbox.insert(tk.END, host.get_display_val())
 
     def reload_vulnerabilities_listbox():
         vulnerabilities_listbox.delete(0, tk.END)
@@ -60,25 +61,22 @@ def main():
         waiting_scanner2 = STimer.do_after(update_left_header_label_random_waiting_msg, 30)
         waiting_scanner3 = STimer.do_after(update_left_header_label_random_waiting_msg, 45)
 
-        # ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
-        # hosts = scan_host_entry_var.get()
-        # scanner = Scanner(hosts, ports)
-        scanner = Scanner('192.168.1.0/28', '7-300')
-        print("Scan start")
-        result = scanner.host_discover()
-        print("MAC: ", result)
-        result = scanner.get_os_service_scan_details()
-        print("OS: ", result)
-        print("Scan END")
-
-        # scanner.fast_scan()
-        # scanner.host_discover()
+        ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
+        hosts = scan_host_entry_var.get()
+        scanner = Scanner(hosts, ports)
         nonlocal scanned_hosts
+        print("Scan start")
         set_host(scanner.get_os_service_scan_details())
+        print("Scan END")
         scan_button.config(state="normal")
         scan_end_date = datetime.datetime.now()
         timedelta = scan_end_date - scan_start_date
         timedelta.total_seconds()
+        last_row_id = DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
+
+        for host in get_hosts():
+            DBFunctions.save_host(host, last_row_id)
+
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
         waiting_scanner1.cancel()
@@ -89,6 +87,10 @@ def main():
         nonlocal scanned_hosts
         scanned_hosts = h
         reload_hosts_listbox()
+
+    def get_hosts():
+        nonlocal scanned_hosts
+        return scanned_hosts
 
     # Click Handlers
     def on_scan():
@@ -109,8 +111,9 @@ def main():
         # Note here that Tkinter passes an event object to onselect()
         listbox = evt.widget
         index = int(listbox.curselection()[0])
-        selected_host = scanned_hosts[index].get_ip()
-        host_name_entry_var.set(selected_host)
+        host_name_entry_var.set(scanned_hosts[index].get_display_name())
+        mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
+        port_number_entry_var.set(scanned_hosts[index].get_ip())
 
     def new_device_popup():
         dp.DevicePopup.new_popup()
@@ -226,7 +229,9 @@ def main():
     mac_address_label = tk.Label(mac_address_frame, text="MAC Address:")
     mac_address_label.grid(row=0, column=0, padx=(16, 0))
 
-    mac_address_text_entry = tk.Entry(mac_address_frame)
+    mac_address_entry_var = tk.StringVar()
+    mac_address_entry_var.set("")
+    mac_address_text_entry = tk.Entry(mac_address_frame, textvariable=mac_address_entry_var)
     mac_address_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
     #  Port Number UI
@@ -234,10 +239,12 @@ def main():
     port_number_frame.grid(row=3, column=0, sticky="nsew", pady=(0, 8))
     port_number_frame.grid_columnconfigure(1, weight=1)
 
-    port_number_label = tk.Label(port_number_frame, text="Port Number:")
+    port_number_label = tk.Label(port_number_frame, text="IP:")
     port_number_label.grid(row=0, column=0, padx=(16, 0))
 
-    port_number_text_entry = tk.Entry(port_number_frame)
+    port_number_entry_var = tk.StringVar()
+    port_number_entry_var.set("")
+    port_number_text_entry = tk.Entry(port_number_frame, textvariable=port_number_entry_var)
     port_number_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
     # Check Vulnerabilities UI

@@ -48,11 +48,6 @@ class Scanner:
         return self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
 
     def get_os_details(self, result, host):
-        print("--")
-        print(result['scan'][host])
-        print("--")
-        print(result['scan'][host]["osmatch"])
-        print("--")
         if result['scan'][host]["osmatch"] is not None and len(result['scan'][host]["osmatch"]) > 0:
             name = result['scan'][host]["osmatch"][0]["name"]
             os_family = result['scan'][host]["osmatch"][0]["osclass"][0]["osfamily"]
@@ -61,9 +56,9 @@ class Scanner:
         else:
             return ["", "", ""]
 
-    def get_vendor(self, result, host):
-        if "vendor" in result and host in result["vendor"]:
-            return result["vendor"][host]
+    def get_vendor(self, result, mac):
+        if "vendor" in result and mac in result["vendor"]:
+            return result["vendor"][mac]
         else:
             return ""
 
@@ -80,20 +75,18 @@ class Scanner:
         hosts = []
         if self._scanned:
             # for each host scanned
-            print("MUCHO DETAILS")
             for host in self._scanner.all_hosts():
-                print("HOST: ")
-                print("==================")
+                print("-----------------")
                 print(result['scan'][host])
-                print("==================")
+                print("-----------------")
                 state = result['scan'][host]["status"]["state"]
                 mac = self.get_mac_address(result, host)
-                vendor = self.get_vendor(result, host)
+                vendor = self.get_vendor(result, mac)
                 val_arr = self.get_os_details(result, host)
                 name = val_arr[0]
                 os_gen = val_arr[1]
                 os_family = val_arr[2]
-                hosts.append(Host(host, state, name, os_family, os_gen, " ", mac))
+                hosts.append(Host(host, state, name, os_family, os_gen, vendor, mac))
 
         return hosts
 
