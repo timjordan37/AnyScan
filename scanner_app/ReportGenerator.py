@@ -27,6 +27,10 @@ def list():
     rows = cursor.fetchall();
     return render_template("DatabaseTemplate.html", rows=rows)
 
+    cursor.execute('SELECT * from Hosts')
+    rows = cursor.fetchall();
+    return render_template("DatabaseTemplate.html", row=rows)
+
     cursor.execute('SELECT * from Parameters')
     rows = cursor.fetchall();
     return render_template("DatabaseTemplate.html", rows=rows)
