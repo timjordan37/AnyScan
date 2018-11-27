@@ -101,6 +101,9 @@ def main():
     def on_check_vulnerabilities():
         print("User clicked 'check vulnerabilities'")
 
+    def new_vuln_popup():
+        vp.VulnPopup.new_popup()
+
     def on_details():
         print("User clicked 'Details'")
 
@@ -118,8 +121,6 @@ def main():
     def new_device_popup():
         dp.DevicePopup.new_popup()
 
-    def new_vuln_popup():
-        vp.VulnPopup.new_popup()
 
 
     # Variables
@@ -268,6 +269,11 @@ def main():
 
     vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report", command=on_report)
     vulnerability_report_button.grid(row=0, column=1)
+
+    add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
+                                           command=new_vuln_popup)
+    add_vulnerabilities_button.grid(row=0, column=2)
+
 
     #################
     # Setup File Menu

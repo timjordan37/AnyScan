@@ -17,11 +17,8 @@ class Scanner:
     def host_discover(self):
         """Scans for live host that respond to pings"""
         self._scanned = True
-        # return self._scanner.scan(self._ips, self._ports)
         return self._scanner.scan(self._ips, arguments='-sP', sudo=True)
 
-    # Won't run from pycharm because stealth scans require sudo and pycharm doesn't have a
-    # console to ask for password. Researching further.
     def full_scan(self):
         """Performs a full TCP scan with service discovery, good for initial scans"""
         self._scanned = True
@@ -48,17 +45,22 @@ class Scanner:
         return self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
 
     def get_os_details(self, result, host):
-        if result['scan'][host]["osmatch"] is not None and len(result['scan'][host]["osmatch"]) > 0:
+        if "osmatch" in result['scan'][host] and len(result['scan'][host]["osmatch"]) > 0:
             name = result['scan'][host]["osmatch"][0]["name"]
             os_family = result['scan'][host]["osmatch"][0]["osclass"][0]["osfamily"]
             os_gen = result['scan'][host]["osmatch"][0]["osclass"][0]["osgen"]
-            return [name, os_family, os_gen];
+            return [name, os_family, os_gen]
+        elif "osclass" in result['scan'][host]:
+            name = result['scan'][host]['osclass']['vendor']
+            os_family = result['scan'][host]['osclass']['osfamily']
+            os_gen = result['scan'][host]['osclass']['osgen']
+            return [name, os_family, os_gen]
         else:
             return ["", "", ""]
 
-    def get_vendor(self, result, mac):
-        if "vendor" in result and mac in result["vendor"]:
-            return result["vendor"][mac]
+    def get_vendor(self, result, host, mac):
+        if "vendor" in result['scan'][host] and mac in result['scan'][host]['vendor']:
+            return result['scan'][host]['vendor'][mac]
         else:
             return ""
 
@@ -68,6 +70,7 @@ class Scanner:
         else:
             return ""
 
+# Requires sudo must be ran from commandline
     def get_os_service_scan_details(self):
         """Runs scan to detemine OS and running service of given host"""
         self._scanned = True
@@ -81,7 +84,7 @@ class Scanner:
                 print("-----------------")
                 state = result['scan'][host]["status"]["state"]
                 mac = self.get_mac_address(result, host)
-                vendor = self.get_vendor(result, mac)
+                vendor = self.get_vendor(result, host, mac)
                 val_arr = self.get_os_details(result, host)
                 name = val_arr[0]
                 os_gen = val_arr[1]
@@ -89,6 +92,19 @@ class Scanner:
                 hosts.append(Host(host, state, name, os_family, os_gen, vendor, mac))
 
         return hosts
+
+    def get_cpes(self):
+        """Returns CPEs found from scan"""
+        cpes = []
+        if self._scanned:
+            for host in self._scanner.all_hosts():
+                if 'tcp' in self._scanner[host]:
+                    for port in self._scanner[host]['tcp']:
+                        if 'cpe' in self._scanner[host]['tcp'][port] and self._scanner[host]['tcp'][port]['cpe'] != '':
+                            cpes.append(self._scanner[host]['tcp'][port]['cpe'])
+        else:
+            raise ScannerError("ERROR: A scan has not yet been conducted!")
+        print(cpes)
 
     def get_hosts(self):
         """Return all hosts found during scan"""
