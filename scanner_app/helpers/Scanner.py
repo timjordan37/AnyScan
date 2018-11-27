@@ -95,16 +95,18 @@ class Scanner:
 
     def get_cpes(self):
         """Returns CPEs found from scan"""
-        cpes = []
+        full_cpes = {}
+        host_cpes = []
         if self._scanned:
             for host in self._scanner.all_hosts():
                 if 'tcp' in self._scanner[host]:
                     for port in self._scanner[host]['tcp']:
                         if 'cpe' in self._scanner[host]['tcp'][port] and self._scanner[host]['tcp'][port]['cpe'] != '':
-                            cpes.append(self._scanner[host]['tcp'][port]['cpe'])
+                            host_cpes.append(self._scanner[host]['tcp'][port]['cpe'])
+                full_cpes[host] = host_cpes
+            return full_cpes
         else:
             raise ScannerError("ERROR: A scan has not yet been conducted!")
-        print(cpes)
 
     def get_hosts(self):
         """Return all hosts found during scan"""
