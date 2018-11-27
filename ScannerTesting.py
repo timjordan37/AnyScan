@@ -1,4 +1,4 @@
-from Scanner import *
+from scanner_app.helpers.Scanner import *
 
 # Test scanning on local gateway (router)
 testScan = Scanner('192.168.1.1', '7-1024')
