@@ -1,5 +1,5 @@
 import tkinter as tk
-import scanner_app.DBFunctions as df
+import DBFunctions as df
 
 
 class VulnPopup():
