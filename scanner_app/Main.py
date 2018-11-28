@@ -20,6 +20,9 @@ def main():
 
     # UI Updating Method
     def update_left_header_label(value):
+        """UI Updating Method
+        :param value: value to be set in left header
+        """
         if value is None:
             # if the provided value is none, then update to the default header
             host_count = len(scanned_hosts)
@@ -30,6 +33,7 @@ def main():
             left_frame_header_label_var.set(value)
 
     def update_left_header_label_random_waiting_msg():
+        """Update waiting header randomly"""
         random_waiting_responses = [
             "This may take a while...",
             "I'm sorry this will be a while...",
@@ -39,21 +43,25 @@ def main():
         update_left_header_label(random.choice(random_waiting_responses))
 
     def reset_left_header_label():
+        """Update left header with number of hosts scanned"""
         host_count = len(scanned_hosts)
         host_count_text = f"({host_count}) Hosts Scanned".format()
         left_frame_header_label_var.set(host_count_text)
 
     def reload_hosts_listbox():
+        """Update hosts box with scanned hosts"""
         hosts_listbox.delete(0, tk.END)
         for host in scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_val())
 
     def reload_vulnerabilities_listbox():
+        """Update vulnerabilites box with found vulnerabilites"""
         vulnerabilities_listbox.delete(0, tk.END)
         for vulnerability in vulnerabilities:
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
     def scan_thread_completion():
+        """Scan given inputs, update associated ui, and save scan data"""
         scan_start_date = datetime.datetime.now()
         update_left_header_label("Scan in process...")
         scan_button.config(state="disabled")
@@ -89,33 +97,43 @@ def main():
         waiting_scanner3.cancel()
 
     def set_host(h):
+        """Set scanned hosts for ui
+        :param h: hosts found
+        """
         nonlocal scanned_hosts
         scanned_hosts = h
         reload_hosts_listbox()
 
     def get_hosts():
+        """Get scanned hosts"""
         nonlocal scanned_hosts
         return scanned_hosts
 
     # Click Handlers
     def on_scan():
+        """Click handler for scan btn to start scanner thread"""
         # MAKE SURE TO VALIDATE INPUT
         scan_thread = SThread(0, "SCAN_THREAD_1", 5, scan_thread_completion)
         scan_thread.start()
 
     def on_check_vulnerabilities():
+        """Click hanlder for check vulnerabilities button"""
         print("User clicked 'check vulnerabilities'")
 
     def new_vuln_popup():
+        """Click handler for new vuln button"""
         vp.VulnPopup.new_popup()
 
     def on_details():
+        """Click handler for details button"""
         print("User clicked 'Details'")
 
     def on_report():
+        """Click hanlder for report button"""
         print("User clicked 'Report'")
 
     def on_host_listbox_select(evt):
+        """Click handler to update right ui when user clicks on a host in left box"""
         # Note here that Tkinter passes an event object to onselect()
         listbox = evt.widget
         index = int(listbox.curselection()[0])
@@ -124,6 +142,7 @@ def main():
         port_number_entry_var.set(scanned_hosts[index].get_ip())
 
     def new_device_popup():
+        """Click handler for new device button"""
         dp.DevicePopup.new_popup()
 
 

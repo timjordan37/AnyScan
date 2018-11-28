@@ -45,6 +45,10 @@ class DBFunctions():
     # Saves a scan to the database
     @staticmethod
     def save_scan(Date, Duration):
+        """Save a scan to the Db
+
+        :param Duration: time scan took to complete
+        """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
@@ -67,6 +71,7 @@ class DBFunctions():
     @staticmethod
     def save_host(host, scanID):
         """Saves a scan to the database
+
         :param scanID: scan ID
         """
         conn = sqlite3.connect('vulnDB.db')

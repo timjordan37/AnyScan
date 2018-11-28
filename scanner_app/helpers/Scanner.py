@@ -46,7 +46,11 @@ class Scanner:
         return self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
 
     def get_os_details(self, result, host):
-        """Return host information from a scan given results and specific host"""
+        """Return host information from a scan given results and specific host
+
+        :param result: scan results dictionary
+        :param host: host ip to get os details from
+        """
         if "osmatch" in result['scan'][host] and len(result['scan'][host]["osmatch"]) > 0:
             name = result['scan'][host]["osmatch"][0]["name"]
             os_family = result['scan'][host]["osmatch"][0]["osclass"][0]["osfamily"]
@@ -61,14 +65,23 @@ class Scanner:
             return ["", "", ""]
 
     def get_vendor(self, result, host, mac):
-        """Given results, host, and mac return vendor if found, check for empty string"""
+        """Given results, host, and mac return vendor if found, check for empty string
+
+        :param result: scan results dictionary
+        :param host: host ip to get vendor from
+        :param mac: mac address to get vendor from
+        """
         if "vendor" in result['scan'][host] and mac in result['scan'][host]['vendor']:
             return result['scan'][host]['vendor'][mac]
         else:
             return ""
 
     def get_mac_address(self, result, host):
-        """Given results and host return mac if found, check for empty string"""
+        """Given results and host return mac if found, check for empty string
+
+        :param result: scan results dictionary
+        :param host: host ip to get mac from
+        """
         if "mac" in result['scan'][host]["addresses"]:
             return result['scan'][host]["addresses"]["mac"]
         else:
