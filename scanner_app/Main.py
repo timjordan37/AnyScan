@@ -101,10 +101,6 @@ def main():
     def new_vuln_popup():
         vp.VulnPopup.new_popup()
 
-
-
-
-
     # Variables
     vulnerabilities = []
     scanned_hosts = []
