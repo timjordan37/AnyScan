@@ -44,18 +44,43 @@ class DBFunctions():
 
     # Saves a scan to the database
     @staticmethod
-    def save_scan(Date, Model, Duration,):
+    def save_scan(Date, Duration):
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
-        cursor.execute('SELECT MAX(ScanID) FROM History')
+        cursor.execute('SELECT MAX(ScanID) FROM ScanHistory')
+        conn.commit()
+
+        maxIDTuple = cursor.fetchone()
+        maxID = 0
+        if maxIDTuple is not None:
+            maxID = maxIDTuple[0]
+            maxID += 1
+
+        scanID = maxID
+
+        scan_info = (scanID, Date, Duration)
+        cursor.execute('''INSERT INTO ScanHistory VALUES(?, ?, ?)''', scan_info)
+        conn.commit()
+        return cursor.lastrowid
+
+    # Saves a scan to the database
+    @staticmethod
+    def save_host(host, scanID):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT MAX(HostID) FROM Hosts')
         conn.commit()
         maxIDTuple = cursor.fetchone()
-        maxID = maxIDTuple[0]
-        scanID = maxID + 1
+        maxID = 0
+        if maxIDTuple is not None and maxIDTuple[0] is not None:
+            maxID = maxIDTuple[0]
+            maxID += 1
 
-        scan_info = (scanID, Date, Model, Duration)
-        cursor.execute('INSERT INTO  VALUES(?, ?, ?, ?', scan_info)
+        hostID = maxID
+        scan_info = (hostID, host._ip, host._macAddress, host._osFamily, host._osGen, host._name, host._vendor, scanID)
+        cursor.execute('''INSERT INTO Hosts VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', scan_info)
         conn.commit()
 
     # Builds the database
@@ -71,7 +96,9 @@ class DBFunctions():
             priviligesRequired TEXT, userInteraction TEXT, confidentialityImpact TEXT, integrityImpact TEXT, availabilityImpact TEXT,
             baseScore TEXT, baseSeverity TEXT, exploitabilityScore INTEGER, FOREIGN KEY(Model) REFERENCES Devices(Model))''')
         cursor.execute(
-            '''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, Model TEXT, ScanDate TEXT, Duration INTEGER)''')
+            '''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, ScanDate TEXT, Duration INTEGER)''')
+        cursor.execute(
+            '''CREATE TABLE Hosts (HostID INTEGER PRIMARY KEY, ip TEXT, macAddress TEXT, osFamily TEXT, osGen TEXT, name TEXT, vendor TEXT, ScanID INTEGER, FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
         conn.commit()
         cursor.execute(
             '''CREATE TABLE Parameters (ScanID INTEGER, ParameterValue TEXT, ParameterType TEXT, PRIMARY KEY(ScanID, ParameterType))''')
