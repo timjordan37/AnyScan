@@ -1,15 +1,19 @@
 import tkinter as tk
+import VulnPopup as vp
+import DevicePopup as dp
+import DBFunctions as df
+from pathlib import Path
 import random
-
-from scanner_app.helpers.Scanner import Scanner
-from scanner_app.util.SThread import SThread
-from scanner_app.util.STime import STimer
-
+from helpers.Scanner import Scanner
+from util.SThread import SThread
+from util.STime import STimer
+import datetime
+from DBFunctions import DBFunctions
 # Main method to handle setting up and managing the UI
 
 
 # Constants
-HOME_IP = '127.0.0.1'
+HOME_IP = '192.168.1.1'
 
 def main():
     print("Scanner App Started...")
@@ -18,9 +22,9 @@ def main():
     def update_left_header_label(value):
         if value is None:
             # if the provided value is none, then update to the default header
-            device_count = len(devices)
-            device_count_text = f"({device_count}) Devices Scanned".format()
-            left_frame_header_label_var.set(device_count_text)
+            host_count = len(scanned_hosts)
+            host_count_text = f"({host_count}) Hosts Scanned".format()
+            left_frame_header_label_var.set(host_count_text)
         else:
             # else
             left_frame_header_label_var.set(value)
@@ -34,16 +38,15 @@ def main():
         ]
         update_left_header_label(random.choice(random_waiting_responses))
 
-
     def reset_left_header_label():
-        device_count = len(devices)
-        device_count_text = f"({device_count}) Devices Scanned".format()
-        left_frame_header_label_var.set(device_count_text)
+        host_count = len(scanned_hosts)
+        host_count_text = f"({host_count}) Hosts Scanned".format()
+        left_frame_header_label_var.set(host_count_text)
 
-    def reload_devices_listbox():
-        devices_listbox.delete(0, tk.END)
-        for device in devices:
-            devices_listbox.insert(tk.END, device)
+    def reload_hosts_listbox():
+        hosts_listbox.delete(0, tk.END)
+        for host in scanned_hosts:
+            hosts_listbox.insert(tk.END, host.get_display_val())
 
     def reload_vulnerabilities_listbox():
         vulnerabilities_listbox.delete(0, tk.END)
@@ -51,6 +54,7 @@ def main():
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
     def scan_thread_completion():
+        scan_start_date = datetime.datetime.now()
         update_left_header_label("Scan in process...")
         scan_button.config(state="disabled")
         waiting_scanner1 = STimer.do_after(update_left_header_label_random_waiting_msg, 15)
@@ -58,16 +62,35 @@ def main():
         waiting_scanner3 = STimer.do_after(update_left_header_label_random_waiting_msg, 45)
 
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
-        scanner = Scanner(HOME_IP, ports)
-        scanner.fast_scan()
-        scanner.host_discover()
-        scanner.print_scan()
+        hosts = scan_host_entry_var.get()
+        scanner = Scanner(hosts, ports)
+        nonlocal scanned_hosts
+        print("Scan start")
+        set_host(scanner.get_os_service_scan_details())
+        print("Scan END")
         scan_button.config(state="normal")
-        update_left_header_label("Scan finished")
+        scan_end_date = datetime.datetime.now()
+        timedelta = scan_end_date - scan_start_date
+        timedelta.total_seconds()
+        last_row_id = DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
+
+        for host in get_hosts():
+            DBFunctions.save_host(host, last_row_id)
+
+        update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
         waiting_scanner1.cancel()
         waiting_scanner2.cancel()
         waiting_scanner3.cancel()
+
+    def set_host(h):
+        nonlocal scanned_hosts
+        scanned_hosts = h
+        reload_hosts_listbox()
+
+    def get_hosts():
+        nonlocal scanned_hosts
+        return scanned_hosts
 
     # Click Handlers
     def on_scan():
@@ -84,9 +107,24 @@ def main():
     def on_report():
         print("User clicked 'Report'")
 
+    def on_host_listbox_select(evt):
+        # Note here that Tkinter passes an event object to onselect()
+        listbox = evt.widget
+        index = int(listbox.curselection()[0])
+        host_name_entry_var.set(scanned_hosts[index].get_display_name())
+        mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
+        port_number_entry_var.set(scanned_hosts[index].get_ip())
+
+    def new_device_popup():
+        dp.DevicePopup.new_popup()
+
+    def new_vuln_popup():
+        vp.VulnPopup.new_popup()
+
+
     # Variables
-    devices = []
     vulnerabilities = []
+    scanned_hosts = []
 
     # Setup root ui
     root = tk.Tk()
@@ -108,14 +146,29 @@ def main():
     left_frame_header_label = tk.Label(left_frame, textvariable=left_frame_header_label_var)
     left_frame_header_label.grid(row=0, column=0)
 
-    # Setup Left frame DevicesListbox
-    devices_listbox = tk.Listbox(left_frame)
-    devices_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
-    reload_devices_listbox()
+    # Setup Left frame HostListbox
+    hosts_listbox = tk.Listbox(left_frame, width="30")
+    hosts_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
+    hosts_listbox.bind('<<ListboxSelect>>', on_host_listbox_select)
+    reload_hosts_listbox()
+
+    # Setup scan host frame
+    scan_host_frame = tk.Frame(left_frame)
+    scan_host_frame.grid(row=2, column=0)
+
+    # Setup scan host label
+    scan_host_label = tk.Label(scan_host_frame, text="Hosts:")
+    scan_host_label.grid(row=0, column=0)
+
+    # Setup scan host entry
+    scan_host_entry_var = tk.StringVar()
+    scan_host_entry_var.set("192.168.1.0/28")
+    scan_host_entry = tk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
+    scan_host_entry.grid(row=0, column=1)
 
     ## Setup scan port label frame
     scan_port_label_frame = tk.Frame(left_frame)
-    scan_port_label_frame.grid(row=2, column=0)
+    scan_port_label_frame.grid(row=3, column=0)
 
     ## Setup scan port label
     port_start_label = tk.Label(scan_port_label_frame, text="Start Port")
@@ -126,7 +179,7 @@ def main():
 
     ## Setup scan port frame
     scan_port_frame = tk.Frame(left_frame)
-    scan_port_frame.grid(row=3, column=0)
+    scan_port_frame.grid(row=4, column=0)
 
     ## Setup scan port entries
     port_start_entry_var = tk.StringVar()
@@ -141,7 +194,7 @@ def main():
 
     # Setup Left frame scan button
     scan_button = tk.Button(left_frame, text="Scan", command=on_scan)
-    scan_button.grid(row=4, column=0, pady=(8, 8))
+    scan_button.grid(row=5, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
@@ -152,19 +205,21 @@ def main():
     right_frame.grid_columnconfigure(0, weight=1)
 
     # Right frame header label
-    right_frame_header_label = tk.Label(right_frame, text="Device Info")
+    right_frame_header_label = tk.Label(right_frame, text="Host Info")
     right_frame_header_label.grid(row=0, column=0, pady=(8, 8))
 
-    #  Device name UI
-    device_name_frame = tk.Frame(right_frame)
-    device_name_frame.grid(row=1, column=0, sticky="nsew")
-    device_name_frame.grid_columnconfigure(1, weight=1)
+    #  Host name UI
+    host_name_frame = tk.Frame(right_frame)
+    host_name_frame.grid(row=1, column=0, sticky="nsew")
+    host_name_frame.grid_columnconfigure(1, weight=1)
 
-    device_name_label = tk.Label(device_name_frame, text="Device Name:")
-    device_name_label.grid(row=0, column=0, padx=(16, 0))
+    host_name_label = tk.Label(host_name_frame, text="Host Name:")
+    host_name_label.grid(row=0, column=0, padx=(16, 0))
 
-    device_name_text_entry = tk.Entry(device_name_frame)
-    device_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
+    host_name_entry_var = tk.StringVar()
+    host_name_entry_var.set("")
+    host_name_text_entry = tk.Entry(host_name_frame, textvariable=host_name_entry_var)
+    host_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
     #  MAC Address UI
     mac_address_frame = tk.Frame(right_frame)
@@ -174,7 +229,9 @@ def main():
     mac_address_label = tk.Label(mac_address_frame, text="MAC Address:")
     mac_address_label.grid(row=0, column=0, padx=(16, 0))
 
-    mac_address_text_entry = tk.Entry(mac_address_frame)
+    mac_address_entry_var = tk.StringVar()
+    mac_address_entry_var.set("")
+    mac_address_text_entry = tk.Entry(mac_address_frame, textvariable=mac_address_entry_var)
     mac_address_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
     #  Port Number UI
@@ -182,10 +239,12 @@ def main():
     port_number_frame.grid(row=3, column=0, sticky="nsew", pady=(0, 8))
     port_number_frame.grid_columnconfigure(1, weight=1)
 
-    port_number_label = tk.Label(port_number_frame, text="Port Number:")
+    port_number_label = tk.Label(port_number_frame, text="IP:")
     port_number_label.grid(row=0, column=0, padx=(16, 0))
 
-    port_number_text_entry = tk.Entry(port_number_frame)
+    port_number_entry_var = tk.StringVar()
+    port_number_entry_var.set("")
+    port_number_text_entry = tk.Entry(port_number_frame, textvariable=port_number_entry_var)
     port_number_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
     # Check Vulnerabilities UI
@@ -210,12 +269,27 @@ def main():
     vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report", command=on_report)
     vulnerability_report_button.grid(row=0, column=1)
 
+    #################
+    # Setup File Menu
+    #################
+
+    # Creating the menu
+    file_menu = tk.Menu(root)
+    file_menu.add_command(label="Add new Device", command=new_device_popup)
+    file_menu.add_command(label="Add new Vulnerability", command=new_vuln_popup)
+
+    # Display the menu
+    root.config(menu=file_menu)
+
     # Run the program with UI
-    root.geometry("500x400")
-    root.minsize(500, 400)
+    root.geometry("600x500")
+    root.minsize(600, 500)
     root.mainloop()
 
 
 #  Runs the main method if this file is called to run
 if __name__ == '__main__':
+    db_location = Path("vulnDB.db")
+    if not db_location.exists():
+        df.DBFunctions.build_db()
     main()

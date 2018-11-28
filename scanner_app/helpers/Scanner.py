@@ -1,5 +1,7 @@
 import nmap
 
+from models.Host import Host
+
 class Scanner:
     """Scanner class wraps nmap scans for quick scan types"""
     _ips = ''
@@ -15,8 +17,8 @@ class Scanner:
     def host_discover(self):
         """Scans for live host that respond to pings"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports)
-        # return self._scanner.scan(self._ips, self._ports, arguments='-sP')
+        # return self._scanner.scan(self._ips, self._ports)
+        return self._scanner.scan(self._ips, arguments='-sP', sudo=True)
 
     # Won't run from pycharm because stealth scans require sudo and pycharm doesn't have a
     # console to ask for password. Researching further.
@@ -43,7 +45,50 @@ class Scanner:
     def detect_os_service_scan(self):
         """Runs scan to detemine OS and running service of given host"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports, arguments='-A')
+        return self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
+
+    def get_os_details(self, result, host):
+        if result['scan'][host]["osmatch"] is not None and len(result['scan'][host]["osmatch"]) > 0:
+            name = result['scan'][host]["osmatch"][0]["name"]
+            os_family = result['scan'][host]["osmatch"][0]["osclass"][0]["osfamily"]
+            os_gen = result['scan'][host]["osmatch"][0]["osclass"][0]["osgen"]
+            return [name, os_family, os_gen];
+        else:
+            return ["", "", ""]
+
+    def get_vendor(self, result, mac):
+        if "vendor" in result and mac in result["vendor"]:
+            return result["vendor"][mac]
+        else:
+            return ""
+
+    def get_mac_address(self, result, host):
+        if "mac" in result['scan'][host]["addresses"]:
+            return result['scan'][host]["addresses"]["mac"]
+        else:
+            return ""
+
+    def get_os_service_scan_details(self):
+        """Runs scan to detemine OS and running service of given host"""
+        self._scanned = True
+        result = self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
+        hosts = []
+        if self._scanned:
+            # for each host scanned
+            for host in self._scanner.all_hosts():
+                print("-----------------")
+                print(result['scan'][host])
+                print("-----------------")
+                state = result['scan'][host]["status"]["state"]
+                mac = self.get_mac_address(result, host)
+                vendor = self.get_vendor(result, mac)
+                val_arr = self.get_os_details(result, host)
+                name = val_arr[0]
+                os_gen = val_arr[1]
+                os_family = val_arr[2]
+                hosts.append(Host(host, state, name, os_family, os_gen, vendor, mac))
+
+        return hosts
 
     def get_hosts(self):
         """Return all hosts found during scan"""
@@ -57,13 +102,13 @@ class Scanner:
         if self._scanned:
             return self._scanner.csv()
 
+
     def print_scan(self):
         """Print a scan result to the console with relevant information"""
         if self._scanned:
             # for each host scanned
             for host in self._scanner.all_hosts():
                 # print the ip and associated hostname if available and state
-                print('\nIP: %s\t State: %s' % (host, self._scanner[host].state()))
                 # for each protocol of the given host
                 for pro in self._scanner[host].all_protocols():
                     # print the protocol and all the port responses
