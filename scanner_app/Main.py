@@ -73,9 +73,12 @@ def main():
         hosts = scan_host_entry_var.get()
         scanner = Scanner(hosts, ports)
         nonlocal scanned_hosts
+
         print("Scan start")
         set_host(scanner.get_os_service_scan_details())
+        set_cpes_vulns(scanner.get_cpes())
         print("Scan END")
+
         scan_button.config(state="normal")
 
         # could get this from the scan itself
@@ -104,6 +107,14 @@ def main():
         scanned_hosts = h
         reload_hosts_listbox()
 
+    def set_cpes_vulns(c):
+        """Set vulnerabilities from cps"""
+        nonlocal cpes
+        cpes = c
+        # query
+        # todo reload after querying for cves and setting vulnerabilities[]
+        #reload_vulnerabilities_listbox()
+
     def get_hosts():
         """Get scanned hosts"""
         nonlocal scanned_hosts
@@ -118,6 +129,7 @@ def main():
 
     def on_check_vulnerabilities():
         """Click hanlder for check vulnerabilities button"""
+        # todo set_cpes_vulns() test
         print("User clicked 'check vulnerabilities'")
 
     def new_vuln_popup():
@@ -150,6 +162,7 @@ def main():
     # Variables
     vulnerabilities = []
     scanned_hosts = []
+    cpes ={}
 
     # Setup root ui
     root = tk.Tk()
@@ -276,9 +289,11 @@ def main():
     # Check Vulnerabilities UI
     #################
     #
+    # Check Vulnerabilities button
     check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities", command=on_check_vulnerabilities)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
 
+    # Vulnerabilities ListBox label
     vulnerabilities_header_label = tk.Label(right_frame, text="Vulnerabilities")
     vulnerabilities_header_label.grid(row=5, column=0)
 

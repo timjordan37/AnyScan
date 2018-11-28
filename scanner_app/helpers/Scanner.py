@@ -127,9 +127,7 @@ class Scanner:
 
     def query_db_cves(self):
         if self._scanned:
-            ## todo
             df.DBFunctions.query_cves(self.get_cpes())
-
 
     def get_hosts(self):
         """Return all hosts found during scan"""
@@ -142,7 +140,6 @@ class Scanner:
         """Return lastest scan information in csv format"""
         if self._scanned:
             return self._scanner.csv()
-
 
     def print_scan(self):
         """Print a scan result to the console with relevant information"""
@@ -158,6 +155,7 @@ class Scanner:
                     # for each port print its state
                     for port in ports:
                         print('Port: %s\tState: %s' %(port, self._scanner[host][pro][port]['state']))
+
 
 class ScannerError(Exception):
     """Raised when Scanner encounters a possible error to be handled accordingly"""

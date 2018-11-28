@@ -100,6 +100,7 @@ class DBFunctions():
         print("Query HERE")
         print(cpeDict)
 
+        # todo search db for cves with cpeDict
         #cursor.execute()
 
     @staticmethod
