@@ -19,8 +19,8 @@ class DBFunctions():
 
     #Saving a Vulnerability to the database
     @staticmethod
-    def save_vulnerability(Model, cpeName, cpe23URI, versionsAffected,
-                           description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
+    def save_vulnerability(cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
+                           customScoreReason, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore):
         conn = sqlite3.connect('vulnDB.db')
@@ -32,13 +32,13 @@ class DBFunctions():
         maxID = maxIDTuple[0]
         vulnID = maxID + 1
 
-        vulnerability_info = (vulnID, Model, cpeName, cpe23URI, versionsAffected,
-                           description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
+        vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
+                           customScoreReason, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore)
         try:
             cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
-                           '?, ?, ?, ?, ?,)''', vulnerability_info)
+                           '?, ?, ?)''', vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return "That device already exists in the database."
@@ -90,30 +90,60 @@ class DBFunctions():
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
-        cursor.execute('''CREATE TABLE Devices (Model TEXT PRIMARY KEY, Manufacturer TEXT, cpeURI TEXT)''')
-        cursor.execute('''CREATE TABLE CPEVulns (cpeURI TEXT, cveName TEXT, PRIMARY KEY(cpeURI, cveName)''')
+        cursor.execute('''CREATE TABLE Devices (Model TEXT PRIMARY KEY,
+             Manufacturer TEXT, 
+             cpeURI TEXT)''')
+        cursor.execute('''CREATE TABLE CPEVulns (
+            cpeURI TEXT, 
+            cveName TEXT, 
+            PRIMARY KEY(cpeURI, cveName)''')
         conn.commit()
-        cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, cveName TEXT,
-            description TEXT, CVSSScore INTEGER, attackVector TEXT, attackComplexity TEXT, customScore TEXT, customScoreReason TEXT
-            priviligesRequired TEXT, userInteraction TEXT, confidentialityImpact TEXT, integrityImpact TEXT, availabilityImpact TEXT,
-            baseScore TEXT, baseSeverity TEXT, exploitabilityScore INTEGER''')
-        cursor.execute(
-            '''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, ScanDate TEXT, Duration INTEGER)''')
-        cursor.execute(
-            '''CREATE TABLE Hosts (HostID INTEGER PRIMARY KEY, ip TEXT, macAddress TEXT, osFamily TEXT, osGen TEXT, name TEXT, vendor TEXT, ScanID INTEGER, FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
+            cveName TEXT,
+            description TEXT, 
+            CVSSScore INTEGER, 
+            attackVector TEXT, 
+            attackComplexity TEXT, 
+            customScore TEXT, 
+            customScoreReason TEXT
+            priviligesRequired TEXT, 
+            userInteraction TEXT, 
+            confidentialityImpact TEXT, 
+            integrityImpact TEXT, 
+            availabilityImpact TEXT,
+            baseScore TEXT, 
+            baseSeverity TEXT, 
+            exploitabilityScore INTEGER''')
+        cursor.execute('''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, 
+            ScanDate TEXT, 
+            Duration INTEGER)''')
+        cursor.execute('''CREATE TABLE Hosts (HostID INTEGER PRIMARY KEY, 
+            ip TEXT, 
+            macAddress TEXT, 
+            osFamily TEXT, 
+            osGen TEXT, name TEXT, 
+            vendor TEXT, 
+            ScanID INTEGER, 
+            FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
         conn.commit()
-        cursor.execute(
-            '''CREATE TABLE Parameters (ScanID INTEGER, ParameterValue TEXT, ParameterType TEXT, PRIMARY KEY(ScanID, ParameterType))''')
-        cursor.execute('''CREATE TABLE PenTestHistory (PenTestID INTEGER PRIMARY KEY, VulnID INTEGER, Model TEXT,
-            ScanID INTEGER, Result TEXT, FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), FOREIGN KEY(Model) REFERENCES Devices(Model), 
-            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        cursor.execute('''CREATE TABLE Parameters (ScanID INTEGER, 
+            ParameterValue TEXT, 
+            ParameterType TEXT, 
+            PRIMARY KEY(ScanID, ParameterType))''')
+        cursor.execute('''CREATE TABLE PenTestHistory (PenTestID INTEGER PRIMARY KEY, 
+            VulnID INTEGER, 
+            Model TEXT,
+            ScanID INTEGER, 
+            Result TEXT, 
+            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), 
+            FOREIGN KEY(Model) REFERENCES Devices(Model), 
+            FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
         conn.commit()
 
     # Imports Data from NVD JSON file
     @staticmethod
     def import_NVD_JSON():
-        json_nvd = json.load("nvdcve-1.0-2018.json")
-        for key, value in json_nvd:
+        print("Still to implement")
 
 
 
