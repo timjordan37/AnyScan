@@ -45,6 +45,7 @@ class Scanner:
         return self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
 
     def get_os_details(self, result, host):
+        """Return host information from a scan given results and specific host"""
         if "osmatch" in result['scan'][host] and len(result['scan'][host]["osmatch"]) > 0:
             name = result['scan'][host]["osmatch"][0]["name"]
             os_family = result['scan'][host]["osmatch"][0]["osclass"][0]["osfamily"]

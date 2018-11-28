@@ -25,7 +25,7 @@ class Host:
 
         if self._name != "":
             first_val = self._name
-        elif self._vendor != "" :
+        elif self._vendor != "":
             first_val = self._vendor
         else:
             first_val = self._ip
@@ -33,7 +33,8 @@ class Host:
         if self._macAddress != "":
             second_val = self._macAddress
         else:
-            second_val = self._state
+            second_val = 'State: '
+            second_val += self._state
 
         return f"{first_val} - {second_val}"
 

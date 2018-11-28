@@ -13,7 +13,7 @@ from DBFunctions import DBFunctions
 
 
 # Constants
-HOME_IP = '192.168.1.1'
+HOME_IP = '192.168.1.1' # default gateway, not really home
 
 def main():
     print("Scanner App Started...")
@@ -69,9 +69,14 @@ def main():
         set_host(scanner.get_os_service_scan_details())
         print("Scan END")
         scan_button.config(state="normal")
+
+        # could get this from the scan itself
         scan_end_date = datetime.datetime.now()
         timedelta = scan_end_date - scan_start_date
         timedelta.total_seconds()
+        ##
+
+
         last_row_id = DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
 
         for host in get_hosts():
@@ -248,48 +253,51 @@ def main():
     port_number_text_entry = tk.Entry(port_number_frame, textvariable=port_number_entry_var)
     port_number_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
+    #################
     # Check Vulnerabilities UI
+    #################
+    #
     check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities", command=on_check_vulnerabilities)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
 
     vulnerabilities_header_label = tk.Label(right_frame, text="Vulnerabilities")
     vulnerabilities_header_label.grid(row=5, column=0)
 
+    #################
     # Vulnerabilities ListBox
+    #################
+    #
     vulnerabilities_listbox = tk.Listbox(right_frame)
     vulnerabilities_listbox.grid(row=6, column=0, sticky="nsew", padx=(16, 16))
     reload_vulnerabilities_listbox()
 
+    #################
     # Vulnerabilities button frame
+    #################
+    #
     vulnerabilities_button_frame = tk.Frame(right_frame)
     vulnerabilities_button_frame.grid(row=7, column=0, pady=(8, 8))
 
+    # Details
     vulnerability_details_button = tk.Button(vulnerabilities_button_frame, text="Details", command=on_details)
     vulnerability_details_button.grid(row=0, column=0)
 
+    # Report
     vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report", command=on_report)
     vulnerability_report_button.grid(row=0, column=1)
-
+    # Add Vulnerability
     add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
                                            command=new_vuln_popup)
     add_vulnerabilities_button.grid(row=0, column=2)
 
+    # Add Device
+    add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=new_device_popup)
+    add_vulnerabilities_button.grid(row=0, column=3)
 
-    #################
-    # Setup File Menu
-    #################
-
-    # Creating the menu
-    file_menu = tk.Menu(root)
-    file_menu.add_command(label="Add new Device", command=new_device_popup)
-    file_menu.add_command(label="Add new Vulnerability", command=new_vuln_popup)
-
-    # Display the menu
-    root.config(menu=file_menu)
 
     # Run the program with UI
-    root.geometry("600x500")
-    root.minsize(600, 500)
+    root.geometry("800x500")
+    root.minsize(800, 500)
     root.mainloop()
 
 
