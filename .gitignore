@@ -13,4 +13,4 @@ venv/
 >>>>>>> develop
 
 # Local Db
-vulnDb.db
+vulnDB.db
