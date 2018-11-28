@@ -33,8 +33,7 @@ class Host:
         if self._macAddress != "":
             second_val = self._macAddress
         else:
-            second_val = 'State: '
-            second_val += self._state
+            second_val = 'State: ' + self._state
 
         return f"{first_val} - {second_val}"
 

@@ -64,9 +64,11 @@ class DBFunctions():
         conn.commit()
         return cursor.lastrowid
 
-    # Saves a scan to the database
     @staticmethod
     def save_host(host, scanID):
+        """Saves a scan to the database
+        :param scanID: scan ID
+        """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
@@ -83,9 +85,20 @@ class DBFunctions():
         cursor.execute('''INSERT INTO Hosts VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', scan_info)
         conn.commit()
 
-    # Builds the database
+    def query_cves(cpeDict):
+        """query DB for CVEs according to CPEs found by scanner
+        :param cpeDict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
+        """
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        print("Query HERE")
+        print(cpeDict)
+
+        #cursor.execute()
+
     @staticmethod
     def build_db():
+        """Build database"""
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 

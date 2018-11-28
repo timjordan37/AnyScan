@@ -1,4 +1,5 @@
 import nmap
+import DBFunctions as df
 
 from models.Host import Host
 
@@ -10,7 +11,7 @@ class Scanner:
     _scanned = False
 
     def __init__(self, ips, ports):
-        self._ips  = ips
+        self._ips = ips
         self._ports = ports
         self._scanner = nmap.PortScanner()
 
@@ -60,12 +61,14 @@ class Scanner:
             return ["", "", ""]
 
     def get_vendor(self, result, host, mac):
+        """Given results, host, and mac return vendor if found, check for empty string"""
         if "vendor" in result['scan'][host] and mac in result['scan'][host]['vendor']:
             return result['scan'][host]['vendor'][mac]
         else:
             return ""
 
     def get_mac_address(self, result, host):
+        """Given results and host return mac if found, check for empty string"""
         if "mac" in result['scan'][host]["addresses"]:
             return result['scan'][host]["addresses"]["mac"]
         else:
@@ -108,6 +111,12 @@ class Scanner:
             return full_cpes
         else:
             raise ScannerError("ERROR: A scan has not yet been conducted!")
+
+    def query_db_cves(self):
+        if self._scanned:
+            ## todo
+            df.DBFunctions.query_cves(self.get_cpes())
+
 
     def get_hosts(self):
         """Return all hosts found during scan"""
