@@ -1,4 +1,5 @@
 import sqlite3
+import json
 
 class DBFunctions():
 
@@ -90,11 +91,12 @@ class DBFunctions():
         cursor = conn.cursor()
 
         cursor.execute('''CREATE TABLE Devices (Model TEXT PRIMARY KEY, Manufacturer TEXT, cpeURI TEXT)''')
+        cursor.execute('''CREATE TABLE CPEVulns (cpeURI TEXT, cveName TEXT, PRIMARY KEY(cpeURI, cveName)''')
         conn.commit()
-        cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, Model, cpeName TEXT, cpe22uri TEXT , 
-            cpe23uri TEXT, versionsAffected TEXT, description TEXT, CVSSScore INTEGER, attackVector TEXT, attackComplexity TEXT,
+        cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, cveName TEXT,
+            description TEXT, CVSSScore INTEGER, attackVector TEXT, attackComplexity TEXT, customScore TEXT, customScoreReason TEXT
             priviligesRequired TEXT, userInteraction TEXT, confidentialityImpact TEXT, integrityImpact TEXT, availabilityImpact TEXT,
-            baseScore TEXT, baseSeverity TEXT, exploitabilityScore INTEGER, FOREIGN KEY(Model) REFERENCES Devices(Model))''')
+            baseScore TEXT, baseSeverity TEXT, exploitabilityScore INTEGER''')
         cursor.execute(
             '''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, ScanDate TEXT, Duration INTEGER)''')
         cursor.execute(
@@ -106,4 +108,15 @@ class DBFunctions():
             ScanID INTEGER, Result TEXT, FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), FOREIGN KEY(Model) REFERENCES Devices(Model), 
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
         conn.commit()
+
+    # Imports Data from NVD JSON file
+    @staticmethod
+    def import_NVD_JSON():
+        json_nvd = json.load("nvdcve-1.0-2018.json")
+        for key, value in json_nvd:
+
+
+
+
+
 
