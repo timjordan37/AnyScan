@@ -4,7 +4,7 @@ import DevicePopup as dp
 import DBFunctions as df
 from pathlib import Path
 import random
-from helpers.Scanner import Scanner
+from scanner_app.helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
@@ -13,6 +13,8 @@ from DBFunctions import DBFunctions
 
 
 # Constants
+from scanner_app.ReportGenerator import ReportGenerator
+
 HOME_IP = '192.168.1.1'
 
 def main():
@@ -106,6 +108,7 @@ def main():
 
     def on_report():
         print("User clicked 'Report'")
+        ReportGenerator.generatereport()
 
     def on_host_listbox_select(evt):
         # Note here that Tkinter passes an event object to onselect()

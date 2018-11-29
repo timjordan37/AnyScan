@@ -1,8 +1,9 @@
 import sqlite3
 
+
 class DBFunctions():
 
-    #Saves a new device to the database
+    # Saves a new device to the database
     @staticmethod
     def save_device(deviceName, deviceManufacturer, cpeURI):
         conn = sqlite3.connect('vulnDB.db')
@@ -16,7 +17,7 @@ class DBFunctions():
 
         return True
 
-    #Saving a Vulnerability to the database
+    # Saving a Vulnerability to the database
     @staticmethod
     def save_vulnerability(Model, cpeName, cpe23URI, versionsAffected,
                            description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
@@ -32,9 +33,9 @@ class DBFunctions():
         vulnID = maxID + 1
 
         vulnerability_info = (vulnID, Model, cpeName, cpe23URI, versionsAffected,
-                           description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
-                           userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
-                           baseScore, baseSeverity, exploitabilityScore)
+                              description, CVSSScore, attackVector, attackComplexity, priviledgesRequired,
+                              userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                              baseScore, baseSeverity, exploitabilityScore)
         try:
             cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
                            '?, ?, ?, ?, ?,)''', vulnerability_info)
@@ -106,4 +107,3 @@ class DBFunctions():
             ScanID INTEGER, Result TEXT, FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), FOREIGN KEY(Model) REFERENCES Devices(Model), 
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
         conn.commit()
-

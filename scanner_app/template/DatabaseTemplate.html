@@ -6,21 +6,21 @@
         <table border = 1>
             <h2>Devices</h2>
 
-                {% for row in rows %}
+                {% for row1 in row1 %}
                 <tr>
                     <th>deviceName</th>
                     <td>{{row["deviceName"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row1 in row1 %}
                 <tr>
                     <th>deviceManufacturer</th>
                     <td>{{row["deviceManufacturer"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row1 in row1 %}
                 <tr>
                     <th>cpeURI</th>
                     <td>{{row["cpeURI"]}}</td>
@@ -31,126 +31,126 @@
         <table border = 1>
             <h2>Vulnerabilities</h2>
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>vulnID</th>
                     <td>{{row["vulnID"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>Model</th>
                     <td>{{row["Model"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>cpeName</th>
                     <td>{{row["cpeName"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>cpe22uri</th>
                     <td>{{row["cpe22uri"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>cpe23uri</th>
                     <td>{{row["cpe23uri"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>versionsAffected</th>
                     <td>{{row["versionsAffected"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>Description</th>
                     <td>{{row["description"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>CVSSScore</th>
                     <td>{{row["CVSSScore"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>attackVector</th>
                     <td>{{row["attackVector"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>attackComplexity</th>
                     <td>{{row["attackComplexity"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>privilegesRequired</th>
                     <td>{{row["privilegesRequired"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>userInteraction</th>
                     <td>{{row["userInteraction"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>confidentialityImpact</th>
                     <td>{{row["confidentialityImpact"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>integrityImpact</th>
                     <td>{{row["integrityImpact"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>availabilityImpact</th>
                     <td>{{row["availabilityImpact"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>baseScore</th>
                     <td>{{row["baseScore"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>baseSeverity</th>
                     <td>{{row["baseSeverity"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row2 in row2 %}
                 <tr>
                     <th>exploitabilityScore</th>
                     <td>{{row["exploitabilityScore"]}}</td>
@@ -161,21 +161,21 @@
         <table border = 1>
             <h2>Scan History</h2>
 
-                {% for row in rows %}
+                {% for row3 in row3 %}
                 <tr>
                     <th>scanID</th>
                     <td>{{row["scanID"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row3 in row3 %}
                 <tr>
                     <th>Date</th>
                     <td>{{row["Date"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row3 in row3 %}
                 <tr>
                     <th>Duration</th>
                     <td>{{row["Duration"]}}</td>
@@ -186,56 +186,56 @@
         <table border = 1>
             <h2>Hosts</h2>
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>hostID</th>
                     <td>{{row["hostID"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>host._ip</th>
                     <td>{{row["host._ip"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>host._macAddress</th>
                     <td>{{row["host._macAddress"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>host._osFamily</th>
                     <td>{{row["host._osFamily"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>host._osGen</th>
                     <td>{{row["host._osGen"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>host._name</th>
                     <td>{{row["host._name"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>host._vendor</th>
                     <td>{{row["host._vendor"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row4 in row4 %}
                 <tr>
                     <th>scanID</th>
                     <td>{{row["scanID"]}}</td>
@@ -246,21 +246,21 @@
         <table border = 1>
             <h2>Parameters</h2>
 
-                {% for row in rows %}
+                {% for row5 in row5 %}
                 <tr>
                     <th>ScanID</th>
                     <td>{{row["ScanID"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row5 in row5 %}
                 <tr>
                     <th>ParameterValue</th>
                     <td>{{row["ParameterValue"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row5 in row5 %}
                 <tr>
                     <th>ParameterType</th>
                     <td>{{row["ParameterType"]}}</td>
@@ -271,35 +271,35 @@
         <table border = 1>
             <h2>PenTest History</h2>
 
-                {% for row in rows %}
+                {% for row6 in row6 %}
                 <tr>
                     <th>PenTestID</th>
                     <td>{{row["PenTestID"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row6 in row6 %}
                 <tr>
                     <th>VulnID</th>
                     <td>{{row["VulnID"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row6 in row6 %}
                 <tr>
                     <th>Model</th>
                     <td>{{row["Model"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row6 in row6 %}
                 <tr>
                     <th>ScanID</th>
                     <td>{{row["ScanID"]}}</td>
                 </tr>
                 {% endfor %}
 
-                {% for row in rows %}
+                {% for row6 in row6 %}
                 <tr>
                     <th>Result</th>
                     <td>{{row["Result"]}}</td>
