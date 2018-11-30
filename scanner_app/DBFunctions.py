@@ -37,8 +37,8 @@ class DBFunctions():
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore)
         try:
-            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
-                           '?, ?, ?)''', vulnerability_info)
+            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                           ?, ?, ?)''', vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return "That device already exists in the database."
@@ -58,7 +58,7 @@ class DBFunctions():
 
         maxIDTuple = cursor.fetchone()
         maxID = 0
-        if maxIDTuple is not None:
+        if maxIDTuple is not None and maxIDTuple[0] is not None:
             maxID = maxIDTuple[0]
             maxID += 1
 
@@ -68,6 +68,62 @@ class DBFunctions():
         cursor.execute('''INSERT INTO ScanHistory VALUES(?, ?, ?)''', scan_info)
         conn.commit()
         return cursor.lastrowid
+
+    @staticmethod
+    def build_db():
+        """Build database"""
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute('''CREATE TABLE Devices (Model TEXT PRIMARY KEY,
+             Manufacturer TEXT, 
+             cpeURI TEXT)''')
+        cursor.execute('''CREATE TABLE CPEVulns (
+            cpeURI TEXT, 
+            cveName TEXT, 
+            PRIMARY KEY(cpeURI, cveName))''')
+        conn.commit()
+        cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
+            cveName TEXT,
+            description TEXT, 
+            CVSSScore INTEGER, 
+            attackVector TEXT, 
+            attackComplexity TEXT, 
+            customScore TEXT, 
+            customScoreReason TEXT
+            priviligesRequired TEXT, 
+            userInteraction TEXT, 
+            confidentialityImpact TEXT, 
+            integrityImpact TEXT, 
+            availabilityImpact TEXT,
+            baseScore TEXT, 
+            baseSeverity TEXT, 
+            exploitabilityScore INTEGER)''')
+        cursor.execute('''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, 
+            ScanDate TEXT, 
+            Duration INTEGER)''')
+        cursor.execute('''CREATE TABLE Hosts (HostID INTEGER PRIMARY KEY, 
+            ip TEXT, 
+            macAddress TEXT, 
+            osFamily TEXT, 
+            osGen TEXT, name TEXT, 
+            vendor TEXT, 
+            ScanID INTEGER, 
+            FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        conn.commit()
+        cursor.execute('''CREATE TABLE Parameters (ScanID INTEGER, 
+            ParameterValue TEXT, 
+            ParameterType TEXT, 
+            PRIMARY KEY(ScanID, ParameterType))''')
+        cursor.execute('''CREATE TABLE PenTestHistory (PenTestID INTEGER PRIMARY KEY, 
+            VulnID INTEGER, 
+            Model TEXT,
+            ScanID INTEGER, 
+            Result TEXT, 
+            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), 
+            FOREIGN KEY(Model) REFERENCES Devices(Model), 
+            FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        conn.commit()
 
     @staticmethod
     def save_host(host, scanID):
@@ -96,68 +152,32 @@ class DBFunctions():
         :param cpeDict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
         """
         conn = sqlite3.connect('vulnDB.db')
+        cves = []
         cursor = conn.cursor()
         print("Query HERE")
-        print(cpeDict)
 
-        # todo search db for cves with cpeDict
-        #cursor.execute()
+        # static example for below loop
+        cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", ("cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",))
+        str = cursor.fetchone()
+        print(str[1])
 
-    @staticmethod
-    def build_db():
-        """Build database"""
-        conn = sqlite3.connect('vulnDB.db')
-        cursor = conn.cursor()
+        for hList in cpeDict:
+            for cpe in cpeDict[hList]:
+                print("CPE: ")
+                print(cpe)
+                cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
+                testStr = cursor.fetchone()
+                if testStr:
+                    print("FOUND")
+                    # todo import database to test loops and results from call in Main
+                    print("CVE: ")
+                    print(testStr[1])
+                    cves.append(testStr[1])
+                else:
+                    print("NOT FOUND")
 
-        cursor.execute('''CREATE TABLE Devices (Model TEXT PRIMARY KEY,
-             Manufacturer TEXT, 
-             cpeURI TEXT)''')
-        cursor.execute('''CREATE TABLE CPEVulns (
-            cpeURI TEXT, 
-            cveName TEXT, 
-            PRIMARY KEY(cpeURI, cveName)''')
-        conn.commit()
-        cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
-            cveName TEXT,
-            description TEXT, 
-            CVSSScore INTEGER, 
-            attackVector TEXT, 
-            attackComplexity TEXT, 
-            customScore TEXT, 
-            customScoreReason TEXT
-            priviligesRequired TEXT, 
-            userInteraction TEXT, 
-            confidentialityImpact TEXT, 
-            integrityImpact TEXT, 
-            availabilityImpact TEXT,
-            baseScore TEXT, 
-            baseSeverity TEXT, 
-            exploitabilityScore INTEGER''')
-        cursor.execute('''CREATE TABLE ScanHistory (ScanID INTEGER PRIMARY KEY, 
-            ScanDate TEXT, 
-            Duration INTEGER)''')
-        cursor.execute('''CREATE TABLE Hosts (HostID INTEGER PRIMARY KEY, 
-            ip TEXT, 
-            macAddress TEXT, 
-            osFamily TEXT, 
-            osGen TEXT, name TEXT, 
-            vendor TEXT, 
-            ScanID INTEGER, 
-            FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
-        conn.commit()
-        cursor.execute('''CREATE TABLE Parameters (ScanID INTEGER, 
-            ParameterValue TEXT, 
-            ParameterType TEXT, 
-            PRIMARY KEY(ScanID, ParameterType))''')
-        cursor.execute('''CREATE TABLE PenTestHistory (PenTestID INTEGER PRIMARY KEY, 
-            VulnID INTEGER, 
-            Model TEXT,
-            ScanID INTEGER, 
-            Result TEXT, 
-            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), 
-            FOREIGN KEY(Model) REFERENCES Devices(Model), 
-            FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
-        conn.commit()
+        # return all the fun stuff
+        return cves
 
     # Imports Data from NVD JSON file
     @staticmethod

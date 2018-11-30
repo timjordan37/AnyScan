@@ -111,6 +111,7 @@ def main():
         """Set vulnerabilities from cps"""
         nonlocal cpes
         cpes = c
+        DBFunctions.query_cves(cpes)
         # query
         # todo reload after querying for cves and setting vulnerabilities[]
         #reload_vulnerabilities_listbox()
@@ -130,6 +131,8 @@ def main():
     def on_check_vulnerabilities():
         """Click hanlder for check vulnerabilities button"""
         # todo set_cpes_vulns() test
+        if cpes:
+            set_cpes_vulns(cpes)
         print("User clicked 'check vulnerabilities'")
 
     def new_vuln_popup():
@@ -138,6 +141,7 @@ def main():
 
     def on_details():
         """Click handler for details button"""
+        # todo query for selected cve fromm listbox
         print("User clicked 'Details'")
 
     def on_report():
