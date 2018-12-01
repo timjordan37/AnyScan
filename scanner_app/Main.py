@@ -85,6 +85,7 @@ def main():
         print("Scan END")
 
         scan_button.config(state="normal")
+        check_vulnerabilities_button.config(state="normal")
 
         # could get this from the scan itself
         scan_end_date = datetime.datetime.now()
@@ -319,6 +320,7 @@ def main():
     # Check Vulnerabilities button
     check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities", command=on_check_vulnerabilities)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
+    check_vulnerabilities_button.config(state="disabled")
 
     #################
     # Vulnerabilities listBox Frame
