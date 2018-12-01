@@ -18,6 +18,7 @@ class Host:
         self._macAddress = macAddress
 
     def get_display_val(self):
+        """Get display value for a given host to be displayed"""
         first_val = ""
         second_val = ""
 
@@ -25,7 +26,7 @@ class Host:
 
         if self._name != "":
             first_val = self._name
-        elif self._vendor != "" :
+        elif self._vendor != "":
             first_val = self._vendor
         else:
             first_val = self._ip
@@ -33,17 +34,20 @@ class Host:
         if self._macAddress != "":
             second_val = self._macAddress
         else:
-            second_val = self._state
+            second_val = 'State: ' + self._state
 
         return f"{first_val} - {second_val}"
 
     def get_ip(self):
+        """Get IP of host"""
         return self._ip
 
     def get_mac_address(self):
+        """Get MAC address of host"""
         return self._macAddress
 
     def get_display_name(self):
+        """Get name of host or vendor if not found"""
         if self._name != "":
             return self._name
         elif self._vendor != "" :
