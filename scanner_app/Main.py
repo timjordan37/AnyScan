@@ -60,6 +60,11 @@ def main():
         for vulnerability in vulnerabilities:
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
+        nonlocal vulnerabilities_header_label
+        nonlocal vulnerabilities_number_label
+        vulnerabilities_header_label['text'] = "Vulnerabilities: "
+        vulnerabilities_number_label['text'] = len(vulnerabilities)
+
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
         scan_start_date = datetime.datetime.now()
@@ -167,11 +172,8 @@ def main():
         """Click handler for vulnerabilities selection"""
         listbox = evt.widget
         index = int(listbox.curselection()[0])
-        nonlocal vulnerabilities_header_label
-        nonlocal vulnerabilities_number_label
+
         nonlocal vulnerability_label
-        vulnerabilities_header_label['text'] = "Vulnerabilities: "
-        vulnerabilities_number_label['text'] = len(vulnerabilities)
         vulnerability_label['text'] = vulnerabilities[index]
 
     def new_device_popup():
