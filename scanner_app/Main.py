@@ -3,7 +3,7 @@ from views import DevicePopup as dp, VulnPopup as vp
 from views.DetailsPopup import DetailsPopup
 from pathlib import Path
 import random
-from scanner_app.helpers.Scanner import Scanner
+from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
@@ -12,14 +12,9 @@ from util import DBFunctions as df
 
 
 # Constants
-<<<<<<< HEAD
 from scanner_app.ReportGenerator import ReportGenerator
 
-HOME_IP = '192.168.1.1'
-=======
-HOME_IP = '192.168.1.1' # default gateway, not really home
-
->>>>>>> develop
+HOME_IP = '192.168.1.1'  # default gateway, not really home
 
 
 def main():
@@ -188,8 +183,6 @@ def main():
 
         index = int(listbox.curselection()[0])
 
-<<<<<<< HEAD
-=======
         nonlocal vulnerability_label
         vulnerability_label['text'] = vulnerabilities[index]
 
@@ -197,11 +190,10 @@ def main():
         """Click handler for new device button"""
         dp.DevicePopup.new_popup()
 
->>>>>>> develop
     # Variables
     vulnerabilities = []
     scanned_hosts = []
-    cpes ={}
+    cpes = {}
 
     # Setup root ui
     root = tk.Tk()
@@ -250,7 +242,6 @@ def main():
     ## Setup scan port label
     port_start_label = tk.Label(scan_port_label_frame, text="Start Port")
     port_start_label.grid(row=0, column=0, padx=(0, 8))
-
     port_end_label = tk.Label(scan_port_label_frame, text="End Port")
     port_end_label.grid(row=0, column=1, padx=(8, 0))
 
@@ -326,15 +317,11 @@ def main():
 
     #################
     # Check Vulnerabilities UI
-<<<<<<< HEAD
-    check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities",
-                                             command=on_check_vulnerabilities)
-=======
     #################
     #
     # Check Vulnerabilities button
-    check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities", command=on_check_vulnerabilities)
->>>>>>> develop
+    check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities",
+                                             command=on_check_vulnerabilities)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
     check_vulnerabilities_button.config(state="disabled")
 
@@ -377,6 +364,7 @@ def main():
     # Report
     vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report", command=on_report)
     vulnerability_report_button.grid(row=0, column=1)
+
     # Add Vulnerability
     add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
                                            command=new_vuln_popup)
