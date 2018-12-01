@@ -1,5 +1,6 @@
 import sqlite3
 import json
+from pathlib import Path
 
 class DBFunctions():
 
@@ -129,6 +130,7 @@ class DBFunctions():
     def save_host(host, scanID):
         """Saves a scan to the database
 
+        :param host: host name
         :param scanID: scan ID
         """
         conn = sqlite3.connect('vulnDB.db')
@@ -147,14 +149,28 @@ class DBFunctions():
         cursor.execute('''INSERT INTO Hosts VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', scan_info)
         conn.commit()
 
-    def query_cves(cpeDict):
+    @staticmethod
+    def save_cpeVuln(cpe, cve):
+        """Saves a new cpe\cve combo into the cpeVulns table
+        :param cpe: cpe to import to db
+        :param cve; cve to import to db
+        """
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cpeVuln = (cpe, cve)
+
+        cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
+        conn.commit()
+
+    def query_cves(cpe_dict):
         """query DB for CVEs according to CPEs found by scanner
-        :param cpeDict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
+        :param cpe_dict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
         """
         conn = sqlite3.connect('vulnDB.db')
         cves = []
         cursor = conn.cursor()
-        print("Query HERE")
+        print("CVE Query HERE")
 
 
         CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
@@ -235,8 +251,8 @@ class DBFunctions():
 
         # todo delete static testing to test on imported db
 
-        # for hList in cpeDict:
-        #     for cpe in cpeDict[hList]:
+        # for hList in cpe_dict:
+        #     for cpe in cpe_dict[hList]:
         #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
         #         testStr = cursor.fetchone()
         #         if testStr:
@@ -244,10 +260,56 @@ class DBFunctions():
         # # return all the fun stuff
         # return cves
 
+    def query_vulns(cve):
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        print("Vuln Query HERE")
+
+        cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
+        return cursor.fetchone()
+
     # Imports Data from NVD JSON file
     @staticmethod
     def import_NVD_JSON():
-        print("Still to implement")
+
+        json_fp = Path("test1.json")
+        nvd_json = json.loads(json_fp.read_text())
+        cve_items_list = nvd_json['CVE_Items']
+
+        i = 0
+        for cve in cve_items_list:
+            cve_detail = cve_items_list[i]
+            cve_meta_data = cve_detail.get("cve").get("CVE_data_meta")
+
+            description_data = cve_detail.get("cve").get("description").get("description_data")
+            description = description_data[0].get("value")
+
+            configurations = cve_detail['configurations']
+            cpe_list = configurations['nodes']
+
+            cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
+            baseMetric = cve_detail.get("impact").get("baseMetricV3")
+
+            DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
+                                           cvssV3['attackComplexity'], "", "", cvssV3['privilegesRequired'],
+                                           cvssV3['userInteraction'],
+                                           cvssV3['confidentialityImpact'], cvssV3['integrityImpact'],
+                                           cvssV3['availabilityImpact'],
+                                           cvssV3['baseScore'], cvssV3['baseSeverity'],
+                                           baseMetric['exploitabilityScore'])
+
+            for item in cpe_list:
+                cpe_match = item['cpe_match']
+                for item in cpe_match:
+                    try:
+                        cpe_URI = item['cpe23Uri']
+                    except:
+                        cpe_URI = item['cpe22Uri']
+                    DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
+
+            i += 1
+            print(i)
 
 
 

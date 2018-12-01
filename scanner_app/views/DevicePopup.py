@@ -1,5 +1,5 @@
 import tkinter as tk
-import DBFunctions as df
+from util import DBFunctions as df
 from tkinter import messagebox
 
 

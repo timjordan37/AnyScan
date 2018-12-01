@@ -1,5 +1,6 @@
 import tkinter as tk
 from views import DevicePopup as dp, VulnPopup as vp
+from views.DetailsPopup import DetailsPopup
 from pathlib import Path
 import random
 from helpers.Scanner import Scanner
@@ -57,7 +58,6 @@ def main():
         """Update vulnerabilites box with found vulnerabilites"""
         vulnerabilities_listbox.delete(0, tk.END)
         for vulnerability in vulnerabilities:
-            print(vulnerability)
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
     def scan_thread_completion():
@@ -107,6 +107,11 @@ def main():
         scanned_hosts = h
         reload_hosts_listbox()
 
+    def get_hosts():
+        """Get scanned hosts"""
+        nonlocal scanned_hosts
+        return scanned_hosts
+
     def set_cpes_vulns(c):
         """Set vulnerabilities from cps"""
         nonlocal cpes
@@ -115,11 +120,6 @@ def main():
         vulnerabilities = df.DBFunctions.query_cves(cpes)
         # reload ui
         reload_vulnerabilities_listbox()
-
-    def get_hosts():
-        """Get scanned hosts"""
-        nonlocal scanned_hosts
-        return scanned_hosts
 
     # Click Handlers
     def on_scan():
@@ -146,10 +146,10 @@ def main():
         if vulnerabilities and vulnerability_label['text']:
             cve_name = vulnerability_label['text']
             cve_details = df.DBFunctions.query_vulns(cve_name)
-            print(cve_details)
-
-
-
+            pop = DetailsPopup(cve_details)
+            pop.new_popup()
+            for item in cve_details:
+                print(item)
 
     def on_report():
         """Click hanlder for report button"""
