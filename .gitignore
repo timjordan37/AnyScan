@@ -11,3 +11,6 @@ __pycache__
 .idea
 venv/
 >>>>>>> develop
+
+# Local Db
+vulnDB.db
