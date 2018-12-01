@@ -163,6 +163,9 @@ def main():
         """Click handler to update right ui when user clicks on a host in left box"""
         # Note here that Tkinter passes an event object to onselect()
         listbox = evt.widget
+        if len(listbox.curselection()) == 0:
+            return
+
         index = int(listbox.curselection()[0])
         host_name_entry_var.set(scanned_hosts[index].get_display_name())
         mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
@@ -171,6 +174,9 @@ def main():
     def on_vuln_listbox_select(evt):
         """Click handler for vulnerabilities selection"""
         listbox = evt.widget
+        if len(listbox.curselection()) == 0:
+            return
+
         index = int(listbox.curselection()[0])
 
         nonlocal vulnerability_label
