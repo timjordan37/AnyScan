@@ -228,37 +228,19 @@ class DBFunctions():
             cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cps,))
             test_str = cursor.fetchone()
             if test_str:
-                print("FOUND")
-                # todo import database to test loops and results from call in Main
-                print("CVE: ")
-                print(test_str[1])
                 cves.append(test_str[1])
             else:
                 print("NOT FOUND")
-
         return cves
 
+        # todo delete static testing to test on imported db
 
-        # # static example for below loop
-        # cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", ("cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",))
-        # str = cursor.fetchone()
-        # print(str[1])
-        #
         # for hList in cpeDict:
         #     for cpe in cpeDict[hList]:
-        #         print("CPE: ")
-        #         print(cpe)
         #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
         #         testStr = cursor.fetchone()
         #         if testStr:
-        #             print("FOUND")
-        #             # todo import database to test loops and results from call in Main
-        #             print("CVE: ")
-        #             print(testStr[1])
         #             cves.append(testStr[1])
-        #         else:
-        #             print("NOT FOUND")
-        #
         # # return all the fun stuff
         # return cves
 

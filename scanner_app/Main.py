@@ -161,21 +161,16 @@ def main():
         """Click handler for vulnerabilities selection"""
         listbox = evt.widget
         index = int(listbox.curselection()[0])
-
         nonlocal vulnerabilities_header_label
-        vulnerabilities_header_label = tk.Label(vulnerabilities_frame, text="Vulnerabilities: ")
-        vulnerabilities_header_label.grid(row=0, column=0)
-        vulnerabilities_number_label = tk.Label(vulnerabilities_frame, text=len(vulnerabilities))
-        vulnerabilities_number_label.grid(row=0, column=1)
-        vulnerability_label = tk.Label(vulnerabilities_frame, text=vulnerabilities[index])
-        vulnerability_label.grid(row=0, column=2)
-
+        nonlocal vulnerabilities_number_label
+        nonlocal vulnerability_label
+        vulnerabilities_header_label['text'] = "Vulnerabilities: "
+        vulnerabilities_number_label['text'] = len(vulnerabilities)
+        vulnerability_label['text'] = vulnerabilities[index]
 
     def new_device_popup():
         """Click handler for new device button"""
         dp.DevicePopup.new_popup()
-
-
 
     # Variables
     vulnerabilities = []
@@ -311,7 +306,10 @@ def main():
     check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities", command=on_check_vulnerabilities)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
 
-
+    #################
+    # Vulnerabilities listBox Frame
+    #################
+    #
     vulnerabilities_frame = tk.Frame(right_frame)
     vulnerabilities_frame.grid(row=5, column=0)
 
@@ -319,10 +317,15 @@ def main():
     vulnerabilities_header_label = tk.Label(vulnerabilities_frame, text="Vulnerabilities")
     vulnerabilities_header_label.grid(row=0, column=0)
 
-    #################
-    # Vulnerabilities ListBox
-    #################
-    #
+    # Vulnerabilities number
+    vulnerabilities_number_label = tk.Label(vulnerabilities_frame, text="")
+    vulnerabilities_number_label.grid(row=0, column=1)
+
+    # Vulnerabilities selection label
+    vulnerability_label = tk.Label(vulnerabilities_frame, text="")
+    vulnerability_label.grid(row=0, column=2)
+
+    # Vulnerabilities listbox
     vulnerabilities_listbox = tk.Listbox(right_frame)
     vulnerabilities_listbox.grid(row=6, column=0, sticky="nsew", padx=(16, 16))
     vulnerabilities_listbox.bind('<<ListboxSelect>>', on_vuln_listbox_select)
