@@ -12,7 +12,7 @@ from util import DBFunctions as df
 
 
 # Constants
-from scanner_app.ReportGenerator import ReportGenerator
+from helpers.ReportGenerator import ReportGenerator
 
 HOME_IP = '192.168.1.1'  # default gateway, not really home
 

@@ -5,9 +5,6 @@ import webbrowser
 import pdfkit
 from flask import Flask, render_template
 
-from scanner_app.helpers.Scanner import Scanner
-
-
 class ReportGenerator():
 
     @staticmethod
