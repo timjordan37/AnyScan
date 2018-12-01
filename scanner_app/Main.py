@@ -58,6 +58,7 @@ def main():
         """Update vulnerabilites box with found vulnerabilites"""
         vulnerabilities_listbox.delete(0, tk.END)
         for vulnerability in vulnerabilities:
+            print(vulnerability)
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
     def scan_thread_completion():
@@ -111,10 +112,10 @@ def main():
         """Set vulnerabilities from cps"""
         nonlocal cpes
         cpes = c
-        DBFunctions.query_cves(cpes)
-        # query
-        # todo reload after querying for cves and setting vulnerabilities[]
-        #reload_vulnerabilities_listbox()
+        nonlocal vulnerabilities
+        vulnerabilities = DBFunctions.query_cves(cpes)
+        # reload ui
+        reload_vulnerabilities_listbox()
 
     def get_hosts():
         """Get scanned hosts"""
@@ -130,7 +131,6 @@ def main():
 
     def on_check_vulnerabilities():
         """Click hanlder for check vulnerabilities button"""
-        # todo set_cpes_vulns() test
         if cpes:
             set_cpes_vulns(cpes)
         print("User clicked 'check vulnerabilities'")
@@ -156,6 +156,20 @@ def main():
         host_name_entry_var.set(scanned_hosts[index].get_display_name())
         mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
         port_number_entry_var.set(scanned_hosts[index].get_ip())
+
+    def on_vuln_listbox_select(evt):
+        """Click handler for vulnerabilities selection"""
+        listbox = evt.widget
+        index = int(listbox.curselection()[0])
+
+        nonlocal vulnerabilities_header_label
+        vulnerabilities_header_label = tk.Label(vulnerabilities_frame, text="Vulnerabilities: ")
+        vulnerabilities_header_label.grid(row=0, column=0)
+        vulnerabilities_number_label = tk.Label(vulnerabilities_frame, text=len(vulnerabilities))
+        vulnerabilities_number_label.grid(row=0, column=1)
+        vulnerability_label = tk.Label(vulnerabilities_frame, text=vulnerabilities[index])
+        vulnerability_label.grid(row=0, column=2)
+
 
     def new_device_popup():
         """Click handler for new device button"""
@@ -297,9 +311,13 @@ def main():
     check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities", command=on_check_vulnerabilities)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
 
+
+    vulnerabilities_frame = tk.Frame(right_frame)
+    vulnerabilities_frame.grid(row=5, column=0)
+
     # Vulnerabilities ListBox label
-    vulnerabilities_header_label = tk.Label(right_frame, text="Vulnerabilities")
-    vulnerabilities_header_label.grid(row=5, column=0)
+    vulnerabilities_header_label = tk.Label(vulnerabilities_frame, text="Vulnerabilities")
+    vulnerabilities_header_label.grid(row=0, column=0)
 
     #################
     # Vulnerabilities ListBox
@@ -307,6 +325,7 @@ def main():
     #
     vulnerabilities_listbox = tk.Listbox(right_frame)
     vulnerabilities_listbox.grid(row=6, column=0, sticky="nsew", padx=(16, 16))
+    vulnerabilities_listbox.bind('<<ListboxSelect>>', on_vuln_listbox_select)
     reload_vulnerabilities_listbox()
 
     #################

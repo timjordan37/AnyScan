@@ -156,28 +156,111 @@ class DBFunctions():
         cursor = conn.cursor()
         print("Query HERE")
 
-        # static example for below loop
-        cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", ("cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",))
-        str = cursor.fetchone()
-        print(str[1])
 
-        for hList in cpeDict:
-            for cpe in cpeDict[hList]:
-                print("CPE: ")
-                print(cpe)
-                cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
-                testStr = cursor.fetchone()
-                if testStr:
-                    print("FOUND")
-                    # todo import database to test loops and results from call in Main
-                    print("CVE: ")
-                    print(testStr[1])
-                    cves.append(testStr[1])
-                else:
-                    print("NOT FOUND")
+        CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d20:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d25:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d30:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d35:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d40:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d45:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d50:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d55:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d60:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.1x46:d65:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3x48:d10:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3x48:d15:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3x48:d20:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3x48:d25:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3x48:d30:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x49:d10:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x49:d20:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x49:d30:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d20:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d21:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d25:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d30:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d32:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d33:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d34:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d61:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d62:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1x53:d63:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1:*:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1:r1:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1:r2:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1:r3:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1:r4:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1:r8:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1:r9:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.2:r1:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.2:r2:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.2:r3:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.2:r4:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.2:r5:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.2:r7:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.2:r8:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1:r1:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:15.1:r2:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:*:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r1:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r10:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r2:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r3:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r4:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r5:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r6:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r7:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r8:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:12.3:r9:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:*:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d10:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d15:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d16:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d25:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d26:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d27:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d35:*:*:*:*:*:*",
+                "cpe:2.3:o:juniper:junos:14.1x53:d50:*:*:*:*:*:*"]
 
-        # return all the fun stuff
+        for cps in CP:
+            cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cps,))
+            test_str = cursor.fetchone()
+            if test_str:
+                print("FOUND")
+                # todo import database to test loops and results from call in Main
+                print("CVE: ")
+                print(test_str[1])
+                cves.append(test_str[1])
+            else:
+                print("NOT FOUND")
+
         return cves
+
+
+        # # static example for below loop
+        # cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", ("cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",))
+        # str = cursor.fetchone()
+        # print(str[1])
+        #
+        # for hList in cpeDict:
+        #     for cpe in cpeDict[hList]:
+        #         print("CPE: ")
+        #         print(cpe)
+        #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
+        #         testStr = cursor.fetchone()
+        #         if testStr:
+        #             print("FOUND")
+        #             # todo import database to test loops and results from call in Main
+        #             print("CVE: ")
+        #             print(testStr[1])
+        #             cves.append(testStr[1])
+        #         else:
+        #             print("NOT FOUND")
+        #
+        # # return all the fun stuff
+        # return cves
 
     # Imports Data from NVD JSON file
     @staticmethod
