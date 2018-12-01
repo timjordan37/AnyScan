@@ -17,6 +17,7 @@ from scanner_app.ReportGenerator import ReportGenerator
 
 HOME_IP = '192.168.1.1'
 
+
 def main():
     print("Scanner App Started...")
 
@@ -123,7 +124,6 @@ def main():
 
     def new_vuln_popup():
         vp.VulnPopup.new_popup()
-
 
     # Variables
     vulnerabilities = []
@@ -251,7 +251,8 @@ def main():
     port_number_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
     # Check Vulnerabilities UI
-    check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities", command=on_check_vulnerabilities)
+    check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities",
+                                             command=on_check_vulnerabilities)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
 
     vulnerabilities_header_label = tk.Label(right_frame, text="Vulnerabilities")
