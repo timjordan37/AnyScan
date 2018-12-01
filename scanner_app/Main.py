@@ -1,19 +1,18 @@
 import tkinter as tk
-import VulnPopup as vp
-import DevicePopup as dp
-import DBFunctions as df
+from views import DevicePopup as dp, VulnPopup as vp
 from pathlib import Path
 import random
 from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
-from DBFunctions import DBFunctions
+from util import DBFunctions as df
 # Main method to handle setting up and managing the UI
 
 
 # Constants
 HOME_IP = '192.168.1.1' # default gateway, not really home
+
 
 def main():
     print("Scanner App Started...")
@@ -89,10 +88,10 @@ def main():
         ##
 
 
-        last_row_id = DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
+        last_row_id = df.DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
 
         for host in get_hosts():
-            DBFunctions.save_host(host, last_row_id)
+            df.DBFunctions.save_host(host, last_row_id)
 
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
@@ -113,7 +112,7 @@ def main():
         nonlocal cpes
         cpes = c
         nonlocal vulnerabilities
-        vulnerabilities = DBFunctions.query_cves(cpes)
+        vulnerabilities = df.DBFunctions.query_cves(cpes)
         # reload ui
         reload_vulnerabilities_listbox()
 
@@ -141,8 +140,16 @@ def main():
 
     def on_details():
         """Click handler for details button"""
-        # todo query for selected cve fromm listbox
         print("User clicked 'Details'")
+
+        # todo query for selected cve fromm listbox
+        if vulnerabilities and vulnerability_label['text']:
+            cve_name = vulnerability_label['text']
+            cve_details = df.DBFunctions.query_vulns(cve_name)
+            print(cve_details)
+
+
+
 
     def on_report():
         """Click hanlder for report button"""
@@ -353,7 +360,6 @@ def main():
     # Add Device
     add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=new_device_popup)
     add_vulnerabilities_button.grid(row=0, column=3)
-
 
     # Run the program with UI
     root.geometry("800x500")

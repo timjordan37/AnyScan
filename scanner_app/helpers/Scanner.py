@@ -1,6 +1,5 @@
 import nmap
-import DBFunctions as df
-
+from util import DBFunctions as df
 from models.Host import Host
 
 class Scanner:
