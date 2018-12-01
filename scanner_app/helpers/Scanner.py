@@ -2,6 +2,7 @@ import nmap
 from util import DBFunctions as df
 from models.Host import Host
 
+
 class Scanner:
     """Scanner class wraps nmap scans for quick scan types"""
     _ips = ''

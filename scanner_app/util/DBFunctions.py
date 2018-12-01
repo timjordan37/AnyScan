@@ -2,8 +2,10 @@ import sqlite3
 import json
 from pathlib import Path
 
-class DBFunctions():
 
+class DBFunctions:
+
+    # todo create docstrings for all functions
     #Saves a new device to the database
     @staticmethod
     def save_device(deviceName, deviceManufacturer, cpeURI):
@@ -49,6 +51,7 @@ class DBFunctions():
     def save_scan(Date, Duration):
         """Save a scan to the Db
 
+        :param Date: date of scan to be imported
         :param Duration: time scan took to complete
         """
         conn = sqlite3.connect('vulnDB.db')
@@ -165,6 +168,7 @@ class DBFunctions():
 
     def query_cves(cpe_dict):
         """query DB for CVEs according to CPEs found by scanner
+
         :param cpe_dict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
         """
         conn = sqlite3.connect('vulnDB.db')
@@ -261,6 +265,10 @@ class DBFunctions():
         # return cves
 
     def query_vulns(cve):
+        """Query the database for a specific vulnerability
+
+        :param cve: vulnerability to be searched for
+        """
 
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()

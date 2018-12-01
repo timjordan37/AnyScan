@@ -141,8 +141,7 @@ def main():
     def on_details():
         """Click handler for details button"""
         print("User clicked 'Details'")
-
-        # todo query for selected cve fromm listbox
+        # todo set button to disabled until a scan is complete
         if vulnerabilities and vulnerability_label['text']:
             cve_name = vulnerability_label['text']
             cve_details = df.DBFunctions.query_vulns(cve_name)
