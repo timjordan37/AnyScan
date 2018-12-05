@@ -10,8 +10,8 @@ class ReportGenerator():
     @staticmethod
     def generatereport():
         app = Flask(__name__, template_folder='template')
-        app.config['PDF_FOLDER'] = 'static/pdf/'
-        app.config['TEMPLATE_FOLDER'] = 'template/'
+        app.config['PDF_FOLDER'] = 'helpers/static/pdf/'
+        app.config['TEMPLATE_FOLDER'] = 'helpers/template/'
 
         # if Scanner._scanned == True:
 
