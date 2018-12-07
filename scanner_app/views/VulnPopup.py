@@ -105,11 +105,16 @@ class VulnPopup():
 
         # Function to call the save vulnerability function
         def save_vuln():
-            df.DBFunctions.save_vulnerability(cve_name, description, cvss_score,
+            if df.DBFunctions.save_vulnerability(cve_name, description, cvss_score,
                                               attack_vector, attack_complexity, custom_score, custom_score_reason,
                                               privileges_required, user_interaction, confidentiality_impact,
                                               integrity_impact, availability_impact, base_score, base_severity,
-                                              exploitability_score)
+                                              exploitability_score):
+                    tk.messagebox.showinfo("Success", "Vulnerability Added Successfully")
+            else:
+                tk.messagebox.showinfo("Failure", "Device Did Not Save Correctly")
+
+            vuln_popup.destroy()
 
         # Adding the save button to the popup window
         save_button = tk.Button(vuln_popup, text="Save", command=save_vuln)
