@@ -110,9 +110,10 @@ class VulnPopup():
                                               privileges_required, user_interaction, confidentiality_impact,
                                               integrity_impact, availability_impact, base_score, base_severity,
                                               exploitability_score):
-                    tk.messagebox.showinfo("Success", "Vulnerability Added Successfully")
+                tk.messagebox.showinfo("Success", "Vulnerability Added Successfully")
+
             else:
-                tk.messagebox.showinfo("Failure", "Device Did Not Save Correctly")
+                tk.messagebox.showinfo("Failure", "Vulnerability Did Not Save Correctly")
 
             vuln_popup.destroy()
 
