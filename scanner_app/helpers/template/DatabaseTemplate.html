@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<title>Scan Report</title>
+<html>
+    <body>
+        <h2>Scan Report</h2>
+        <table border = 1>
+            <h2>Devices</h2>
+
+                {% for row1 in row1 %}
+                <tr>
+                    <th>deviceName</th>
+                    <td>{{row1["deviceName"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row1 in row1 %}
+                <tr>
+                    <th>deviceManufacturer</th>
+                    <td>{{row1["deviceManufacturer"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row1 in row1 %}
+                <tr>
+                    <th>cpeURI</th>
+                    <td>{{row1["cpeURI"]}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+
+        <table border = 1>
+            <h2>Vulnerabilities</h2>
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>vulnID</th>
+                    <td>{{row2["vulnID"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>cveName</th>
+                    <td>{{row2["cveName"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>description</th>
+                    <td>{{row2["description"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>CVSSScore</th>
+                    <td>{{row2["CVSSScore"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>attackVector</th>
+                    <td>{{row2["attackVector"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>attackComplexity</th>
+                    <td>{{row2["attackComplexity"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>customScore</th>
+                    <td>{{row2["customScore"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>customScoreReason</th>
+                    <td>{{row2["customScoreReason"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>priviledgesRequired</th>
+                    <td>{{row2["priviledgesRequired"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>userInteraction</th>
+                    <td>{{row2["userInteraction"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>confidentialityImpact</th>
+                    <td>{{row2["confidentialityImpact"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>integrityImpact</th>
+                    <td>{{row2["integrityImpact"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>availibilityImpact</th>
+                    <td>{{row2["availibilityImpact"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>baseScore</th>
+                    <td>{{row2["baseScore"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>baseSeverity</th>
+                    <td>{{row2["baseSeverity"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row2 in row2 %}
+                <tr>
+                    <th>exploitabilityScore</th>
+                    <td>{{row2["exploitabilityScore"]}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+
+        <table border = 1>
+            <h2>Scan History</h2>
+
+                {% for row3 in row3 %}
+                <tr>
+                    <th>scanID</th>
+                    <td>{{row3["scanID"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row3 in row3 %}
+                <tr>
+                    <th>Date</th>
+                    <td>{{row3["Date"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row3 in row3 %}
+                <tr>
+                    <th>Duration</th>
+                    <td>{{row3["Duration"]}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+
+        <table border = 1>
+            <h2>Hosts</h2>
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>hostID</th>
+                    <td>{{row4["hostID"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>host._ip</th>
+                    <td>{{row4["host._ip"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>host._macAddress</th>
+                    <td>{{row4["host._macAddress"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>host._osFamily</th>
+                    <td>{{row4["host._osFamily"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>host._osGen</th>
+                    <td>{{row4["host._osGen"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>host._name</th>
+                    <td>{{row4["host._name"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>host._vendor</th>
+                    <td>{{row4["host._vendor"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row4 in row4 %}
+                <tr>
+                    <th>scanID</th>
+                    <td>{{row4["scanID"]}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+
+        <table border = 1>
+            <h2>Parameters</h2>
+
+                {% for row5 in row5 %}
+                <tr>
+                    <th>ScanID</th>
+                    <td>{{row5["ScanID"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row5 in row5 %}
+                <tr>
+                    <th>ParameterValue</th>
+                    <td>{{row5["ParameterValue"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row5 in row5 %}
+                <tr>
+                    <th>ParameterType</th>
+                    <td>{{row5["ParameterType"]}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+
+        <table border = 1>
+            <h2>PenTest History</h2>
+
+                {% for row6 in row6 %}
+                <tr>
+                    <th>PenTestID</th>
+                    <td>{{row6["PenTestID"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row6 in row6 %}
+                <tr>
+                    <th>VulnID</th>
+                    <td>{{row6["VulnID"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row6 in row6 %}
+                <tr>
+                    <th>Model</th>
+                    <td>{{row6["Model"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row6 in row6 %}
+                <tr>
+                    <th>ScanID</th>
+                    <td>{{row6["ScanID"]}}</td>
+                </tr>
+                {% endfor %}
+
+                {% for row6 in row6 %}
+                <tr>
+                    <th>Result</th>
+                    <td>{{row6["Result"]}}</td>
+                </tr>
+                {% endfor %}
+        </table>
+        <p><a href="http://localhost:5000/convert">Convert to PDF</a></p>
+    </body>
+</html>

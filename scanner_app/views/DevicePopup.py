@@ -1,5 +1,5 @@
 import tkinter as tk
-import scanner_app.DBFunctions as df
+from util import DBFunctions as df
 from tkinter import messagebox
 
 
@@ -13,7 +13,7 @@ class DevicePopup():
 
         # Creating the Popup Window
         device_popup = tk.Toplevel(padx=10, pady=10)
-        device_popup.wm_title("Add Vulnerability")
+        device_popup.wm_title("Add Device")
 
         # Adding the fields to the popup
         related_mod = tk.Entry(device_popup, textvariable=model)
