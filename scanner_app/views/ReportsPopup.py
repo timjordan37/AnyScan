@@ -8,22 +8,6 @@ class ReportsPopup():
     device_manufacturer = ''
     cpe_uri = ''
 
-    vuln_id = ''
-    cve_name = ''
-    description = ''
-    attack_vector = ''
-    attack_complexity = ''
-    custom_score = ''
-    custom_score_reason = ''
-    privileges_required = ''
-    user_interaction = ''
-    confidentiality_impact = ''
-    integrity_impact = ''
-    availability_impact = ''
-    base_score = ''
-    base_severity = ''
-    exploitability_score = ''
-
     scan_id = ''
     date = ''
     duration = ''
@@ -44,3 +28,27 @@ class ReportsPopup():
 
     def __init__(self, report_generator):
         self._report_generator = report_generator
+
+        self.device_name = report_generator[0]
+        self.device_manufacturer = report_generator[1]
+        self.cpe_uri = report_generator[2]
+
+        self.scan_id = report_generator[3]
+        self.date = report_generator[4]
+        self.duration = report_generator[5]
+        self.host_id = report_generator[6]
+        self.host_ip = report_generator[7]
+        self.host_macAddress = report_generator[8]
+        self.host_osFamily = report_generator[9]
+        self.host_osGen = report_generator[10]
+        self.host_name = report_generator[11]
+        self.host_vendor = report_generator[12]
+
+        self.parameter_value = report_generator[13]
+        self.parameter_type = report_generator[14]
+
+        self.pen_test_id = report_generator[15]
+        self.result = report_generator[16]
+
+    def new_popup(self):
+
