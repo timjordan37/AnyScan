@@ -1,5 +1,5 @@
 import tkinter as tk
-from views import DevicePopup as dp, VulnPopup as vp
+from views import DevicePopup as dp, VulnPopup as vp, ScanSettingsPopup as ssp
 from views.DetailsPopup import DetailsPopup
 from pathlib import Path
 import random
@@ -7,7 +7,7 @@ from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
-from util import DBFunctions as df
+from util import DBFunctions as df, System
 # Main method to handle setting up and managing the UI
 
 
@@ -136,6 +136,10 @@ def main():
         scan_thread = SThread(0, "SCAN_THREAD_1", 5, scan_thread_completion)
         scan_thread.start()
 
+    def on_change_scan_type():
+        """Click handler for scan settings button"""
+        show_scan_settings_popup()
+
     def on_check_vulnerabilities():
         """Click hanlder for check vulnerabilities button"""
         if cpes:
@@ -189,6 +193,10 @@ def main():
     def new_device_popup():
         """Click handler for new device button"""
         dp.DevicePopup.new_popup()
+
+    def show_scan_settings_popup():
+        ssp.ScanSettingsPopup.new_popup()
+        print(System.ScanSettings.getInstance().scan_type)
 
     # Variables
     vulnerabilities = []
@@ -260,9 +268,16 @@ def main():
     port_end_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_end_entry_var)
     port_end_entry.grid(row=0, column=1, padx=(16, 0))
 
+    scan_button_frame = tk.Frame(left_frame)
+    scan_button_frame.grid(row=5, column=0)
+
     # Setup Left frame scan button
-    scan_button = tk.Button(left_frame, text="Scan", command=on_scan)
-    scan_button.grid(row=5, column=0, pady=(8, 8))
+    scan_button = tk.Button(scan_button_frame, text="Scan", command=on_scan)
+    scan_button.grid(row=0, column=0, pady=(8, 8))
+
+    ## Setup Left frame change scan button
+    change_scan_button = tk.Button(scan_button_frame, text="Change Scan Type", command=on_change_scan_type)
+    change_scan_button.grid(row=0, column=1, pady=(8, 8))
 
     #################
     # Setup RightFrame
