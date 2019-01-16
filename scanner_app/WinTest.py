@@ -1,7 +1,6 @@
 import sys
 import ctypes
 
-
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
@@ -11,8 +10,15 @@ def is_admin():
 
 if is_admin():
     print('is an admin')
-    input('Test complete')
+
     # TODO run main file
+    print(__file__)
+    errorRet = ctypes.windll.shell32.ShellExecuteA(None, "runas", sys.executable, 'scanner_app/Main.py', None, 1)
+    # keep getting path not found errors here
+    print(int(errorRet))
+
+
+    input('Test complete: press enter')
 else:
     print('restarting...')
 
