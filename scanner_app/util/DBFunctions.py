@@ -324,8 +324,23 @@ class DBFunctions:
             i += 1
             print(i)
 
+    # Retrieves all data for specified ScanID
+    @staticmethod
+    def retrieve_scanID_data(scanID):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        retrievalID = (scanID)
+        cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
 
+        results = cursor.fetchone()
+        return results
 
-
-
+    # Retrieves scanIDs and Dates for all Scans
+    @staticmethod
+    def retrieve_scan_history():
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        cursor.execute('''SELECT ScanID, ScanDate FROM ScanHistory''')
+        results = cursor.fetchall()
+        return results
 
