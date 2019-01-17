@@ -52,3 +52,55 @@ class ReportsPopup():
 
     def new_popup(self):
 
+        popup = tk.Toplevel(padx=10, pady=10)
+        popup.wm_title("Scan Report")
+
+        device_name_label = tk.Label(popup, text="Device Name: ")
+        device_name_entry = tk.Label(popup, text=self.device_name)
+        device_name_label.grid(column=0, row=0, padx=5, pady=5)
+        device_name_entry.grid(column=1, row=0, padx=5, pady=5)
+
+        device_manufacturer_label = tk.Label(popup, text="Device Manufacturer")
+        device_manufacturer_entry = tk.Label(popup, text=self.device_manufacturer)
+        device_manufacturer_label.grid(column=0, row=1, padx=5, pady=5)
+        device_manufacturer_entry.grid(column=1, row=1, padx=5, pady=5)
+
+        cpe_uri_label = tk.Label(popup, text="cpeURI: ")
+        cpe_uri_entry = tk.Label(popup, text=self.cpe_uri)
+        cpe_uri_label.grid(column=0, row=2, padx=5, pady=5)
+        cpe_uri_entry.grid(column=1, row=2, padx=5, pady=5)
+
+        scan_id_label = tk.Label(popup, text="Scan ID: ")
+        scan_id_entry = tk.Label(popup, text=self.scan_id)
+        scan_id_label.grid(column=0, row=3, padx=5, pady=5)
+        scan_id_entry.grid(column=1, row=3, padx=5, pady=5)
+
+        date_label = tk.Label(popup, text="Date: ")
+        date_entry = tk.Label(popup, text=self.date)
+        date_label.grid(column=0, row=4, padx=5, pady=5)
+        date_entry.grid(column=1, row=4, padx=5, pady=5)
+
+        duration_label = tk.Label(popup, text="Duration: ")
+        duration_entry = tk.Label(popup, text=self.duration)
+        duration_label.grid(column=0, row=5, padx=5, pady=5)
+        duration_entry.grid(column=1, row=5, padx=5, pady=5)
+
+        host_id_label = tk.Label(popup, text="Host ID: ")
+        host_id_entry = tk.Label(popup, text=self.host_id)
+        host_id_label.grid(column=0, row=7, padx=5, pady=5)
+        host_id_entry.grid(column=1, row=7, padx=5, pady=5)
+
+        host_ip_label = tk.Label(popup, text="Host IP: ")
+        host_ip_entry = tk.Label(popup, text=self.host_ip)
+        host_ip_label.grid(column=0, row=8, padx=5, pady=5)
+        host_ip_entry.grid(column=1, row=8, padx=5, pady=5)
+
+        host_macAddress_label = tk.Label(popup, text="Host MacAddress: ")
+        host_macAddress_entry = tk.Label(popup, text=self.host_macAddress)
+        host_macAddress_label.grid(column=0, row=9, padx=5, pady=5)
+        host_macAddress_entry.grid(column=1, row=9, padx=5, pady=5)
+
+        host_osFamily_label = tk.Label(popup, text="Host OS Family: ")
+        host_osFamily_entry = tk.Label(popup, text=self.host_osFamily)
+        host_osFamily_label.grid(column=0, row=10, padx=5, pady=5)
+        host_osFamily_entry.grid(column=1, row=10, padx=5, pady=5)
