@@ -1,4 +1,5 @@
 import tkinter as tk
+from util import System
 
 class ScanSettingsPopup():
 
@@ -9,4 +10,18 @@ class ScanSettingsPopup():
     def new_popup():
         # Creating the Popup Window
         popup = tk.Toplevel(padx=10, pady=10)
-        popup.wm_title("New Popup")
+        popup.wm_title("Scan Settings")
+
+        scan_options = []
+        for type in System.ScanType:
+            scan_options.append((System.ScanType.display_name_for_scan_type(type.value), type.value))
+
+        selection_var = tk.IntVar()
+        selection_var.set(System.Settings.getInstance().scan_type.value)
+
+        def on_select():
+            System.Settings.getInstance().scan_type = System.ScanType.scan_type_for_int(selection_var.get())
+
+        for name, value in scan_options:
+            b = tk.Radiobutton(popup, text=name, variable=selection_var, value=value, command=on_select)
+            b.pack()

@@ -196,7 +196,6 @@ def main():
 
     def show_scan_settings_popup():
         ssp.ScanSettingsPopup.new_popup()
-        print(System.ScanSettings.getInstance().scan_type)
 
     # Variables
     vulnerabilities = []
