@@ -344,3 +344,10 @@ class DBFunctions:
         results = cursor.fetchall()
         return results
 
+    # Deletes specified ScanID
+    @staticmethod
+    def delete_scan_ID(scanID):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        deleteID = (scanID)
+        cursor.execute('''DELETE FROM ScanHistory WHERE ScanID = ?''', deleteID)
