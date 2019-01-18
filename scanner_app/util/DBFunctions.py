@@ -282,6 +282,16 @@ class DBFunctions:
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
 
+    def query_repoort_info(self):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute("""SELECT * FROM Devices""")
+        cursor.execute("""SELECT * FROM ScanHistory""")
+        cursor.execute("""SELECT * FROM PenTestHistory""")
+
+        return cursor.fetchall()
+
     # Imports Data from NVD JSON file
     @staticmethod
     def import_NVD_JSON():
