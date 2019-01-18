@@ -17,10 +17,12 @@ class ScanSettingsPopup():
             scan_options.append((System.ScanType.display_name_for_scan_type(type.value), type.value))
 
         selection_var = tk.IntVar()
-        selection_var.set(System.Settings.getInstance().scan_type.value)
+        scan_type = System.Settings.getInstance().get_scan_type()
+        selection_var.set(scan_type.value)
 
         def on_select():
-            System.Settings.getInstance().scan_type = System.ScanType.scan_type_for_int(selection_var.get())
+            new_scan_type = System.ScanType.scan_type_for_int(selection_var.get())
+            System.Settings.getInstance().set_scan_type(new_scan_type)
 
         for name, value in scan_options:
             b = tk.Radiobutton(popup, text=name, variable=selection_var, value=value, command=on_select)
