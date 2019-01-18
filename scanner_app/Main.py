@@ -8,6 +8,8 @@ from util.SThread import SThread
 from util.STime import STimer
 import datetime
 from util import DBFunctions as df
+import ctypes
+import sys
 # Main method to handle setting up and managing the UI
 
 
@@ -382,7 +384,21 @@ def main():
 
 #  Runs the main method if this file is called to run
 if __name__ == '__main__':
-    db_location = Path("vulnDB.db")
-    if not db_location.exists():
-        df.DBFunctions.build_db()
-    main()
+    def is_admin():
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            return False
+
+
+    # TODO: test on windows further
+    if is_admin():
+        db_location = Path("vulnDB.db")
+        if not db_location.exists():
+            df.DBFunctions.build_db()
+        main()
+    else:
+        # This works and runs the app with admin privileges, but I'm getting errors
+        # when I scan. Most likely to my vm environment. Still investigating.
+        print('restarting...')
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
