@@ -20,9 +20,6 @@ class ReportsPopup():
     host_name = ''
     host_vendor = ''
 
-    parameter_value = ''
-    parameter_type = ''
-
     pen_test_id = ''
     result = ''
 
@@ -44,11 +41,8 @@ class ReportsPopup():
         self.host_name = report_generator[11]
         self.host_vendor = report_generator[12]
 
-        self.parameter_value = report_generator[13]
-        self.parameter_type = report_generator[14]
-
-        self.pen_test_id = report_generator[15]
-        self.result = report_generator[16]
+        self.pen_test_id = report_generator[13]
+        self.result = report_generator[14]
 
     def new_popup(self):
 
@@ -104,3 +98,28 @@ class ReportsPopup():
         host_osFamily_entry = tk.Label(popup, text=self.host_osFamily)
         host_osFamily_label.grid(column=0, row=10, padx=5, pady=5)
         host_osFamily_entry.grid(column=1, row=10, padx=5, pady=5)
+
+        host_osGen_label = tk.Label(popup, text="Host OS Gen: ")
+        host_osGen_entry = tk.Label(popup, text=self.host_osGen)
+        host_osGen_label.grid(column=0, row=11, padx=5, pady=5)
+        host_osGen_entry.grid(column=1, row=11, padx=5, pady=5)
+
+        host_name_label = tk.Label(popup, text="Host Name: ")
+        host_name_entry = tk.Label(popup, text=self.host_name)
+        host_name_label.grid(column=0, row=12, padx=5, pady=5)
+        host_name_entry.grid(column=1, row=12, padx=5, pady=5)
+
+        host_vendor_label = tk.Label(popup, text="Host Vendor: ")
+        host_vendor_entry = tk.Label(popup, text=self.host_vendor)
+        host_vendor_label.grid(column=0, row=13, padx=5, pady=5)
+        host_vendor_entry.grid(column=1, row=13, padx=5, pady=5)
+
+        pen_test_id_label = tk.Label(popup, text="Pen Test ID: ")
+        pen_test_id_entry = tk.Label(popup, text=self.pen_test_id)
+        pen_test_id_label.grid(column=0, row=14, padx=5, pady=5)
+        pen_test_id_entry.grid(column=1, row=14, padx=5, pady=5)
+
+        result_label = tk.Label(popup, text="Result: ")
+        result_entry = tk.Label(popup, text=self.result)
+        result_label.grid(column=0, row=15, padx=5, pady=5)
+        result_entry.grid(column=1, row=15, padx=5, pady=5)
