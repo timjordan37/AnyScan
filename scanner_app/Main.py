@@ -82,13 +82,7 @@ def main():
         nonlocal scanned_hosts
 
         print("Scan start")
-
-        # Check scan type
-        print("Scan Type: ", System.Settings.getInstance().get_scan_type())
-
-        set_host(scanner.get_os_service_scan_details())
-
-
+        set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
         set_cpes_vulns(scanner.get_cpes())
         print("Scan END")
 
@@ -406,5 +400,5 @@ if __name__ == '__main__':
     if not db_location.exists():
         df.DBFunctions.build_db()
 
-    System.Settings.getInstance().init_config()
+    System.Settings.init_config()
     main()

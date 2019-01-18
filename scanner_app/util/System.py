@@ -49,12 +49,12 @@ class Settings():
     __instance = None
 
     """Methods"""
-    @staticmethod
-    def getInstance():
-        """ Static access method. """
-        if Settings.__instance == None:
-            Settings()
-        return Settings.__instance
+    # @staticmethod
+    # def getInstance():
+    #     """ Static access method. """
+    #     if Settings.__instance == None:
+    #         Settings()
+    #     return Settings.__instance
 
     def __init__(self):
         """ Virtually private constructor. """
@@ -65,10 +65,10 @@ class Settings():
 
     @staticmethod
     def init_config():
-        if not Settings.getInstance().does_settings_file_exist():
+        if not Settings.does_settings_file_exist():
             config = configparser.ConfigParser()
             config[SettingKey.config_key] = {
-                SettingKey.scan_type: Settings.getInstance().get_scan_type().value
+                SettingKey.scan_type: Settings.get_scan_type().value
             }
 
             with open(SettingKey.setting_file_name, 'w') as configfile:
@@ -93,10 +93,10 @@ class Settings():
     """Scan Type"""
     @staticmethod
     def get_scan_type():
-        if not SettingKey.scan_type in Settings.getInstance().get_settings_dict():
+        if not SettingKey.scan_type in Settings.get_settings_dict():
             return ScanType.detect_os_service_scan
 
-        scan_type_raw = Settings.getInstance().get_settings_dict()[SettingKey.scan_type]
+        scan_type_raw = Settings.get_settings_dict()[SettingKey.scan_type]
         return ScanType.scan_type_for_int(scan_type_raw)
 
     @staticmethod
