@@ -91,7 +91,7 @@ class Scanner:
     def get_os_service_scan_details(self):
         """Runs scan to detemine OS and running service of given host"""
         self._scanned = True
-        result = self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
+        result = self._scanner.scan(self._ips, self._ports, arguments='-A')
         hosts = []
         if self._scanned:
             # for each host scanned
