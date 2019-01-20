@@ -10,15 +10,12 @@ import datetime
 from util import DBFunctions as df
 import ctypes
 import sys
-# Main method to handle setting up and managing the UI
-
-
-# Constants
+import platform
+import os
+from elevate import elevate
 from helpers.ReportGenerator import ReportGenerator
 
-HOME_IP = '192.168.1.1'  # default gateway, not really home
-
-
+# Main method to handle setting up and managing the UI
 def main():
     print("Scanner App Started...")
 
@@ -384,21 +381,35 @@ def main():
 
 #  Runs the main method if this file is called to run
 if __name__ == '__main__':
-    def is_admin():
+    def is_win_admin():
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
         except:
             return False
 
+    def is_root():
+        return os.getuid() == 0
 
-    # TODO: test on windows further
-    if is_admin():
+    # print(platform.system())
+
+    if platform.system() == 'Windows':
+        print('Not on windows')
+        if is_win_admin():
+            db_location = Path("vulnDB.db")
+            if not db_location.exists():
+                df.DBFunctions.build_db()
+            main()
+        else:
+            # todo handle rejection of UAC prompt gracefully
+            # restarts with admin privileges
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+    else:
+        if not is_root():
+            # todo ensure works on pi and test further
+            # recreates process with AppleScript, sudo, or other appropriate command
+            # attempts graphical escalation first
+            elevate()
         db_location = Path("vulnDB.db")
         if not db_location.exists():
             df.DBFunctions.build_db()
         main()
-    else:
-        # This works and runs the app with admin privileges, but I'm getting errors
-        # when I scan. Most likely to my vm environment. Still investigating.
-        print('restarting...')
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
