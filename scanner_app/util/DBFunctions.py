@@ -282,7 +282,8 @@ class DBFunctions:
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
 
-    def query_repoort_info(self):
+    @staticmethod
+    def query_repoort_info():
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 

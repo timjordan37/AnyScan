@@ -1,6 +1,7 @@
 import tkinter as tk
 from views import DevicePopup as dp, VulnPopup as vp
 from views.DetailsPopup import DetailsPopup
+from views.ReportsPopup import ReportsPopup
 from pathlib import Path
 import random
 from helpers.Scanner import Scanner
@@ -161,7 +162,11 @@ def main():
     def on_report():
         """Click hanlder for report button"""
         print("User clicked 'Report'")
-        ReportGenerator.generatereport()
+        report_generator = df.DBFunctions.query_repoort_info()
+        pop = ReportsPopup(report_generator)
+        pop.new_popup()
+        for item in report_generator:
+            print(item)
 
     def on_host_listbox_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
