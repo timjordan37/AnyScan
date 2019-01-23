@@ -105,14 +105,6 @@ class VulnPopup():
 
         # Function to call the save vulnerability function
         def save_vuln():
-            # todo test vulnpopup after fix
-            print('Inside VulnPopup save_vuln()')
-            print(cve_name.get(), description.get(), cvss_score.get(),
-                  attack_vector.get(), attack_complexity.get(), custom_score.get(), custom_score_reason.get(),
-                  privileges_required.get(), user_interaction.get(), confidentiality_impact.get(),
-                  integrity_impact.get(), availability_impact.get(), base_score.get(), base_severity.get(),
-                  exploitability_score.get()    )
-
             if df.DBFunctions.save_vulnerability(cve_name.get(), description.get(), cvss_score.get(),
                                               attack_vector.get(), attack_complexity.get(), custom_score.get(), custom_score_reason.get(),
                                               privileges_required.get(), user_interaction.get(), confidentiality_impact.get(),

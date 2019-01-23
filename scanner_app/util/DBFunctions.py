@@ -19,6 +19,7 @@ class DBFunctions:
         # todo debug why this isn't saving or throwing errors
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
+            conn.commit()
         except sqlite3.IntegrityError as e:
             return False
 
@@ -286,11 +287,11 @@ class DBFunctions:
         return cursor.fetchone()
 
     @staticmethod
-    def query_repoort_info():
+    def query_report_info():
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
-        # todo verify info is being added to tables
+        # todo verify info is being retrieved successfully
         #
         cursor.execute("""SELECT * FROM Devices""")
         cursor.execute("""SELECT * FROM ScanHistory""")

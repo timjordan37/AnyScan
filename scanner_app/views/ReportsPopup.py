@@ -16,6 +16,7 @@ class ReportsPopup():
     result = ''
 
     def __init__(self, report_generator):
+        # todo throw error if report_generator is empty
         self._report_generator = report_generator
 
         self.device_name = report_generator[0]

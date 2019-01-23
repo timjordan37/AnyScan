@@ -33,7 +33,6 @@ class DevicePopup():
 
         # Function to call the save vulnerability function
         def save_device():
-            print(related_mod.get(), manufacturer_entry.get(), cpe_uri_entry.get())
             if df.DBFunctions.save_device(related_mod.get(), manufacturer_entry.get(), cpe_uri_entry.get()):
                 messagebox.showinfo("Success", "Device Saved Successfully")
             else:

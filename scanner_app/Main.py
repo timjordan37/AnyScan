@@ -162,7 +162,7 @@ def main():
     def on_report():
         """Click hanlder for report button"""
         print("User clicked 'Report'")
-        report_generator = df.DBFunctions.query_repoort_info()
+        report_generator = df.DBFunctions.query_report_info()
         # Debugging work
         #
         print(report_generator)
