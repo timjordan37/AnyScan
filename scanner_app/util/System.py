@@ -32,6 +32,27 @@ class ScanType(enum.Enum):
         }
         return scan_types[int(scan_int)]
 
+class SortType(enum.Enum):
+    alphaASC = 0
+    alphaDESC = 1
+
+
+    @staticmethod
+    def display_name_for_sort_type(type):
+        displayNames = {
+            0: "Alphabetical ASC",
+            1: "Alphabetical DESC"
+        }
+        return displayNames[type]
+
+    @staticmethod
+    def sort_type_for_int(scan_int):
+        sort_types = {
+            0: SortType.alphaASC,
+            1: SortType.alphaDESC
+        }
+        return sort_types[int(scan_int)]
+
 
 class SettingKey():
     # Dictionary Keys
@@ -40,6 +61,8 @@ class SettingKey():
 
     # Settings Keys
     scan_type = "SCAN_TYPE"
+    host_sort_type = "HOST_SORT_TYPE"
+    vuln_sort_type = "VULN_SORT_TYPE"
 
 
 
@@ -68,7 +91,8 @@ class Settings():
         if not Settings.does_settings_file_exist():
             config = configparser.ConfigParser()
             config[SettingKey.config_key] = {
-                SettingKey.scan_type: Settings.get_scan_type().value
+                SettingKey.scan_type: Settings.get_scan_type().value,
+                SettingKey.host_sort_type: Settings.get_host_sort_type().value
             }
 
             with open(SettingKey.setting_file_name, 'w') as configfile:
@@ -104,5 +128,23 @@ class Settings():
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.scan_type] = str(new_scan_type.value)
+        with open(SettingKey.setting_file_name, 'w') as configfile:
+            config.write(configfile)
+
+    """Host Sort Type"""
+
+    @staticmethod
+    def get_host_sort_type():
+        if not SettingKey.host_sort_type in Settings.get_settings_dict():
+            return SortType.alphaASC
+
+        sort_type_raw = Settings.get_settings_dict()[SettingKey.host_sort_type]
+        return SortType.sort_type_for_int(sort_type_raw)
+
+    @staticmethod
+    def set_host_sort_type(new_sort_type):
+        config = configparser.ConfigParser()
+        config.read(SettingKey.setting_file_name)
+        config[SettingKey.config_key][SettingKey.host_sort_type] = str(new_sort_type.value)
         with open(SettingKey.setting_file_name, 'w') as configfile:
             config.write(configfile)

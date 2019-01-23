@@ -1,5 +1,5 @@
 import tkinter as tk
-from views import DevicePopup as dp, VulnPopup as vp, ScanSettingsPopup as ssp
+from views import DevicePopup as dp, VulnPopup as vp, ScanSettingsPopup as ssp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from pathlib import Path
 import random
@@ -197,6 +197,13 @@ def main():
     def show_scan_settings_popup():
         ssp.ScanSettingsPopup.new_popup()
 
+    def on_settings():
+        """Click handler for the Settings button"""
+        show_settings_popup()
+
+    def show_settings_popup():
+        sp.SettingsPopup.new_popup()
+
     # Variables
     vulnerabilities = []
     scanned_hosts = []
@@ -387,6 +394,10 @@ def main():
     # Add Device
     add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=new_device_popup)
     add_vulnerabilities_button.grid(row=0, column=3)
+
+    # Settings
+    add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings", command=on_settings)
+    add_vulnerabilities_button.grid(row=0, column=4)
 
     # Run the program with UI
     root.geometry("800x500")
