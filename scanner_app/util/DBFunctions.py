@@ -13,6 +13,10 @@ class DBFunctions:
         cursor = conn.cursor()
         device_info = (deviceName, deviceManufacturer, cpeURI)
 
+        print('Inside DBFunctions save_device')
+        print(device_info)
+
+        # todo debug why this isn't saving or throwing errors
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
         except sqlite3.IntegrityError as e:
@@ -23,7 +27,7 @@ class DBFunctions:
     #Saving a Vulnerability to the database
     @staticmethod
     def save_vulnerability(cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, priviledgesRequired,
+                           customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore):
         conn = sqlite3.connect('vulnDB.db')
@@ -40,12 +44,11 @@ class DBFunctions:
         vulnID = maxID + 1
 
         vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, priviledgesRequired,
+                           customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore)
         try:
-            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                           ?, ?, ?)''', vulnerability_info)
+            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return False
@@ -100,7 +103,7 @@ class DBFunctions:
             attackVector TEXT, 
             attackComplexity TEXT, 
             customScore TEXT, 
-            customScoreReason TEXT
+            customScoreReason TEXT,
             priviligesRequired TEXT, 
             userInteraction TEXT, 
             confidentialityImpact TEXT, 
@@ -287,6 +290,8 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
+        # todo verify info is being added to tables
+        #
         cursor.execute("""SELECT * FROM Devices""")
         cursor.execute("""SELECT * FROM ScanHistory""")
         cursor.execute("""SELECT * FROM PenTestHistory""")

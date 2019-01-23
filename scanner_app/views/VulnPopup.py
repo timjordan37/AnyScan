@@ -5,21 +5,21 @@ class VulnPopup():
 
     @staticmethod
     def new_popup():
-        cve_name = ""
-        description = ""
-        cvss_score = ""
-        attack_vector = ""
-        attack_complexity = ""
-        custom_score = ""
-        custom_score_reason = ""
-        privileges_required = ""
-        user_interaction = ""
-        confidentiality_impact = ""
-        integrity_impact = ""
-        availability_impact = ""
-        base_score = ""
-        base_severity = ""
-        exploitability_score = ""
+        cve_name = tk.StringVar()
+        description = tk.StringVar()
+        cvss_score = tk.StringVar()
+        attack_vector = tk.StringVar()
+        attack_complexity = tk.StringVar()
+        custom_score = tk.StringVar()
+        custom_score_reason = tk.StringVar()
+        privileges_required = tk.StringVar()
+        user_interaction = tk.StringVar()
+        confidentiality_impact = tk.StringVar()
+        integrity_impact = tk.StringVar()
+        availability_impact = tk.StringVar()
+        base_score = tk.StringVar()
+        base_severity = tk.StringVar()
+        exploitability_score = tk.StringVar()
 
         # Creating the Popup Window
         vuln_popup = tk.Toplevel(padx=10, pady=10)
@@ -105,11 +105,19 @@ class VulnPopup():
 
         # Function to call the save vulnerability function
         def save_vuln():
-            if df.DBFunctions.save_vulnerability(cve_name, description, cvss_score,
-                                              attack_vector, attack_complexity, custom_score, custom_score_reason,
-                                              privileges_required, user_interaction, confidentiality_impact,
-                                              integrity_impact, availability_impact, base_score, base_severity,
-                                              exploitability_score):
+            # todo test vulnpopup after fix
+            print('Inside VulnPopup save_vuln()')
+            print(cve_name.get(), description.get(), cvss_score.get(),
+                  attack_vector.get(), attack_complexity.get(), custom_score.get(), custom_score_reason.get(),
+                  privileges_required.get(), user_interaction.get(), confidentiality_impact.get(),
+                  integrity_impact.get(), availability_impact.get(), base_score.get(), base_severity.get(),
+                  exploitability_score.get()    )
+
+            if df.DBFunctions.save_vulnerability(cve_name.get(), description.get(), cvss_score.get(),
+                                              attack_vector.get(), attack_complexity.get(), custom_score.get(), custom_score_reason.get(),
+                                              privileges_required.get(), user_interaction.get(), confidentiality_impact.get(),
+                                              integrity_impact.get(), availability_impact.get(), base_score.get(), base_severity.get(),
+                                              exploitability_score.get()):
                 tk.messagebox.showinfo("Success", "Vulnerability Added Successfully")
 
             else:

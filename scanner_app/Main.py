@@ -163,6 +163,12 @@ def main():
         """Click hanlder for report button"""
         print("User clicked 'Report'")
         report_generator = df.DBFunctions.query_repoort_info()
+        # Debugging work
+        #
+        print(report_generator)
+        #
+        #
+        #
         pop = ReportsPopup(report_generator)
         pop.new_popup()
         for item in report_generator:
