@@ -164,7 +164,7 @@ def main():
         print("User clicked 'Report'")
         report_generator = df.DBFunctions.query_report_info()
         # Debugging work
-        #
+        # todo ensure report_generator has correct information
         print(report_generator)
         #
         #

@@ -290,14 +290,15 @@ class DBFunctions:
     def query_report_info():
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
+        cursor2 = conn.cursor()
 
-        # todo verify info is being retrieved successfully
+        # todo change query to needed data
         #
         cursor.execute("""SELECT * FROM Devices""")
-        cursor.execute("""SELECT * FROM ScanHistory""")
-        cursor.execute("""SELECT * FROM PenTestHistory""")
-
-        return cursor.fetchall()
+        cursor2.execute("""SELECT * FROM ScanHistory""")
+        #cursor.execute("""SELECT * FROM PenTestHistory""")
+        results = (cursor.fetchall(), cursor2.fetchall())
+        return results
 
     # Imports Data from NVD JSON file
     @staticmethod

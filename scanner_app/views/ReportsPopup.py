@@ -21,14 +21,14 @@ class ReportsPopup():
 
         self.device_name = report_generator[0]
         self.device_manufacturer = report_generator[1]
-        self.cpe_uri = report_generator[2]
+        #self.cpe_uri = report_generator[2]
 
-        self.scan_id = report_generator[3]
-        self.date = report_generator[4]
-        self.duration = report_generator[5]
+        #self.scan_id = report_generator[3]
+        #self.date = report_generator[4]
+        #self.duration = report_generator[5]
 
-        self.pen_test_id = report_generator[6]
-        self.result = report_generator[7]
+        #self.pen_test_id = report_generator[6]
+        #self.result = report_generator[7]
 
     def new_popup(self):
 
