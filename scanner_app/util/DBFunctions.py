@@ -294,9 +294,8 @@ class DBFunctions:
 
         # todo change query to needed data
         #
-        cursor.execute("""SELECT * FROM Devices""")
-        cursor2.execute("""SELECT * FROM ScanHistory""")
-        #cursor.execute("""SELECT * FROM PenTestHistory""")
+        cursor.execute("""SELECT * FROM Hosts""")
+        cursor2.execute("""SELECT * FROM Vulnerabilities""")
         results = (cursor.fetchall(), cursor2.fetchall())
         return results
 
