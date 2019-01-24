@@ -295,7 +295,7 @@ class DBFunctions:
         # todo change query to needed data
         #
         cursor.execute("""SELECT * FROM Hosts""")
-        cursor2.execute("""SELECT * FROM Vulnerabilities""")
+        cursor2.execute("""SELECT * FROM Vulnerabilities WHERE baseScore IS >= 7.0""")
         results = (cursor.fetchall(), cursor2.fetchall())
         return results
 
