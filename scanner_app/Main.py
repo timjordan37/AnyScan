@@ -1,5 +1,5 @@
 import tkinter as tk
-from views import DevicePopup as dp, VulnPopup as vp, ScanSettingsPopup as ssp, SettingsPopup as sp
+from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from pathlib import Path
 import random
@@ -53,7 +53,19 @@ def main():
     def reload_hosts_listbox():
         """Update hosts box with scanned hosts"""
         hosts_listbox.delete(0, tk.END)
-        for host in scanned_hosts:
+
+        # Sort according to the Host Sort Setting
+        reverse_sort = False
+
+        if System.Settings.get_host_sort_type() == System.SortType.alphaDESC:
+            reverse_sort = True
+
+        sorted_scanned_hosts = sorted(scanned_hosts, key=lambda x: (x.get_display_name()), reverse=reverse_sort)
+
+        if sorted_scanned_hosts is None:
+            return
+
+        for host in sorted_scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_val())
 
     def reload_vulnerabilities_listbox():
@@ -136,10 +148,6 @@ def main():
         scan_thread = SThread(0, "SCAN_THREAD_1", 5, scan_thread_completion)
         scan_thread.start()
 
-    def on_change_scan_type():
-        """Click handler for scan settings button"""
-        show_scan_settings_popup()
-
     def on_check_vulnerabilities():
         """Click hanlder for check vulnerabilities button"""
         if cpes:
@@ -193,9 +201,6 @@ def main():
     def new_device_popup():
         """Click handler for new device button"""
         dp.DevicePopup.new_popup()
-
-    def show_scan_settings_popup():
-        ssp.ScanSettingsPopup.new_popup()
 
     def on_settings():
         """Click handler for the Settings button"""
@@ -280,10 +285,6 @@ def main():
     # Setup Left frame scan button
     scan_button = tk.Button(scan_button_frame, text="Scan", command=on_scan)
     scan_button.grid(row=0, column=0, pady=(8, 8))
-
-    ## Setup Left frame change scan button
-    change_scan_button = tk.Button(scan_button_frame, text="Change Scan Type", command=on_change_scan_type)
-    change_scan_button.grid(row=0, column=1, pady=(8, 8))
 
     #################
     # Setup RightFrame
