@@ -295,7 +295,10 @@ class DBFunctions:
         # todo change query to needed data
         #
         cursor.execute("""SELECT * FROM Hosts""")
-        cursor2.execute("""SELECT * FROM Vulnerabilities WHERE baseScore IS >= 7.0""")
+        # I fixed this, but we'll want to add a range of baseScore vulns to the DB to test
+        # Also, if baseScore isn't a number I'm pretty sure sqlite will consider it bigger no matter what
+        # We will want to test what happens there too  
+        cursor2.execute("""SELECT * FROM Vulnerabilities WHERE baseScore >= 7.0""")
         results = (cursor.fetchall(), cursor2.fetchall())
         return results
 

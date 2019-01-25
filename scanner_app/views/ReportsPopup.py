@@ -32,6 +32,22 @@ class ReportsPopup():
     def __init__(self, report_generator):
         # todo throw error if report_generator is empty
         self._report_generator = report_generator
+        print('From ReportsPopup: ')
+        # Devices
+        print(self._report_generator[0])
+        print('\n\n')
+        # Vulnerabilities
+        print(self._report_generator[1])
+        print('\n\n')
+        # Vuln 1
+        print(self._report_generator[1][0])
+        # Vuln 2
+        print(self._report_generator[1][1])
+        # Vuln 3
+        print(self._report_generator[1][2])
+        # Vuln 4
+        print(self._report_generator[1][3])
+
 
         self.host_id = report_generator[0]
         self.host_ip = report_generator[1]
