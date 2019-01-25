@@ -33,7 +33,7 @@ class Scanner:
     def udp_scan(self):
         """Runs a UDP scan good for DNS, SNMP, and DHCP. Typically takes longer than a TCP scan"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports, arguments='-sU')
+        return self._scanner.scan(self._ips, self._ports, arguments='-sU', sudo=True)
 
     def fast_scan(self):
         """Quick scan of small port range with default arguments"""
