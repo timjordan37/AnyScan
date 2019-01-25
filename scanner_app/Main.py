@@ -1,5 +1,5 @@
 import tkinter as tk
-from views import DevicePopup as dp, VulnPopup as vp
+from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from pathlib import Path
 import random
@@ -7,12 +7,12 @@ from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
-from util import DBFunctions as df
 import ctypes
 import sys
 import platform
 import os
 from elevate import elevate
+from util import DBFunctions as df, System
 from helpers.ReportGenerator import ReportGenerator
 
 # Main method to handle setting up and managing the UI
@@ -52,7 +52,19 @@ def main():
     def reload_hosts_listbox():
         """Update hosts box with scanned hosts"""
         hosts_listbox.delete(0, tk.END)
-        for host in scanned_hosts:
+
+        # Sort according to the Host Sort Setting
+        reverse_sort = False
+
+        if System.Settings.get_host_sort_type() == System.SortType.alphaDESC:
+            reverse_sort = True
+
+        sorted_scanned_hosts = sorted(scanned_hosts, key=lambda x: (x.get_display_name()), reverse=reverse_sort)
+
+        if sorted_scanned_hosts is None:
+            return
+
+        for host in sorted_scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_val())
 
     def reload_vulnerabilities_listbox():
@@ -81,7 +93,7 @@ def main():
         nonlocal scanned_hosts
 
         print("Scan start")
-        set_host(scanner.get_os_service_scan_details())
+        set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
         set_cpes_vulns(scanner.get_cpes())
         print("Scan END")
 
@@ -189,6 +201,13 @@ def main():
         """Click handler for new device button"""
         dp.DevicePopup.new_popup()
 
+    def on_settings():
+        """Click handler for the Settings button"""
+        show_settings_popup()
+
+    def show_settings_popup():
+        sp.SettingsPopup.new_popup()
+
     # Variables
     vulnerabilities = []
     scanned_hosts = []
@@ -259,9 +278,12 @@ def main():
     port_end_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_end_entry_var)
     port_end_entry.grid(row=0, column=1, padx=(16, 0))
 
+    scan_button_frame = tk.Frame(left_frame)
+    scan_button_frame.grid(row=5, column=0)
+
     # Setup Left frame scan button
-    scan_button = tk.Button(left_frame, text="Scan", command=on_scan)
-    scan_button.grid(row=5, column=0, pady=(8, 8))
+    scan_button = tk.Button(scan_button_frame, text="Scan", command=on_scan)
+    scan_button.grid(row=0, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
@@ -373,6 +395,10 @@ def main():
     add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=new_device_popup)
     add_vulnerabilities_button.grid(row=0, column=3)
 
+    # Settings
+    add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings", command=on_settings)
+    add_vulnerabilities_button.grid(row=0, column=4)
+
     # Run the program with UI
     root.geometry("800x500")
     root.minsize(800, 500)
@@ -390,10 +416,7 @@ if __name__ == '__main__':
     def is_root():
         return os.getuid() == 0
 
-    # print(platform.system())
-
     if platform.system() == 'Windows':
-        print('Not on windows')
         if is_win_admin():
             db_location = Path("vulnDB.db")
             if not db_location.exists():
