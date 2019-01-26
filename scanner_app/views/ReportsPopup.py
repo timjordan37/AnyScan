@@ -4,14 +4,9 @@ class ReportsPopup():
 
     _report_generator = ''
 
-    host_id = ''
     host_ip = ''
     host_macaddress = ''
-    host_osfamily = ''
-    host_osgen = ''
     host_name = ''
-    host_vendor = ''
-    scan_id = ''
 
     vuln_id = ''
     cve_name = ''
@@ -32,57 +27,57 @@ class ReportsPopup():
     def __init__(self, report_generator):
         # todo throw error if report_generator is empty
         self._report_generator = report_generator
-        print('From ReportsPopup: ')
+        #print('From ReportsPopup: ')
         # Devices
-        print(self._report_generator[0])
-        print('\n\n')
+        #print(self._report_generator[0])
+        #print('\n\n')
         # Vulnerabilities
-        print(self._report_generator[1])
-        print('\n\n')
+        #print(self._report_generator[1])
+        #print('\n\n')
         # Vuln 1
-        print(self._report_generator[1][0])
+        #print(self._report_generator[1][0])
         # Vuln 2
-        print(self._report_generator[1][1])
+        #print(self._report_generator[1][1])
         # Vuln 3
-        print(self._report_generator[1][2])
+        #print(self._report_generator[1][2])
         # Vuln 4
-        print(self._report_generator[1][3])
+        #print(self._report_generator[1][3])
 
 
-        self.host_id = report_generator[0]
-        self.host_ip = report_generator[1]
-        self.host_macaddress = report_generator[2]
-        self.host_osfamily = report_generator[3]
-        self.host_osgen = report_generator[4]
-        self.host_name = report_generator[5]
-        self.host_vendor = report_generator[6]
-        self.scan_id = report_generator[7]
+        #self.host_id = report_generator[0]
+        self.host_ip = report_generator[0]
+        self.host_macaddress = report_generator[1]
+        #self.host_osfamily = report_generator[3]
+        #self.host_osgen = report_generator[4]
+        self.host_name = report_generator[2]
+        #self.host_vendor = report_generator[6]
+        #self.scan_id = report_generator[7]
 
-        self.vuln_id = report_generator[8]
-        self.cve_name = report_generator[9]
-        self.description = report_generator[10]
-        self.attack_vector = report_generator[11]
-        self.attack_complexity = report_generator[12]
-        self.custom_score = report_generator[13]
-        self.custom_score_reason = report_generator[14]
-        self.privileges_required = report_generator[15]
-        self.user_interaction = report_generator[16]
-        self.confidentiality_impact = report_generator[17]
-        self.integrity_impact = report_generator[18]
-        self.availability_impact = report_generator[19]
-        self.base_score = report_generator[20]
-        self.base_severity = report_generator[21]
-        self.exploitability_score = report_generator[22]
+        '''self.vuln_id = report_generator[3]
+        self.cve_name = report_generator[4]
+        self.description = report_generator[4]
+        self.attack_vector = report_generator[5]
+        self.attack_complexity = report_generator[6]
+        self.custom_score = report_generator[7]
+        self.custom_score_reason = report_generator[8]
+        self.privileges_required = report_generator[9]
+        self.user_interaction = report_generator[10]
+        self.confidentiality_impact = report_generator[11]
+        self.integrity_impact = report_generator[12]
+        self.availability_impact = report_generator[13]
+        self.base_score = report_generator[14]
+        self.base_severity = report_generator[15]
+        self.exploitability_score = report_generator[16]'''
 
     def new_popup(self):
 
         popup = tk.Toplevel(padx=10, pady=10)
         popup.wm_title("Scan Report")
 
-        host_id_label = tk.Label(popup, text="Host ID: ")
+        '''host_id_label = tk.Label(popup, text="Host ID: ")
         host_id_entry = tk.Label(popup, text=self.host_id)
         host_id_label.grid(column=0, row=0, padx=5, pady=5)
-        host_id_entry.grid(column=1, row=0, padx=5, pady=5)
+        host_id_entry.grid(column=1, row=0, padx=5, pady=5)'''
 
         host_ip_label = tk.Label(popup, text="Host IP: ")
         host_ip_entry = tk.Label(popup, text=self.host_ip)
@@ -94,7 +89,7 @@ class ReportsPopup():
         host_macaddress_label.grid(column=0, row=2, padx=5, pady=5)
         host_macaddress_entry.grid(column=1, row=2, padx=5, pady=5)
 
-        host_osfamily_label = tk.Label(popup, text="Host OS Family: ")
+        '''host_osfamily_label = tk.Label(popup, text="Host OS Family: ")
         host_osfamily_entry = tk.Label(popup, text=self.host_osfamily)
         host_osfamily_label.grid(column=0, row=3, padx=5, pady=5)
         host_osfamily_entry.grid(column=1, row=3, padx=5, pady=5)
@@ -102,14 +97,14 @@ class ReportsPopup():
         host_osgen_label = tk.Label(popup, text="Host OS Gen: ")
         host_osgen_entry = tk.Label(popup, text=self.host_osgen)
         host_osgen_label.grid(column=0, row=4, padx=5, pady=5)
-        host_osgen_entry.grid(column=1, row=4, padx=5, pady=5)
+        host_osgen_entry.grid(column=1, row=4, padx=5, pady=5)'''
 
         host_name_label = tk.Label(popup, text="Host Name: ")
         host_name_entry = tk.Label(popup, text=self.host_name)
         host_name_label.grid(column=0, row=5, padx=5, pady=5)
         host_name_entry.grid(column=1, row=5, padx=5, pady=5)
 
-        host_vendor_label = tk.Label(popup, text="Host Vendor: ")
+        '''host_vendor_label = tk.Label(popup, text="Host Vendor: ")
         host_vendor_entry = tk.Label(popup, text=self.host_vendor)
         host_vendor_label.grid(column=0, row=6, padx=5, pady=5)
         host_vendor_entry.grid(column=1, row=6, padx=5, pady=5)
@@ -117,7 +112,7 @@ class ReportsPopup():
         scan_id_label = tk.Label(popup, text="Scan ID: ")
         scan_id_entry = tk.Label(popup, text=self.scan_id)
         scan_id_label.grid(column=0, row=7, padx=5, pady=5)
-        scan_id_entry.grid(column=1, row=7, padx=5, pady=5)
+        scan_id_entry.grid(column=1, row=7, padx=5, pady=5)'''
 
         vuln_id_label = tk.Label(popup, text="Vulnerability ID: ")
         vuln_id_entry = tk.Label(popup, text=self.vuln_id)
