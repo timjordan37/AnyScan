@@ -92,7 +92,8 @@ class Settings():
             config = configparser.ConfigParser()
             config[SettingKey.config_key] = {
                 SettingKey.scan_type: Settings.get_scan_type().value,
-                SettingKey.host_sort_type: Settings.get_host_sort_type().value
+                SettingKey.host_sort_type: Settings.get_host_sort_type().value,
+                SettingKey.vuln_sort_type: Settings.get_vuln_sort_type().value,
             }
 
             with open(SettingKey.setting_file_name, 'w') as configfile:
@@ -102,9 +103,7 @@ class Settings():
     @staticmethod
     def does_settings_file_exist():
         config = configparser.ConfigParser()
-        #  We need two 'not's here because 'not variable' will check if the file does not exist, and we want to know if
-        #  it does exist, so we take another not to give us the correct value in context
-        return not not config.read(SettingKey.setting_file_name)
+        return config.read(SettingKey.setting_file_name)
 
     @staticmethod
     def get_settings_dict():
@@ -146,5 +145,23 @@ class Settings():
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.host_sort_type] = str(new_sort_type.value)
+        with open(SettingKey.setting_file_name, 'w') as configfile:
+            config.write(configfile)
+
+    """Vuln Sort Type"""
+
+    @staticmethod
+    def get_vuln_sort_type():
+        if not SettingKey.vuln_sort_type in Settings.get_settings_dict():
+            return SortType.alphaASC
+
+        sort_type_raw = Settings.get_settings_dict()[SettingKey.vuln_sort_type]
+        return SortType.sort_type_for_int(sort_type_raw)
+
+    @staticmethod
+    def set_vuln_sort_type(new_sort_type):
+        config = configparser.ConfigParser()
+        config.read(SettingKey.setting_file_name)
+        config[SettingKey.config_key][SettingKey.vuln_sort_type] = str(new_sort_type.value)
         with open(SettingKey.setting_file_name, 'w') as configfile:
             config.write(configfile)

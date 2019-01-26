@@ -71,7 +71,20 @@ def main():
     def reload_vulnerabilities_listbox():
         """Update vulnerabilites box with found vulnerabilites"""
         vulnerabilities_listbox.delete(0, tk.END)
-        for vulnerability in vulnerabilities:
+
+        # Sort according to the Host Sort Setting
+        reverse_sort = False
+
+        if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
+            reverse_sort = True
+
+        # sorted_scanned_vulns = sorted(vulnerabilities, key=lambda x: (x.get_display_name()), reverse=reverse_sort)
+        sorted_scanned_vulns = vulnerabilities.sort(reverse=reverse_sort)
+
+        if sorted_scanned_vulns is None:
+            return
+
+        for vulnerability in sorted_scanned_vulns:
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
         nonlocal vulnerabilities_header_label
