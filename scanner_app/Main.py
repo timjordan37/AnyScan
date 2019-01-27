@@ -14,7 +14,6 @@ import platform
 import os
 from elevate import elevate
 from util import DBFunctions as df, System
-from helpers.ReportGenerator import ReportGenerator
 
 
 # Main method to handle setting up and managing the UI
