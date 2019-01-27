@@ -77,9 +77,8 @@ def main():
 
         if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
             reverse_sort = True
-
-        # sorted_scanned_vulns = sorted(vulnerabilities, key=lambda x: (x.get_display_name()), reverse=reverse_sort)
-        sorted_scanned_vulns = vulnerabilities.sort(reverse=reverse_sort)
+            
+        sorted_scanned_vulns = sorted(vulnerabilities, reverse=reverse_sort)
 
         if sorted_scanned_vulns is None:
             return
