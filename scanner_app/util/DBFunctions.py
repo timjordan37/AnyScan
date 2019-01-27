@@ -296,14 +296,14 @@ class DBFunctions:
 
         # todo change query to needed data
         #
-        cursor.execute("""SELECT name FROM Hosts""")
-        cursor2.execute("""SELECT ip FROM Hosts""")
-        cursor3.execute("""SELECT macAddress FROM Hosts""")
+        cursor.execute("""SELECT ip FROM Hosts""")
+        cursor2.execute("""SELECT macAddress FROM Hosts""")
+        cursor3.execute("""SELECT name FROM Hosts""")
         # I fixed this, but we'll want to add a range of baseScore vulns to the DB to test
         # Also, if baseScore isn't a number I'm pretty sure sqlite will consider it bigger no matter what
         # We will want to test what happens there too  
         #cursor4.execute("""SELECT * FROM Vulnerabilities WHERE baseScore >= 7.0""")
-        results = (cursor.fetchone(), cursor2.fetchone(), cursor3.fetchone())
+        results = (cursor.fetchall(), cursor2.fetchall(), cursor3.fetchall())
         return results
 
     # Imports Data from NVD JSON file
