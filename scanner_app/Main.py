@@ -15,6 +15,7 @@ from elevate import elevate
 from util import DBFunctions as df, System
 from helpers.ReportGenerator import ReportGenerator
 
+
 # Main method to handle setting up and managing the UI
 def main():
     print("Scanner App Started...")
@@ -139,6 +140,7 @@ def main():
         """Set vulnerabilities from cps"""
         nonlocal cpes
         cpes = c
+
         nonlocal vulnerabilities
         vulnerabilities = df.DBFunctions.query_cves(cpes)
         # reload ui
@@ -156,6 +158,24 @@ def main():
         if cpes:
             set_cpes_vulns(cpes)
         print("User clicked 'check vulnerabilities'")
+
+    def find_exploit():
+        """Click handler for exploitation search"""
+        nonlocal cve_selection
+
+        if cve_selection:
+            print(cve_selection)
+            #todo make data viewavle to user
+        else:
+            print('HERE HERE jk')
+            # why am I getting here before I run a scan or even hit the button???
+
+
+
+
+
+
+
 
     def new_vuln_popup():
         """Click handler for new vuln button"""
@@ -196,10 +216,12 @@ def main():
         if len(listbox.curselection()) == 0:
             return
 
-        index = int(listbox.curselection()[0])
-
+        nonlocal vulnerabilities_listbox
         nonlocal vulnerability_label
-        vulnerability_label['text'] = vulnerabilities[index]
+        nonlocal cve_selection
+
+        vulnerability_label['text'] = vulnerabilities_listbox.get(listbox.curselection())
+        cve_selection = vulnerabilities_listbox.get(listbox.curselection())
 
     def new_device_popup():
         """Click handler for new device button"""
@@ -216,6 +238,7 @@ def main():
     vulnerabilities = []
     scanned_hosts = []
     cpes = {}
+    cve_selection = ''
 
     # Setup root ui
     root = tk.Tk()
@@ -345,8 +368,8 @@ def main():
     #################
     #
     # Check Vulnerabilities button
-    check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities",
-                                             command=on_check_vulnerabilities)
+    check_vulnerabilities_button = tk.Button(right_frame, text="Find Exploit",
+                                             command=find_exploit)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
     check_vulnerabilities_button.config(state="disabled")
 
@@ -425,6 +448,7 @@ if __name__ == '__main__':
             db_location = Path("vulnDB.db")
             if not db_location.exists():
                 df.DBFunctions.build_db()
+                # Maybe abstract this out for user controller importing
                 df.DBFunctions.import_NVD_JSON()
             main()
         else:

@@ -32,14 +32,14 @@ class DBFunctions:
         cursor.execute('SELECT MAX(VulnID) FROM Vulnerabilities')
         conn.commit()
         maxIDTuple = cursor.fetchone()
-        print("LOOK TUPLE: ", maxIDTuple)
+        #print("LOOK TUPLE: ", maxIDTuple)
         maxID = maxIDTuple[0]
 
         if maxID is None:
             maxID = 0
 
         vulnID = maxID + 1
-        print(vulnID)
+        #print(vulnID)
         vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
                            customScoreReason, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
@@ -180,6 +180,7 @@ class DBFunctions:
         """
         conn = sqlite3.connect('vulnDB.db')
         cves = []
+        test_data = set()
         cursor = conn.cursor()
         print("CVE Query HERE")
 
@@ -261,14 +262,22 @@ class DBFunctions:
         # return cves
         # todo delete static testing to test on imported db
 
-        for hList in cpe_dict:
-            for cpe in cpe_dict[hList]:
-                cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
-                vul = cursor.fetchone()
-                if vul:
-                    cves.append(vul[1])
+        cursor.execute('''SELECT cveName FROM CPEvulns''')
+        for row in cursor:
+            test_data.add(row[0])
+
+        return test_data
+
+
+
+        # for hList in cpe_dict:
+        #     for cpe in cpe_dict[hList]:
+        #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
+        #         vul = cursor.fetchone()
+        #         if vul:
+        #             cves.append(vul[1])
         # return all the fun stuff
-        return cves
+        # return cves
 
     def query_vulns(cve):
         """Query the database for a specific vulnerability
@@ -328,8 +337,7 @@ class DBFunctions:
                     print("No CPE Matches")
 
             i += 1
-            print(i)
-
+            
     # Retrieves all data for specified ScanID
     @staticmethod
     def retrieve_scanID_data(scanID):
@@ -357,3 +365,18 @@ class DBFunctions:
         cursor = conn.cursor()
         deleteID = (scanID)
         cursor.execute('''DELETE FROM ScanHistory WHERE ScanID = ?''', deleteID)
+
+    @staticmethod
+    def get_full_cve():
+        """Returns all unique CVEs in database
+
+        """
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        results = set()
+        cursor.execute('''SELECT cveName FROM CPEvulns''')
+
+        for row in cursor:
+            results.add(row[0])
+
+        return results

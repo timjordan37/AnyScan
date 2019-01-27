@@ -2,7 +2,7 @@
 from util.ExploitSearch import ExploitSearcher
 
 # cve 2018-4240 is a macOS denial of service (DoS) vulnerability
-es = ExploitSearcher('2018-4042')
+es = ExploitSearcher('CVE-2019-0004')
 
 print(es.search(), "exploit(s) found")
 print('Exploits found: ', es.total())
