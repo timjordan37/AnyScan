@@ -52,6 +52,7 @@ def main():
     def reload_hosts_listbox():
         """Update hosts box with scanned hosts"""
         hosts_listbox.delete(0, tk.END)
+        nonlocal scanned_hosts
 
         # Sort according to the Host Sort Setting
         reverse_sort = False
@@ -63,6 +64,9 @@ def main():
 
         if sorted_scanned_hosts is None:
             return
+
+        # Update hosts to the sorted version to ensure details on select are correct
+        scanned_hosts = sorted_scanned_hosts
 
         for host in sorted_scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_val())
