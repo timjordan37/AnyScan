@@ -1,5 +1,5 @@
 import nmap
-from util import DBFunctions as df
+from util import DBFunctions as df, System
 from models.Host import Host
 
 
@@ -33,12 +33,13 @@ class Scanner:
     def udp_scan(self):
         """Runs a UDP scan good for DNS, SNMP, and DHCP. Typically takes longer than a TCP scan"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports, arguments='-sU')
+        return self._scanner.scan(self._ips, self._ports, arguments='-sU', sudo=True)
 
     def fast_scan(self):
         """Quick scan of small port range with default arguments"""
-        return self._scanner.scan(self._ips, self._ports)
         self._scanned = True
+        return self._scanner.scan(self._ips, self._ports)
+
 
     def detect_os_service_scan(self):
         """Runs scan to detemine OS and running service of given host"""
@@ -86,6 +87,45 @@ class Scanner:
             return result['scan'][host]["addresses"]["mac"]
         else:
             return ""
+
+    """Runs a scan of the given type"""
+    def get_scan_details(self, scan_type):
+        """Runs scan to detemine OS and running service of given host"""
+        result = None
+        # Check scan type
+        if scan_type == System.ScanType.full_scan:
+            print("Full Scan...")
+            result = self.full_scan()
+        elif scan_type == System.ScanType.script_scan:
+            print("Script Scan...")
+            result = self.script_scan()
+        elif scan_type == System.ScanType.udp_scan:
+            print("UDP Scan...")
+            result = self.udp_scan()
+        elif scan_type == System.ScanType.fast_scan:
+            print("Fast Scan...")
+            result = self.fast_scan()
+        elif scan_type == System.ScanType.detect_os_service_scan:
+            print("Detect OS Service Scan...")
+            result = self.detect_os_service_scan()
+
+        hosts = []
+        if self._scanned:
+            # for each host scanned
+            for host in self._scanner.all_hosts():
+                print("-----------------")
+                print(result['scan'][host])
+                print("-----------------")
+                state = result['scan'][host]["status"]["state"]
+                mac = self.get_mac_address(result, host)
+                vendor = self.get_vendor(result, host, mac)
+                val_arr = self.get_os_details(result, host)
+                name = val_arr[0]
+                os_gen = val_arr[1]
+                os_family = val_arr[2]
+                hosts.append(Host(host, state, name, os_family, os_gen, vendor, mac))
+
+        return hosts
 
 # Requires sudo must be ran from commandline
     def get_os_service_scan_details(self):
