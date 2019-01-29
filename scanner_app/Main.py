@@ -2,6 +2,7 @@ import tkinter as tk
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from views.ReportsPopup import ReportsPopup
+from views.ExploitPopup import ExploitPopup
 from pathlib import Path
 import random
 from helpers.Scanner import Scanner
@@ -13,7 +14,7 @@ import sys
 import platform
 import os
 from elevate import elevate
-from util import DBFunctions as df, System
+from util import DBFunctions as df, System, ExploitSearch
 
 
 # Main method to handle setting up and managing the UI
@@ -165,7 +166,12 @@ def main():
 
         if cve_selection:
             print(cve_selection)
-            #todo make data viewavle to user
+            es = ExploitSearch.ExploitSearcher(cve_selection)
+            es.search()
+            popup = ExploitPopup(es.get_results())
+            popup.new_pupup()
+            es.print_all()
+            #todo make data viewable to user
         else:
             print('HERE HERE jk')
             # why am I getting here before I run a scan or even hit the button???
