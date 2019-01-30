@@ -8,7 +8,6 @@ root = tk.Tk()
 root.title("Tabs Prototype")
 
 rows = 0
-
 while rows < 50:
     root.rowconfigure(rows, weight=1)
     root.columnconfigure(rows, weight=1)
