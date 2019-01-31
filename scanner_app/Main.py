@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import *
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from pathlib import Path
@@ -221,6 +222,11 @@ def main():
     def show_settings_popup():
         sp.SettingsPopup.new_popup()
 
+    def donothing():
+        filewin = Toplevel(root)
+        button = Button(filewin, text="Do nothing button")
+        button.pack()
+
     # Variables
     vulnerabilities = []
     scanned_hosts = []
@@ -412,7 +418,21 @@ def main():
     add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings", command=on_settings)
     add_vulnerabilities_button.grid(row=0, column=4)
 
+    # File Menu Bar
+    menubar = Menu(root)
+    filemenu = Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Save", command=donothing)
+    filemenu.add_command(label="Scan Settings", command=show_settings_popup)
+
+    filemenu.add_separator()
+
+    filemenu.add_command(label="Exit", command=root.quit)
+    menubar.add_cascade(label="File", menu=filemenu)
+    editmenu = Menu(menubar, tearoff=0)
+    editmenu.add_command(label="Undo", command=donothing)
+
     # Run the program with UI
+    root.config(menu=menubar)
     root.geometry("800x500")
     root.minsize(800, 500)
     root.mainloop()
