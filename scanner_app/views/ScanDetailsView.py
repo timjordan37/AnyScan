@@ -1,13 +1,20 @@
 import tkinter as tk
 
 class ScanDetailsView():
-
+    host_name_entry_var = None
+    mac_address_entry_var = None
+    port_number_entry_var = None
+    check_vulnerabilities_button = None
 
     def get_view(self, parent_frame):
+        self.host_name_entry_var = tk.StringVar()
+        self.mac_address_entry_var = tk.StringVar()
+        self.port_number_entry_var = tk.StringVar()
+
         frame = tk.Frame(parent_frame)
         frame.grid(row=0, column=0, sticky="nsew")
         # frame.grid_rowconfigure(6, weight=1)
-        # frame.grid_columnconfigure(0, weight=1)
+        frame.grid_columnconfigure(0, weight=1)
 
         # Right frame header label
         header_label = tk.Label(frame, text="Host Info")
@@ -21,9 +28,8 @@ class ScanDetailsView():
         host_name_label = tk.Label(host_name_frame, text="Host Name:")
         host_name_label.grid(row=0, column=0, padx=(16, 0))
 
-        host_name_entry_var = tk.StringVar()
-        host_name_entry_var.set("")
-        host_name_text_entry = tk.Entry(host_name_frame, textvariable=host_name_entry_var)
+        self.host_name_entry_var.set("")
+        host_name_text_entry = tk.Entry(host_name_frame, textvariable=self.host_name_entry_var)
         host_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         #  MAC Address UI
@@ -34,9 +40,8 @@ class ScanDetailsView():
         mac_address_label = tk.Label(mac_address_frame, text="MAC Address:")
         mac_address_label.grid(row=0, column=0, padx=(16, 0))
 
-        mac_address_entry_var = tk.StringVar()
-        mac_address_entry_var.set("")
-        mac_address_text_entry = tk.Entry(mac_address_frame, textvariable=mac_address_entry_var)
+        self.mac_address_entry_var.set("")
+        mac_address_text_entry = tk.Entry(mac_address_frame, textvariable=self.mac_address_entry_var)
         mac_address_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         #  Port Number UI
@@ -47,9 +52,8 @@ class ScanDetailsView():
         port_number_label = tk.Label(port_number_frame, text="IP:")
         port_number_label.grid(row=0, column=0, padx=(16, 0))
 
-        port_number_entry_var = tk.StringVar()
-        port_number_entry_var.set("")
-        port_number_text_entry = tk.Entry(port_number_frame, textvariable=port_number_entry_var)
+        self.port_number_entry_var.set("")
+        port_number_text_entry = tk.Entry(port_number_frame, textvariable=self.port_number_entry_var)
         port_number_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         #################
@@ -57,9 +61,9 @@ class ScanDetailsView():
         #################
         #
         # Check Vulnerabilities button
-        check_vulnerabilities_button = tk.Button(frame, text="Check Vulnerabilities")
-        check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
-        check_vulnerabilities_button.config(state="disabled")
+        self.check_vulnerabilities_button = tk.Button(frame, text="Check Vulnerabilities")
+        self.check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
+        self.check_vulnerabilities_button.config(state="disabled")
 
         #################
         # Vulnerabilities listBox Frame
@@ -93,24 +97,20 @@ class ScanDetailsView():
         vulnerabilities_button_frame = tk.Frame(frame)
         vulnerabilities_button_frame.grid(row=7, column=0, pady=(8, 8))
 
-        # Details
-        vulnerability_details_button = tk.Button(vulnerabilities_button_frame, text="Details")
-        vulnerability_details_button.grid(row=0, column=0)
-
         # Report
         vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report")
-        vulnerability_report_button.grid(row=0, column=1)
+        vulnerability_report_button.grid(row=0, column=0)
 
         # Add Vulnerability
         add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability")
-        add_vulnerabilities_button.grid(row=0, column=2)
+        add_vulnerabilities_button.grid(row=0, column=1)
 
         # Add Device
         add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device")
-        add_vulnerabilities_button.grid(row=0, column=3)
+        add_vulnerabilities_button.grid(row=0, column=2)
 
         # Settings
         add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings")
-        add_vulnerabilities_button.grid(row=0, column=4)
+        add_vulnerabilities_button.grid(row=0, column=3)
 
         return frame

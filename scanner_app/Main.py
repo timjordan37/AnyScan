@@ -6,6 +6,7 @@ from tkinter import ttk
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from views.ScanDetailsView import ScanDetailsView
+from views.VulnerabilitiesView import VulnerabilitiesView
 from pathlib import Path
 from helpers.Scanner import Scanner
 from util.SThread import SThread
@@ -114,14 +115,13 @@ def main():
         print("Scan END")
 
         scan_button.config(state="normal")
-        check_vulnerabilities_button.config(state="normal")
+        scan_details_view.check_vulnerabilities_button.config(state="normal")
 
         # could get this from the scan itself
         scan_end_date = datetime.datetime.now()
         timedelta = scan_end_date - scan_start_date
         timedelta.total_seconds()
         ##
-
 
         last_row_id = df.DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
 
@@ -198,9 +198,10 @@ def main():
             return
 
         index = int(listbox.curselection()[0])
-        host_name_entry_var.set(scanned_hosts[index].get_display_name())
-        mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
-        port_number_entry_var.set(scanned_hosts[index].get_ip())
+
+        scan_details_view.host_name_entry_var.set(scanned_hosts[index].get_display_name())
+        scan_details_view.mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
+        scan_details_view.port_number_entry_var.set(scanned_hosts[index].get_ip())
 
     def on_vuln_listbox_select(evt):
         # """Click handler for vulnerabilities selection"""
@@ -312,8 +313,6 @@ def main():
         root.columnconfigure(rows + 1, weight=1)
         rows += 1
 
-    # Setup Tab 1
-
     # Setup Root Notebook
     main_note_book = ttk.Notebook(root)
     main_note_book.grid(row=0, column=1, columnspan=50, rowspan=49, sticky="NESW")
@@ -323,124 +322,10 @@ def main():
     scan_details_tab = scan_details_view.get_view(main_note_book)
     main_note_book.add(scan_details_tab, text="Scan Details")
 
-    # Setup Tab 1
-    tab2 = tk.Frame(main_note_book)
-    main_note_book.add(tab2, text="Tab 2")
-
-    # # Setup Tab 1
-    # tab2 = tk.Frame(main_note_book)
-    # main_note_book.add(tab2, text="Tab 2")
-
-    # right_frame = tk.Frame(root)
-    # right_frame.grid(row=0, column=1, sticky="nsew")
-    # right_frame.grid_rowconfigure(6, weight=1)
-    # right_frame.grid_columnconfigure(0, weight=1)
-
-    # # Right frame header label
-    # right_frame_header_label = tk.Label(right_frame, text="Host Info")
-    # right_frame_header_label.grid(row=0, column=0, pady=(8, 8))
-    #
-    # #  Host name UI
-    # host_name_frame = tk.Frame(right_frame)
-    # host_name_frame.grid(row=1, column=0, sticky="nsew")
-    # host_name_frame.grid_columnconfigure(1, weight=1)
-    #
-    # host_name_label = tk.Label(host_name_frame, text="Host Name:")
-    # host_name_label.grid(row=0, column=0, padx=(16, 0))
-    #
-    # host_name_entry_var = tk.StringVar()
-    # host_name_entry_var.set("")
-    # host_name_text_entry = tk.Entry(host_name_frame, textvariable=host_name_entry_var)
-    # host_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
-    #
-    # #  MAC Address UI
-    # mac_address_frame = tk.Frame(right_frame)
-    # mac_address_frame.grid(row=2, column=0, sticky="nsew")
-    # mac_address_frame.grid_columnconfigure(1, weight=1)
-    #
-    # mac_address_label = tk.Label(mac_address_frame, text="MAC Address:")
-    # mac_address_label.grid(row=0, column=0, padx=(16, 0))
-    #
-    # mac_address_entry_var = tk.StringVar()
-    # mac_address_entry_var.set("")
-    # mac_address_text_entry = tk.Entry(mac_address_frame, textvariable=mac_address_entry_var)
-    # mac_address_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
-    #
-    # #  Port Number UI
-    # port_number_frame = tk.Frame(right_frame)
-    # port_number_frame.grid(row=3, column=0, sticky="nsew", pady=(0, 8))
-    # port_number_frame.grid_columnconfigure(1, weight=1)
-    #
-    # port_number_label = tk.Label(port_number_frame, text="IP:")
-    # port_number_label.grid(row=0, column=0, padx=(16, 0))
-    #
-    # port_number_entry_var = tk.StringVar()
-    # port_number_entry_var.set("")
-    # port_number_text_entry = tk.Entry(port_number_frame, textvariable=port_number_entry_var)
-    # port_number_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
-    #
-    # #################
-    # # Check Vulnerabilities UI
-    # #################
-    # #
-    # # Check Vulnerabilities button
-    # check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities",
-    #                                          command=on_check_vulnerabilities)
-    # check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
-    # check_vulnerabilities_button.config(state="disabled")
-    #
-    # #################
-    # # Vulnerabilities listBox Frame
-    # #################
-    # #
-    # vulnerabilities_frame = tk.Frame(right_frame)
-    # vulnerabilities_frame.grid(row=5, column=0)
-    #
-    # # Vulnerabilities ListBox label
-    # vulnerabilities_header_label = tk.Label(vulnerabilities_frame, text="Vulnerabilities")
-    # vulnerabilities_header_label.grid(row=0, column=0)
-    #
-    # # Vulnerabilities number
-    # vulnerabilities_number_label = tk.Label(vulnerabilities_frame, text="")
-    # vulnerabilities_number_label.grid(row=0, column=1)
-    #
-    # # Vulnerabilities selection label
-    # vulnerability_label = tk.Label(vulnerabilities_frame, text="")
-    # vulnerability_label.grid(row=0, column=2)
-    #
-    # # Vulnerabilities listbox
-    # vulnerabilities_listbox = tk.Listbox(right_frame)
-    # vulnerabilities_listbox.grid(row=6, column=0, sticky="nsew", padx=(16, 16))
-    # vulnerabilities_listbox.bind('<<ListboxSelect>>', on_vuln_listbox_select)
-    # reload_vulnerabilities_listbox()
-    #
-    # #################
-    # # Vulnerabilities button frame
-    # #################
-    # #
-    # vulnerabilities_button_frame = tk.Frame(right_frame)
-    # vulnerabilities_button_frame.grid(row=7, column=0, pady=(8, 8))
-    #
-    # # Details
-    # vulnerability_details_button = tk.Button(vulnerabilities_button_frame, text="Details", command=on_details)
-    # vulnerability_details_button.grid(row=0, column=0)
-    #
-    # # Report
-    # vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report", command=on_report)
-    # vulnerability_report_button.grid(row=0, column=1)
-    #
-    # # Add Vulnerability
-    # add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
-    #                                        command=new_vuln_popup)
-    # add_vulnerabilities_button.grid(row=0, column=2)
-    #
-    # # Add Device
-    # add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=new_device_popup)
-    # add_vulnerabilities_button.grid(row=0, column=3)
-    #
-    # # Settings
-    # add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings", command=on_settings)
-    # add_vulnerabilities_button.grid(row=0, column=4)
+    # Setup Vulnerabilities Tab
+    vulnerabilities_view = VulnerabilitiesView()
+    vulnerabilities_tab = vulnerabilities_view.get_view(main_note_book)
+    main_note_book.add(vulnerabilities_tab, text="Vulnerabilities")
 
     # Run the program with UI
     root.geometry("800x500")
