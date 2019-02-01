@@ -44,7 +44,7 @@ class DBFunctions:
             maxID = 0
 
         vulnID = maxID + 1
-        #print(vulnID)
+
         vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
                            customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,

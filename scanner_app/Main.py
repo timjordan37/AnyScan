@@ -76,7 +76,19 @@ def main():
     def reload_vulnerabilities_listbox():
         """Update vulnerabilites box with found vulnerabilites"""
         vulnerabilities_listbox.delete(0, tk.END)
-        for vulnerability in vulnerabilities:
+
+        # Sort according to the Host Sort Setting
+        reverse_sort = False
+
+        if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
+            reverse_sort = True
+            
+        sorted_scanned_vulns = sorted(vulnerabilities, reverse=reverse_sort)
+
+        if sorted_scanned_vulns is None:
+            return
+
+        for vulnerability in sorted_scanned_vulns:
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
         nonlocal vulnerabilities_header_label
@@ -466,6 +478,7 @@ if __name__ == '__main__':
                 df.DBFunctions.build_db()
                 # Maybe abstract this out for user controller importing
                 df.DBFunctions.import_NVD_JSON()
+
             main()
         else:
             # todo handle rejection of UAC prompt gracefully
