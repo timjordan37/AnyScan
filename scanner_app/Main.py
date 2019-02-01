@@ -419,17 +419,27 @@ def main():
     add_vulnerabilities_button.grid(row=0, column=4)
 
     # File Menu Bar
-    menubar = Menu(root)
-    filemenu = Menu(menubar, tearoff=0)
+    menubar = Menu(root) # create menu bar
+
+    filemenu = Menu(menubar, tearoff=0) # create a menu to add some stuff too
     filemenu.add_command(label="Save", command=donothing)
     filemenu.add_command(label="Scan Settings", command=show_settings_popup)
-
-    filemenu.add_separator()
-
+    filemenu.add_separator() # pretty
     filemenu.add_command(label="Exit", command=root.quit)
-    menubar.add_cascade(label="File", menu=filemenu)
-    editmenu = Menu(menubar, tearoff=0)
+
+    editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
     editmenu.add_command(label="Undo", command=donothing)
+
+    filemenu.add_cascade(label='Edit 2', menu=editmenu) # add the edit menu under File
+
+    menubar.add_cascade(label="File", menu=filemenu) # add file to menu bar
+    # On macOS there are some default things added to this menu, but are not added to the same menu
+    # under File. 
+    menubar.add_cascade(label='Edit', menu=editmenu) # add edit to menu bar too, for fun
+
+
+
+
 
     # Run the program with UI
     root.config(menu=menubar)
