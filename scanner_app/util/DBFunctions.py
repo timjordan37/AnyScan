@@ -13,8 +13,13 @@ class DBFunctions:
         cursor = conn.cursor()
         device_info = (deviceName, deviceManufacturer, cpeURI)
 
+        print('Inside DBFunctions save_device')
+        print(device_info)
+
+        # todo debug why this isn't saving or throwing errors
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
+            conn.commit()
         except sqlite3.IntegrityError as e:
             return False
 
@@ -23,7 +28,7 @@ class DBFunctions:
     #Saving a Vulnerability to the database
     @staticmethod
     def save_vulnerability(cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, priviledgesRequired,
+                           customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore):
         conn = sqlite3.connect('vulnDB.db')
@@ -41,12 +46,11 @@ class DBFunctions:
         vulnID = maxID + 1
         print(vulnID)
         vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, priviledgesRequired,
+                           customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore)
         try:
-            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                           ?, ?, ?)''', vulnerability_info)
+            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return False
@@ -282,6 +286,26 @@ class DBFunctions:
 
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
+
+    @staticmethod
+    def query_report_info():
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        cursor2 = conn.cursor()
+        cursor3 = conn.cursor()
+        #cursor4 = conn.cursor()
+
+        # todo change query to needed data
+        #
+        cursor.execute("""SELECT ip FROM Hosts""")
+        cursor2.execute("""SELECT macAddress FROM Hosts""")
+        cursor3.execute("""SELECT name FROM Hosts""")
+        # I fixed this, but we'll want to add a range of baseScore vulns to the DB to test
+        # Also, if baseScore isn't a number I'm pretty sure sqlite will consider it bigger no matter what
+        # We will want to test what happens there too  
+        #cursor4.execute("""SELECT * FROM Vulnerabilities WHERE baseScore >= 7.0""")
+        results = (cursor.fetchall(), cursor2.fetchall(), cursor3.fetchall())
+        return results
 
     # Imports Data from NVD JSON file
     @staticmethod
