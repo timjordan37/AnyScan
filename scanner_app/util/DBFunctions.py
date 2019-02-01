@@ -34,11 +34,12 @@ class DBFunctions:
         maxIDTuple = cursor.fetchone()
         print("LOOK TUPLE: ", maxIDTuple)
         maxID = maxIDTuple[0]
+
         if maxID is None:
             maxID = 0
 
         vulnID = maxID + 1
-
+        print(vulnID)
         vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
                            customScoreReason, priviledgesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
@@ -100,7 +101,7 @@ class DBFunctions:
             attackVector TEXT, 
             attackComplexity TEXT, 
             customScore TEXT, 
-            customScoreReason TEXT
+            customScoreReason TEXT,
             priviligesRequired TEXT, 
             userInteraction TEXT, 
             confidentialityImpact TEXT, 
@@ -286,7 +287,7 @@ class DBFunctions:
     @staticmethod
     def import_NVD_JSON():
 
-        json_fp = Path("test1.json")
+        json_fp = Path("nvdcve-1.0-2019.json")
         nvd_json = json.loads(json_fp.read_text())
         cve_items_list = nvd_json['CVE_Items']
 
@@ -301,31 +302,58 @@ class DBFunctions:
             configurations = cve_detail['configurations']
             cpe_list = configurations['nodes']
 
-            cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
-            baseMetric = cve_detail.get("impact").get("baseMetricV3")
-
-            DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
+            try:
+                cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
+                baseMetric = cve_detail.get("impact").get("baseMetricV3")
+                DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
                                            cvssV3['attackComplexity'], "", "", cvssV3['privilegesRequired'],
                                            cvssV3['userInteraction'],
                                            cvssV3['confidentialityImpact'], cvssV3['integrityImpact'],
                                            cvssV3['availabilityImpact'],
                                            cvssV3['baseScore'], cvssV3['baseSeverity'],
                                            baseMetric['exploitabilityScore'])
-
+            except:
+                DBFunctions.save_vulnerability(cve_meta_data['ID'], description, "N/A", "N/A", "","","N/A",
+                                               "N/A", "N/A","N/A","N/A","N/A","N/A","N/A","N/A")
             for item in cpe_list:
-                cpe_match = item['cpe_match']
-                for item in cpe_match:
-                    try:
-                        cpe_URI = item['cpe23Uri']
-                    except:
-                        cpe_URI = item['cpe22Uri']
-                    DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
+                try:
+                    cpe_match = item['cpe_match']
+                    for item in cpe_match:
+                        try:
+                            cpe_URI = item['cpe23Uri']
+                        except:
+                            cpe_URI = item['cpe22Uri']
+                        DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
+                except:
+                    print("No CPE Matches")
 
             i += 1
             print(i)
 
+    # Retrieves all data for specified ScanID
+    @staticmethod
+    def retrieve_scanID_data(scanID):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        retrievalID = (scanID)
+        cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
 
+        results = cursor.fetchone()
+        return results
 
+    # Retrieves scanIDs and Dates for all Scans
+    @staticmethod
+    def retrieve_scan_history():
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        cursor.execute('''SELECT ScanID, ScanDate FROM ScanHistory''')
+        results = cursor.fetchall()
+        return results
 
-
-
+    # Deletes specified ScanID
+    @staticmethod
+    def delete_scan_ID(scanID):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        deleteID = (scanID)
+        cursor.execute('''DELETE FROM ScanHistory WHERE ScanID = ?''', deleteID)
