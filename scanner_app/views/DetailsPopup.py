@@ -1,6 +1,7 @@
 import tkinter as tk
 
-class DetailsPopup():
+
+class DetailsPopup:
     """Details pop up displays information about the selected CVE"""
 
     _cve_details = ''

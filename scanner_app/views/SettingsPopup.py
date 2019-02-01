@@ -16,6 +16,7 @@ class SettingsPopup():
         sort_settings_header_label = tk.Label(root, text="Host Display Settings", font='Helvetica 14 bold', anchor="w", width=24)
         sort_settings_header_label.grid(row=0, column=0)
 
+
         host_sort_radio_btn_frame = tk.Frame(root)
         host_sort_radio_btn_frame.grid(row=1, column=0, sticky="nsew")
         host_sort_radio_btn_frame.grid_rowconfigure(1, weight=1)
@@ -35,6 +36,7 @@ class SettingsPopup():
             System.Settings.set_host_sort_type(new_sort_type)
 
         for name, value in sort_options:
+
             b = tk.Radiobutton(host_sort_radio_btn_frame, text=name, variable=selection_var, value=value, command=on_sort_select, anchor="w", width=24, justify="left")
             b.pack()
 
@@ -61,10 +63,10 @@ class SettingsPopup():
 
         for name, value in vuln_sort_options:
             b = tk.Radiobutton(vuln_sort_radio_btn_frame, text=name, variable=vuln_sort_selection_var, value=value, command=on_vuln_sort_select, anchor="w", width=24, justify="left")
+
             b.pack()
 
         # setup scan type options
-
         scan_type_settings_header_label = tk.Label(root, text="Scan Type", font='Helvetica 14 bold', anchor="w", width=24)
         scan_type_settings_header_label.grid(row=4, column=0, pady=(16, 0))
 

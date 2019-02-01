@@ -2,22 +2,23 @@ import tkinter as tk
 from tkinter import *
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
+from views.ReportsPopup import ReportsPopup
+from views.ExploitPopup import ExploitPopup
 from pathlib import Path
 import random
 from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
-from util import DBFunctions as df, System
+import ctypes
+import sys
+import platform
+import os
+from elevate import elevate
+from util import DBFunctions as df, System, ExploitSearch
+
+
 # Main method to handle setting up and managing the UI
-
-
-# Constants
-from helpers.ReportGenerator import ReportGenerator
-
-HOME_IP = '192.168.1.1'  # default gateway, not really home
-
-
 def main():
     print("Scanner App Started...")
 
@@ -54,6 +55,7 @@ def main():
     def reload_hosts_listbox():
         """Update hosts box with scanned hosts"""
         hosts_listbox.delete(0, tk.END)
+        nonlocal scanned_hosts
 
         # Sort according to the Host Sort Setting
         reverse_sort = False
@@ -65,6 +67,9 @@ def main():
 
         if sorted_scanned_hosts is None:
             return
+
+        # Update hosts to the sorted version to ensure details on select are correct
+        scanned_hosts = sorted_scanned_hosts
 
         for host in sorted_scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_val())
@@ -149,6 +154,7 @@ def main():
         """Set vulnerabilities from cps"""
         nonlocal cpes
         cpes = c
+
         nonlocal vulnerabilities
         vulnerabilities = df.DBFunctions.query_cves(cpes)
         # reload ui
@@ -166,6 +172,29 @@ def main():
         if cpes:
             set_cpes_vulns(cpes)
         print("User clicked 'check vulnerabilities'")
+
+    def find_exploit():
+        """Click handler for exploitation search"""
+        nonlocal cve_selection
+
+        if cve_selection:
+            print(cve_selection)
+            es = ExploitSearch.ExploitSearcher(cve_selection)
+            es.search()
+            popup = ExploitPopup(es.get_results())
+            popup.new_pupup()
+            es.print_all()
+            #todo make data viewable to user
+        else:
+            print('HERE HERE jk')
+            # why am I getting here before I run a scan or even hit the button???
+
+
+
+
+
+
+
 
     def new_vuln_popup():
         """Click handler for new vuln button"""
@@ -186,7 +215,17 @@ def main():
     def on_report():
         """Click hanlder for report button"""
         print("User clicked 'Report'")
-        ReportGenerator.generatereport()
+        report_generator = df.DBFunctions.query_report_info()
+        # Debugging work
+        # todo ensure report_generator has correct information print('From Main: ')
+        print(report_generator)
+        #
+        #
+        #
+        pop = ReportsPopup(report_generator)
+        pop.new_popup()
+        for item in report_generator:
+            print(item)
 
     def on_host_listbox_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
@@ -206,10 +245,12 @@ def main():
         if len(listbox.curselection()) == 0:
             return
 
-        index = int(listbox.curselection()[0])
-
+        nonlocal vulnerabilities_listbox
         nonlocal vulnerability_label
-        vulnerability_label['text'] = vulnerabilities[index]
+        nonlocal cve_selection
+
+        vulnerability_label['text'] = vulnerabilities_listbox.get(listbox.curselection())
+        cve_selection = vulnerabilities_listbox.get(listbox.curselection())
 
     def new_device_popup():
         """Click handler for new device button"""
@@ -231,6 +272,7 @@ def main():
     vulnerabilities = []
     scanned_hosts = []
     cpes = {}
+    cve_selection = ''
 
     # Setup root ui
     root = tk.Tk()
@@ -360,8 +402,8 @@ def main():
     #################
     #
     # Check Vulnerabilities button
-    check_vulnerabilities_button = tk.Button(right_frame, text="Check Vulnerabilities",
-                                             command=on_check_vulnerabilities)
+    check_vulnerabilities_button = tk.Button(right_frame, text="Find Exploit",
+                                             command=find_exploit)
     check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
     check_vulnerabilities_button.config(state="disabled")
 
@@ -450,9 +492,36 @@ def main():
 
 #  Runs the main method if this file is called to run
 if __name__ == '__main__':
-    db_location = Path("vulnDB.db")
-    if not db_location.exists():
-        df.DBFunctions.build_db()
+    def is_win_admin():
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            return False
 
-    System.Settings.init_config()
-    main()
+    def is_root():
+        return os.getuid() == 0
+
+    if platform.system() == 'Windows':
+        if is_win_admin():
+            db_location = Path("vulnDB.db")
+            if not db_location.exists():
+                df.DBFunctions.build_db()
+                # Maybe abstract this out for user controller importing
+                df.DBFunctions.import_NVD_JSON()
+
+            main()
+        else:
+            # todo handle rejection of UAC prompt gracefully
+            # restarts with admin privileges
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+    else:
+        if not is_root():
+            # todo ensure works on pi and test further
+            # recreates process with AppleScript, sudo, or other appropriate command
+            # attempts graphical escalation first
+            elevate()
+        db_location = Path("vulnDB.db")
+        if not db_location.exists():
+            df.DBFunctions.build_db()
+            df.DBFunctions.import_NVD_JSON()
+        main()
