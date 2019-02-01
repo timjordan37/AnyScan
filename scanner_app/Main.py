@@ -7,16 +7,15 @@ from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
+import ctypes
+import sys
+import platform
+import os
+from elevate import elevate
 from util import DBFunctions as df, System
-# Main method to handle setting up and managing the UI
-
-
-# Constants
 from helpers.ReportGenerator import ReportGenerator
 
-HOME_IP = '192.168.1.1'  # default gateway, not really home
-
-
+# Main method to handle setting up and managing the UI
 def main():
     print("Scanner App Started...")
 
@@ -53,6 +52,7 @@ def main():
     def reload_hosts_listbox():
         """Update hosts box with scanned hosts"""
         hosts_listbox.delete(0, tk.END)
+        nonlocal scanned_hosts
 
         # Sort according to the Host Sort Setting
         reverse_sort = False
@@ -64,6 +64,9 @@ def main():
 
         if sorted_scanned_hosts is None:
             return
+
+        # Update hosts to the sorted version to ensure details on select are correct
+        scanned_hosts = sorted_scanned_hosts
 
         for host in sorted_scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_val())
@@ -420,9 +423,32 @@ def main():
 
 #  Runs the main method if this file is called to run
 if __name__ == '__main__':
-    db_location = Path("vulnDB.db")
-    if not db_location.exists():
-        df.DBFunctions.build_db()
+    def is_win_admin():
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            return False
 
-    System.Settings.init_config()
-    main()
+    def is_root():
+        return os.getuid() == 0
+
+    if platform.system() == 'Windows':
+        if is_win_admin():
+            db_location = Path("vulnDB.db")
+            if not db_location.exists():
+                df.DBFunctions.build_db()
+            main()
+        else:
+            # todo handle rejection of UAC prompt gracefully
+            # restarts with admin privileges
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+    else:
+        if not is_root():
+            # todo ensure works on pi and test further
+            # recreates process with AppleScript, sudo, or other appropriate command
+            # attempts graphical escalation first
+            elevate()
+        db_location = Path("vulnDB.db")
+        if not db_location.exists():
+            df.DBFunctions.build_db()
+        main()

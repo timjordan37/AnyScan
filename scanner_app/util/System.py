@@ -81,7 +81,7 @@ class Settings():
 
     def __init__(self):
         """ Virtually private constructor. """
-        if Settings.__instance != None:
+        if Settings.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
             Settings.__instance = self
@@ -99,7 +99,6 @@ class Settings():
             with open(SettingKey.setting_file_name, 'w') as configfile:
                 config.write(configfile)
 
-
     @staticmethod
     def does_settings_file_exist():
         config = configparser.ConfigParser()
@@ -116,7 +115,7 @@ class Settings():
     """Scan Type"""
     @staticmethod
     def get_scan_type():
-        if not SettingKey.scan_type in Settings.get_settings_dict():
+        if SettingKey.scan_type not in Settings.get_settings_dict():
             return ScanType.detect_os_service_scan
 
         scan_type_raw = Settings.get_settings_dict()[SettingKey.scan_type]
