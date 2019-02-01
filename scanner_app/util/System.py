@@ -94,6 +94,7 @@ class Settings():
                 SettingKey.scan_type: Settings.get_scan_type().value,
                 SettingKey.host_sort_type: Settings.get_host_sort_type().value,
                 SettingKey.vuln_sort_type: Settings.get_vuln_sort_type().value,
+
             }
 
             with open(SettingKey.setting_file_name, 'w') as configfile:
@@ -102,7 +103,11 @@ class Settings():
     @staticmethod
     def does_settings_file_exist():
         config = configparser.ConfigParser()
-        return config.read(SettingKey.setting_file_name)
+
+        #  We need two 'not's here because 'not variable' will check if the file does not exist, and we want to know if
+        #  it does exist, so we take another not to give us the correct value in context
+        return not not config.read(SettingKey.setting_file_name)
+
 
     @staticmethod
     def get_settings_dict():
