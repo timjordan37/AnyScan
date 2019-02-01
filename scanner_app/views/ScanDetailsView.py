@@ -1,4 +1,5 @@
 import tkinter as tk
+import enum
 
 class ScanDetailsView():
     host_name_entry_var = None
