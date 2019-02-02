@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 # Pycharm project files
 .idea/
 __pycache__
-=======
 
 # MacOS Settings
 .DS_Store
@@ -10,7 +8,9 @@ __pycache__
 # Intelli-J Settings Folder
 .idea
 venv/
->>>>>>> develop
 
 # Local Db
 vulnDB.db
+
+# Local application settings
+settings.ini

@@ -13,8 +13,13 @@ class DBFunctions:
         cursor = conn.cursor()
         device_info = (deviceName, deviceManufacturer, cpeURI)
 
+        print('Inside DBFunctions save_device')
+        print(device_info)
+
+        # todo debug why this isn't saving or throwing errors
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
+            conn.commit()
         except sqlite3.IntegrityError as e:
             return False
 
@@ -23,7 +28,7 @@ class DBFunctions:
     #Saving a Vulnerability to the database
     @staticmethod
     def save_vulnerability(cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, priviledgesRequired,
+                           customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore):
         conn = sqlite3.connect('vulnDB.db')
@@ -32,20 +37,20 @@ class DBFunctions:
         cursor.execute('SELECT MAX(VulnID) FROM Vulnerabilities')
         conn.commit()
         maxIDTuple = cursor.fetchone()
-        print("LOOK TUPLE: ", maxIDTuple)
+        #print("LOOK TUPLE: ", maxIDTuple)
         maxID = maxIDTuple[0]
+
         if maxID is None:
             maxID = 0
 
         vulnID = maxID + 1
 
         vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, priviledgesRequired,
+                           customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore)
         try:
-            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                           ?, ?, ?)''', vulnerability_info)
+            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return False
@@ -179,86 +184,95 @@ class DBFunctions:
         """
         conn = sqlite3.connect('vulnDB.db')
         cves = []
+        test_data = set()
         cursor = conn.cursor()
         print("CVE Query HERE")
 
 
-        CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d20:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d25:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d30:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d35:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d40:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d45:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d50:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d55:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d60:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.1x46:d65:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3x48:d10:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3x48:d15:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3x48:d20:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3x48:d25:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3x48:d30:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x49:d10:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x49:d20:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x49:d30:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d20:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d21:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d25:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d30:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d32:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d33:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d34:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d61:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d62:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1x53:d63:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1:*:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1:r1:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1:r2:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1:r3:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1:r4:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1:r8:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1:r9:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.2:r1:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.2:r2:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.2:r3:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.2:r4:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.2:r5:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.2:r7:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.2:r8:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1:r1:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:15.1:r2:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:*:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r1:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r10:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r2:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r3:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r4:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r5:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r6:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r7:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r8:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:12.3:r9:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:*:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d10:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d15:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d16:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d25:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d26:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d27:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d35:*:*:*:*:*:*",
-                "cpe:2.3:o:juniper:junos:14.1x53:d50:*:*:*:*:*:*"]
+        # CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d20:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d25:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d30:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d35:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d40:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d45:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d50:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d55:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d60:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.1x46:d65:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3x48:d10:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3x48:d15:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3x48:d20:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3x48:d25:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3x48:d30:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x49:d10:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x49:d20:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x49:d30:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d20:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d21:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d25:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d30:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d32:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d33:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d34:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d61:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d62:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1x53:d63:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1:*:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1:r1:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1:r2:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1:r3:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1:r4:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1:r8:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1:r9:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.2:r1:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.2:r2:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.2:r3:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.2:r4:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.2:r5:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.2:r7:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.2:r8:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1:r1:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:15.1:r2:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:*:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r1:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r10:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r2:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r3:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r4:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r5:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r6:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r7:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r8:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:12.3:r9:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:*:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d10:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d15:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d16:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d25:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d26:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d27:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d35:*:*:*:*:*:*",
+        #         "cpe:2.3:o:juniper:junos:14.1x53:d50:*:*:*:*:*:*"]
         #
-        for cps in CP:
-            cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cps,))
-            test_str = cursor.fetchone()
-            if test_str:
-                cves.append(test_str[1])
-            else:
-                print("NOT FOUND")
-        return cves
+        # for cps in CP:
+        #     cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cps,))
+        #     test_str = cursor.fetchone()
+        #     if test_str:
+        #         cves.append(test_str[1])
+        #     else:
+        #         print("NOT FOUND")
+        # return cves
         # todo delete static testing to test on imported db
+
+        cursor.execute('''SELECT cveName FROM CPEvulns''')
+        for row in cursor:
+            test_data.add(row[0])
+
+        return test_data
+
+
 
         # for hList in cpe_dict:
         #     for cpe in cpe_dict[hList]:
@@ -266,7 +280,7 @@ class DBFunctions:
         #         vul = cursor.fetchone()
         #         if vul:
         #             cves.append(vul[1])
-        # # return all the fun stuff
+        # return all the fun stuff
         # return cves
 
     @staticmethod
@@ -283,11 +297,31 @@ class DBFunctions:
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
 
+    @staticmethod
+    def query_report_info():
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        cursor2 = conn.cursor()
+        cursor3 = conn.cursor()
+        #cursor4 = conn.cursor()
+
+        # todo change query to needed data
+        #
+        cursor.execute("""SELECT ip FROM Hosts""")
+        cursor2.execute("""SELECT macAddress FROM Hosts""")
+        cursor3.execute("""SELECT name FROM Hosts""")
+        # I fixed this, but we'll want to add a range of baseScore vulns to the DB to test
+        # Also, if baseScore isn't a number I'm pretty sure sqlite will consider it bigger no matter what
+        # We will want to test what happens there too  
+        #cursor4.execute("""SELECT * FROM Vulnerabilities WHERE baseScore >= 7.0""")
+        results = (cursor.fetchall(), cursor2.fetchall(), cursor3.fetchall())
+        return results
+
     # Imports Data from NVD JSON file
     @staticmethod
     def import_NVD_JSON():
 
-        json_fp = Path("test1.json")
+        json_fp = Path("nvdcve-1.0-2019.json")
         nvd_json = json.loads(json_fp.read_text())
         cve_items_list = nvd_json['CVE_Items']
 
@@ -302,31 +336,76 @@ class DBFunctions:
             configurations = cve_detail['configurations']
             cpe_list = configurations['nodes']
 
-            cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
-            baseMetric = cve_detail.get("impact").get("baseMetricV3")
-
-            DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
+            try:
+                cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
+                baseMetric = cve_detail.get("impact").get("baseMetricV3")
+                DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
                                            cvssV3['attackComplexity'], "", "", cvssV3['privilegesRequired'],
                                            cvssV3['userInteraction'],
                                            cvssV3['confidentialityImpact'], cvssV3['integrityImpact'],
                                            cvssV3['availabilityImpact'],
                                            cvssV3['baseScore'], cvssV3['baseSeverity'],
                                            baseMetric['exploitabilityScore'])
-
+            except:
+                DBFunctions.save_vulnerability(cve_meta_data['ID'], description, "N/A", "N/A", "","","N/A",
+                                               "N/A", "N/A","N/A","N/A","N/A","N/A","N/A","N/A")
             for item in cpe_list:
-                cpe_match = item['cpe_match']
-                for item in cpe_match:
-                    try:
-                        cpe_URI = item['cpe23Uri']
-                    except:
-                        cpe_URI = item['cpe22Uri']
-                    DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
+                try:
+                    cpe_match = item['cpe_match']
+                    for item in cpe_match:
+                        try:
+                            cpe_URI = item['cpe23Uri']
+                        except:
+                            cpe_URI = item['cpe22Uri']
+                        DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
+                except:
+                    print("No CPE Matches")
 
             i += 1
-            print(i)
+            
+    # Retrieves all data for specified ScanID
+    @staticmethod
+    def retrieve_scanID_data(scanID):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        retrievalID = (scanID)
+        cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
+
+    # Retrieves scanIDs and Dates for all Scans
+    @staticmethod
+    def retrieve_scan_history():
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        cursor.execute('''SELECT ScanID, ScanDate FROM ScanHistory''')
+        results = cursor.fetchall()
+        return results
+
+    # Deletes specified ScanID
+    @staticmethod
+    def delete_scan_ID(scanID):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        deleteID = (scanID)
+        cursor.execute('''DELETE FROM ScanHistory WHERE ScanID = ?''', deleteID)
+
+    @staticmethod
+    def get_full_cve():
+        """Returns all unique CVEs in database
+
+        """
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        results = set()
+        cursor.execute('''SELECT cveName FROM CPEvulns''')
+
+        for row in cursor:
+            results.add(row[0])
+
+        return results
+        
 
 class VulnerabilityDB:
-
+    
     @staticmethod
     def get_all():
         """Query the database for a specific vulnerability
@@ -348,3 +427,5 @@ class VulnerabilityDB:
         print("Remove all Vulns")
 
         cursor.execute("""DELETE FROM Vulnerabilities""", ())
+        results = cursor.fetchone()
+        return results

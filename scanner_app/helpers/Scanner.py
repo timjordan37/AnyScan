@@ -18,12 +18,12 @@ class Scanner:
     def host_discover(self):
         """Scans for live host that respond to pings"""
         self._scanned = True
-        return self._scanner.scan(self._ips, arguments='-sP', sudo=True)
+        return self._scanner.scan(self._ips, arguments='-sP')
 
     def full_scan(self):
         """Performs a full TCP scan with service discovery, good for initial scans"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports, arguments='-sV -sS -T4', sudo=True)
+        return self._scanner.scan(self._ips, self._ports, arguments='-sV -sS -T4')
 
     def script_scan(self):
         """Runs default scripts without host discovery. All host assumed up."""
@@ -33,7 +33,7 @@ class Scanner:
     def udp_scan(self):
         """Runs a UDP scan good for DNS, SNMP, and DHCP. Typically takes longer than a TCP scan"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports, arguments='-sU', sudo=True)
+        return self._scanner.scan(self._ips, self._ports, arguments='-sU')
 
     def fast_scan(self):
         """Quick scan of small port range with default arguments"""
@@ -44,7 +44,7 @@ class Scanner:
     def detect_os_service_scan(self):
         """Runs scan to detemine OS and running service of given host"""
         self._scanned = True
-        return self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
+        return self._scanner.scan(self._ips, self._ports, arguments='-A')
 
     def get_os_details(self, result, host):
         """Return host information from a scan given results and specific host
@@ -131,7 +131,7 @@ class Scanner:
     def get_os_service_scan_details(self):
         """Runs scan to detemine OS and running service of given host"""
         self._scanned = True
-        result = self._scanner.scan(self._ips, self._ports, arguments='-A', sudo=True)
+        result = self._scanner.scan(self._ips, self._ports, arguments='-A')
         hosts = []
         if self._scanned:
             # for each host scanned

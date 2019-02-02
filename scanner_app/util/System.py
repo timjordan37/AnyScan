@@ -81,7 +81,7 @@ class Settings():
 
     def __init__(self):
         """ Virtually private constructor. """
-        if Settings.__instance != None:
+        if Settings.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
             Settings.__instance = self
@@ -94,16 +94,20 @@ class Settings():
                 SettingKey.scan_type: Settings.get_scan_type().value,
                 SettingKey.host_sort_type: Settings.get_host_sort_type().value,
                 SettingKey.vuln_sort_type: Settings.get_vuln_sort_type().value,
+
             }
 
             with open(SettingKey.setting_file_name, 'w') as configfile:
                 config.write(configfile)
 
-
     @staticmethod
     def does_settings_file_exist():
         config = configparser.ConfigParser()
-        return config.read(SettingKey.setting_file_name)
+
+        #  We need two 'not's here because 'not variable' will check if the file does not exist, and we want to know if
+        #  it does exist, so we take another not to give us the correct value in context
+        return not not config.read(SettingKey.setting_file_name)
+
 
     @staticmethod
     def get_settings_dict():
@@ -116,7 +120,7 @@ class Settings():
     """Scan Type"""
     @staticmethod
     def get_scan_type():
-        if not SettingKey.scan_type in Settings.get_settings_dict():
+        if SettingKey.scan_type not in Settings.get_settings_dict():
             return ScanType.detect_os_service_scan
 
         scan_type_raw = Settings.get_settings_dict()[SettingKey.scan_type]
