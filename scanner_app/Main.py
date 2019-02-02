@@ -169,10 +169,6 @@ def main():
             set_cpes_vulns(cpes)
         print("User clicked 'check vulnerabilities'")
 
-    def new_vuln_popup():
-        """Click handler for new vuln button"""
-        vp.VulnPopup.new_popup()
-
     def on_details():
         """Click handler for details button"""
         print("User clicked 'Details'")
@@ -215,16 +211,6 @@ def main():
         # vulnerability_label['text'] = vulnerabilities[index]
         print("TEMP")
 
-    def new_device_popup():
-        """Click handler for new device button"""
-        dp.DevicePopup.new_popup()
-
-    def on_settings():
-        """Click handler for the Settings button"""
-        show_settings_popup()
-
-    def show_settings_popup():
-        sp.SettingsPopup.new_popup()
 
     # Variables
     vulnerabilities = []

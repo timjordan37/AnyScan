@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import enum
 from views.TableView import TableView
+from util import DBFunctions as dbf
 
 
 class VulnerabilitiesView():
@@ -81,11 +82,15 @@ class VulnerabilitiesView():
 
         # TableView
         sections_tuple = TreeColumns.all_cases()
-        data = [
-            ["yes", "no", "maybe", "so"],
-            ["yes", "no", "maybe", "so"],
-            ["yes", "no", "maybe", "so"]
-        ]
+
+        # dbf.DBFunctions.save_vulnerability("a","a","a","a","a","a","a","a","a","a","a","a","a","a","a",)
+        # dbf.DBFunctions.save_vulnerability("b","b","b","b","b","b","b","b","b","b","b","b","b","b","b", )
+        all_vulns = dbf.VulnerabilityDB.get_all()
+
+        data = []
+        for vuln in all_vulns:
+            data.append(list(vuln))
+
         self.table_view = TableView(frame, 6, sections_tuple, data)
 
         return frame
@@ -101,11 +106,12 @@ class TreeColumns(enum.Enum):
     @staticmethod
     def display_name_for_column(col):
         display_names = {
-            0: "CVE Name",
-            1: "Description",
-            2: "CVSS Score",
-            3: "Base Score",
-            4: "Severity",
+            0: "id",
+            1: "CVE Name",
+            2: "Description",
+            3: "CVSS Score",
+            4: "Base Score",
+            5: "Severity",
         }
         return display_names[col]
 

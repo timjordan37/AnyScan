@@ -1,11 +1,24 @@
 import tkinter as tk
 import enum
+from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 
 class ScanDetailsView():
     host_name_entry_var = None
     mac_address_entry_var = None
     port_number_entry_var = None
     check_vulnerabilities_button = None
+
+    def new_vuln_popup(self):
+        """Click handler for new vuln button"""
+        vp.VulnPopup.new_popup()
+
+    def new_device_popup(self):
+        """Click handler for new device button"""
+        dp.DevicePopup.new_popup()
+
+    def on_settings(self):
+        """Click handler for the Settings button"""
+        sp.SettingsPopup.new_popup()
 
     def get_view(self, parent_frame):
         self.host_name_entry_var = tk.StringVar()
@@ -103,15 +116,15 @@ class ScanDetailsView():
         vulnerability_report_button.grid(row=0, column=0)
 
         # Add Vulnerability
-        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability")
+        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability", command=self.new_vuln_popup)
         add_vulnerabilities_button.grid(row=0, column=1)
 
         # Add Device
-        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device")
+        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=self.new_device_popup)
         add_vulnerabilities_button.grid(row=0, column=2)
 
         # Settings
-        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings")
+        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings", command=self.on_settings)
         add_vulnerabilities_button.grid(row=0, column=3)
 
         return frame
