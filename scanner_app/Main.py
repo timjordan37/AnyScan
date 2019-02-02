@@ -5,7 +5,7 @@ from views.ReportsPopup import ReportsPopup
 from views.ExploitPopup import ExploitPopup
 from pathlib import Path
 import random
-from helpers.Scanner import Scanner
+from util.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
