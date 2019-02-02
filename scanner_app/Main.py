@@ -16,10 +16,6 @@ from util.STime import STimer
 from util import DBFunctions as df, System
 # Main method to handle setting up and managing the UI
 
-
-# Constants
-from helpers.ReportGenerator import ReportGenerator
-
 HOME_IP = '192.168.1.1'  # default gateway, not really home
 import datetime
 import ctypes
