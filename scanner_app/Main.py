@@ -183,11 +183,8 @@ def main():
             popup = ExploitPopup(es.get_results())
             popup.new_pupup()
             es.print_all()
-            #todo make data viewable to user
         else:
-            print('HERE HERE jk')
-            # why am I getting here before I run a scan or even hit the button???
-
+            print('No CVEs')
 
 
 

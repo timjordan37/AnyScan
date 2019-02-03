@@ -16,7 +16,6 @@ class DBFunctions:
         print('Inside DBFunctions save_device')
         print(device_info)
 
-        # todo debug why this isn't saving or throwing errors
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
             conn.commit()
