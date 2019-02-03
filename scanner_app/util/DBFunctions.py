@@ -283,6 +283,7 @@ class DBFunctions:
         # return all the fun stuff
         # return cves
 
+    @staticmethod
     def query_vulns(cve):
         """Query the database for a specific vulnerability
 
@@ -370,9 +371,6 @@ class DBFunctions:
         retrievalID = (scanID)
         cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
 
-        results = cursor.fetchone()
-        return results
-
     # Retrieves scanIDs and Dates for all Scans
     @staticmethod
     def retrieve_scan_history():
@@ -403,4 +401,31 @@ class DBFunctions:
         for row in cursor:
             results.add(row[0])
 
+        return results
+        
+
+class VulnerabilityDB:
+    
+    @staticmethod
+    def get_all():
+        """Query the database for a specific vulnerability
+
+        :param cve: vulnerability to be searched for
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        print("Vuln Query HERE")
+
+        cursor.execute("""SELECT * FROM Vulnerabilities""", ())
+        return cursor.fetchall()
+
+    @staticmethod
+    def remove_all():
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        print("Remove all Vulns")
+
+        cursor.execute("""DELETE FROM Vulnerabilities""", ())
+        results = cursor.fetchone()
         return results
