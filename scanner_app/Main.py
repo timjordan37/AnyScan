@@ -7,6 +7,7 @@ from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
+from views.ScanHistoryView import ScanHistoryView
 from views.ReportsPopup import ReportsPopup
 from views.ExploitPopup import ExploitPopup
 from pathlib import Path
@@ -354,6 +355,11 @@ def main():
     vulnerabilities_view = VulnerabilitiesView()
     vulnerabilities_tab = vulnerabilities_view.get_view(main_note_book)
     main_note_book.add(vulnerabilities_tab, text="Vulnerabilities")
+
+    # Setup Scan History Tab
+    scan_history_view = ScanHistoryView()
+    scan_history_tab = scan_history_view.get_view(main_note_book)
+    main_note_book.add(scan_history_tab, text="Scan History")
 
     # Run the program with UI
     root.geometry("800x500")

@@ -408,14 +408,11 @@ class VulnerabilityDB:
     
     @staticmethod
     def get_all():
-        """Query the database for a specific vulnerability
-
-        :param cve: vulnerability to be searched for
+        """Query the database for all saved vulnerabilities
         """
 
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Vuln Query HERE")
 
         cursor.execute("""SELECT * FROM Vulnerabilities""", ())
         return cursor.fetchall()
@@ -427,5 +424,51 @@ class VulnerabilityDB:
         print("Remove all Vulns")
 
         cursor.execute("""DELETE FROM Vulnerabilities""", ())
+        results = cursor.fetchone()
+        return results
+
+class ScanHistoryDB:
+    @staticmethod
+    def get_all():
+        """Query the database for all saved scans
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        print("Vuln Query HERE")
+
+        cursor.execute("""SELECT sh.ScanID as ScanID, 
+                                sh.Duration as Duration, 
+                                sh.ScanDate as Date, 
+                                (SELECT COUNT(*) from Hosts where ScanID = sh.ScanID) as HostCount 
+                                from ScanHistory sh JOIN Hosts h on sh.ScanID = h.ScanID 
+                                GROUP BY sh.ScanID""", ())
+        return cursor.fetchall()
+
+    @staticmethod
+    def get_all_where(query_str, query_params):
+        """Query the database for all saved vulnerabilities with the given string and params
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(query_str, query_params)
+            conn.commit()
+
+        except sqlite3.Error as er:
+            print
+            'er:', er.message
+
+        return cursor.fetchall()
+
+    @staticmethod
+    def remove_all():
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        print("Remove all Vulns")
+
+        cursor.execute("""DELETE FROM ScanHistory""", ())
         results = cursor.fetchone()
         return results
