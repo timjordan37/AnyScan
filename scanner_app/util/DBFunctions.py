@@ -402,34 +402,11 @@ class DBFunctions:
             results.add(row[0])
 
         return results
-        
 
-class VulnerabilityDB:
-    
+
+    """Scan Histort Methods"""
     @staticmethod
-    def get_all():
-        """Query the database for all saved vulnerabilities
-        """
-
-        conn = sqlite3.connect('vulnDB.db')
-        cursor = conn.cursor()
-
-        cursor.execute("""SELECT * FROM Vulnerabilities""", ())
-        return cursor.fetchall()
-
-    @staticmethod
-    def remove_all():
-        conn = sqlite3.connect('vulnDB.db')
-        cursor = conn.cursor()
-        print("Remove all Vulns")
-
-        cursor.execute("""DELETE FROM Vulnerabilities""", ())
-        results = cursor.fetchone()
-        return results
-
-class ScanHistoryDB:
-    @staticmethod
-    def get_all():
+    def get_all_scans():
         """Query the database for all saved scans
         """
 
@@ -447,7 +424,7 @@ class ScanHistoryDB:
 
     @staticmethod
     def get_all_where(query_str, query_params):
-        """Query the database for all saved vulnerabilities with the given string and params
+        """Query the database for all saved entiries with the given string and params
         """
 
         conn = sqlite3.connect('vulnDB.db')
@@ -463,12 +440,14 @@ class ScanHistoryDB:
 
         return cursor.fetchall()
 
+    """Vulnerabilities Methods"""
     @staticmethod
-    def remove_all():
+    def get_all_vulns():
+        """Query the database for all saved vulnerabilities
+        """
+
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Remove all Vulns")
 
-        cursor.execute("""DELETE FROM ScanHistory""", ())
-        results = cursor.fetchone()
-        return results
+        cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities""", ())
+        return cursor.fetchall()

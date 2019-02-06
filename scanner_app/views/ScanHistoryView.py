@@ -71,7 +71,7 @@ class ScanHistoryView():
         # TableView
         sections_tuple = TreeColumns.all_cases()
 
-        all_scans = dbf.ScanHistoryDB.get_all()
+        all_scans = dbf.DBFunctions.get_all_scans()
 
         data = []
         for scan in all_scans:
@@ -83,8 +83,7 @@ class ScanHistoryView():
 
     def on_search(self):
         query_tuple = self.build_query_string()
-        data = dbf.ScanHistoryDB.get_all_where(query_tuple[0], query_tuple[1])
-        print("DATA: ", data)
+        data = dbf.DBFunctions.get_all_where(query_tuple[0], query_tuple[1])
         self.table_view.reload_data(data)
 
     def build_query_string(self):
@@ -104,12 +103,12 @@ class ScanHistoryView():
             query_params_list.append(self.scan_id_entry_var.get())
 
         if self.scan_date_entry_var.get():
-            query_str_params_list.append(""" sh.ScanDate = (?) """)
-            query_params_list.append(self.scan_date_entry_var.get())
+            query_str_params_list.append(""" sh.ScanDate LIKE (?) """)
+            query_params_list.append("%" + self.scan_date_entry_var.get() + "%")
 
         if self.scan_duration_entry_var.get():
-            query_str_params_list.append(""" sh.Duration = (?) """)
-            query_params_list.append(float(self.scan_duration_entry_var.get()))
+            query_str_params_list.append(""" sh.Duration LIKE (?) """)
+            query_params_list.append("%" + self.scan_duration_entry_var.get() + "%")
 
         params_count = len(query_str_params_list)
         for idx, param_str in enumerate(query_str_params_list):
@@ -119,9 +118,6 @@ class ScanHistoryView():
             query_str += (additional_param_str + param_str)
 
         query_str += """ GROUP BY sh.ScanID """
-        print()
-        print(query_str)
-        print(tuple(query_params_list))
         return (query_str, tuple(query_params_list))
 
 class TreeColumns(enum.Enum):
