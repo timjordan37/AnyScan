@@ -22,6 +22,11 @@ class TableView():
     data: List of lists, the data to be displayed, each list contains the items in the index that will be displayed in the tabel
     """
     def __init__(self, parent_view, grid_row, sections, data):
+
+        def get_CVE(a):
+            rowData = tree.focus()
+            print (tree.item(rowData))
+
         self._grid_row = grid_row
         self._parent_view = parent_view
         self._sections = sections
@@ -40,3 +45,5 @@ class TableView():
             for collection in data:
                 tree.insert("", i, values=tuple(collection))
             i += 1
+
+        tree.bind('<Double-Button-1>', get_CVE)
