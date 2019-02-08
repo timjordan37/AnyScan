@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import ttk
+from views.DetailsPopup import DetailsPopup
 
 class TableView():
 
@@ -25,7 +26,10 @@ class TableView():
 
         def get_CVE(a):
             rowData = tree.focus()
-            print (tree.item(rowData))
+            full_row = tree.item(rowData)
+            cve_details = full_row['values']
+            pop = DetailsPopup(cve_details)
+            pop.new_popup()
 
         self._grid_row = grid_row
         self._parent_view = parent_view

@@ -198,7 +198,7 @@ def main():
             
     def new_vuln_popup():
         """Click handler for new vuln button"""
-        vp.VulnPopup.new_popup()
+        vp.VulnPopup.new_vuln()
 
     def on_details():
         """Click handler for details button"""
@@ -208,7 +208,7 @@ def main():
             cve_name = vulnerability_label['text']
             cve_details = df.DBFunctions.query_vulns(cve_name)
             pop = DetailsPopup(cve_details)
-            pop.new_popup()
+            pop.new_vuln()
             for item in cve_details:
                 print(item)
 
@@ -223,7 +223,7 @@ def main():
         #
         #
         pop = ReportsPopup(report_generator)
-        pop.new_popup()
+        pop.new_vuln()
         for item in report_generator:
             print(item)
 
