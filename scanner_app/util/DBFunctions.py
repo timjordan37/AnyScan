@@ -412,7 +412,6 @@ class DBFunctions:
 
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Vuln Query HERE")
 
         cursor.execute("""SELECT sh.ScanID as ScanID, 
                                 sh.Duration as Duration, 
@@ -426,7 +425,6 @@ class DBFunctions:
     def get_all_where(query_str, query_params):
         """Query the database for all saved entiries with the given string and params
         """
-
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 

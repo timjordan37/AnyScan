@@ -56,3 +56,8 @@ class TableView():
             for collection in data:
                 self._tree.insert("", i, values=tuple(collection))
             i += 1
+
+    def get_selected_item(self):
+        selected_item = self._tree.focus()
+
+        return self._tree.item(selected_item)

@@ -3,6 +3,7 @@ from tkinter import ttk
 import enum
 from views.TableView import TableView
 from util import DBFunctions as dbf
+from util import System
 
 
 class ScanHistoryView():
@@ -10,6 +11,9 @@ class ScanHistoryView():
     scan_id_entry_var = None
     scan_duration_entry_var = None
     scan_date_entry_var = None
+
+    """The Method to be called when a scan is selected"""
+    on_selected_scan_completion = None
     
     search_button = None
     table_view = None
@@ -65,8 +69,15 @@ class ScanHistoryView():
         scan_date_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         # Search Button
-        self.search_button = tk.Button(frame, text="Search", command=self.on_search)
-        self.search_button.grid(row=5, column=0, pady=(0, 8))
+        button_frame = tk.Frame(frame)
+        button_frame.grid(row=5, column=0)
+
+        self.search_button = tk.Button(button_frame, text="Search", command=self.on_search)
+        self.search_button.grid(row=0, column=0, pady=(0, 8))
+
+        # Scan Details button
+        self.search_button = tk.Button(button_frame, text="Scan Details", command=self.on_scan_details)
+        self.search_button.grid(row=0, column=1, pady=(0, 8))
 
         # TableView
         sections_tuple = TreeColumns.all_cases()
@@ -85,6 +96,13 @@ class ScanHistoryView():
         query_tuple = self.build_query_string()
         data = dbf.DBFunctions.get_all_where(query_tuple[0], query_tuple[1])
         self.table_view.reload_data(data)
+
+    def on_scan_details(self):
+        selected_value = self.table_view.get_selected_item()["values"]
+
+        if len(selected_value) > 0:
+            # System.Settings.get_instance().current_selected_scan_id = selected_value[0]
+            self.on_selected_scan_completion(selected_value[0])
 
     def build_query_string(self):
         query_str = """SELECT sh.ScanID as ScanID, 
