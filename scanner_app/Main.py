@@ -1,7 +1,7 @@
 import tkinter as tk
+from tkinter.filedialog import asksaveasfilename
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
-from views.ReportsPopup import ReportsPopup
 from views.ExploitPopup import ExploitPopup
 from pathlib import Path
 import random
@@ -9,12 +9,15 @@ from util.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 import datetime
+from datetime import date
 import ctypes
 import sys
 import platform
 import os
 from elevate import elevate
 from util import DBFunctions as df, System, ExploitSearch
+from util.Reporter import Reporter
+
 
 
 # Main method to handle setting up and managing the UI
@@ -211,17 +214,22 @@ def main():
     def on_report():
         """Click hanlder for report button"""
         print("User clicked 'Report'")
-        report_generator = df.DBFunctions.query_report_info()
-        # Debugging work
-        # todo ensure report_generator has correct information print('From Main: ')
-        print(report_generator)
-        #
-        #
-        #
-        pop = ReportsPopup(report_generator)
-        pop.new_popup()
-        for item in report_generator:
-            print(item)
+
+        nonlocal vulnerabilities
+        nonlocal cpes
+        nonlocal scanned_hosts
+        report = {
+            'hosts': scanned_hosts,
+            'cpes': cpes,
+            'vulns': vulnerabilities
+        }
+        time = date.today().isoformat()
+        fname = asksaveasfilename(title='Save Your Report!', defaultextension='.pdf',
+                                  initialfile='Report_'+str(time)+'.pdf')
+        r = Reporter(report, fname, 'Curtis!')
+        r.build_pdf()
+        r.print()
+
 
     def on_host_listbox_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
