@@ -6,7 +6,7 @@ from pathlib import Path
 class DBFunctions:
 
     # todo create docstrings for all functions
-    #Saves a new device to the database
+    # Saves a new device to the database
     @staticmethod
     def save_device(deviceName, deviceManufacturer, cpeURI):
         conn = sqlite3.connect('vulnDB.db')
@@ -25,7 +25,7 @@ class DBFunctions:
 
         return True
 
-    #Saving a Vulnerability to the database
+    # Saving a Vulnerability to the database
     @staticmethod
     def save_vulnerability(cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
                            customScoreReason, privilegesRequired,
@@ -37,7 +37,7 @@ class DBFunctions:
         cursor.execute('SELECT MAX(VulnID) FROM Vulnerabilities')
         conn.commit()
         maxIDTuple = cursor.fetchone()
-        #print("LOOK TUPLE: ", maxIDTuple)
+        # print("LOOK TUPLE: ", maxIDTuple)
         maxID = maxIDTuple[0]
 
         if maxID is None:
@@ -46,11 +46,12 @@ class DBFunctions:
         vulnID = maxID + 1
 
         vulnerability_info = (vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, privilegesRequired,
-                           userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
-                           baseScore, baseSeverity, exploitabilityScore)
+                              customScoreReason, privilegesRequired,
+                              userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                              baseScore, baseSeverity, exploitabilityScore)
         try:
-            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', vulnerability_info)
+            cursor.execute('''INSERT INTO Vulnerabilities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                           vulnerability_info)
             conn.commit()
         except sqlite3.IntegrityError:
             return False
@@ -188,7 +189,6 @@ class DBFunctions:
         cursor = conn.cursor()
         print("CVE Query HERE")
 
-
         # CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
         #         "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
         #         "cpe:2.3:o:juniper:junos:12.1x46:d20:*:*:*:*:*:*",
@@ -272,8 +272,6 @@ class DBFunctions:
 
         return test_data
 
-
-
         # for hList in cpe_dict:
         #     for cpe in cpe_dict[hList]:
         #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
@@ -303,7 +301,7 @@ class DBFunctions:
         cursor = conn.cursor()
         cursor2 = conn.cursor()
         cursor3 = conn.cursor()
-        #cursor4 = conn.cursor()
+        # cursor4 = conn.cursor()
 
         # todo change query to needed data
         #
@@ -313,7 +311,7 @@ class DBFunctions:
         # I fixed this, but we'll want to add a range of baseScore vulns to the DB to test
         # Also, if baseScore isn't a number I'm pretty sure sqlite will consider it bigger no matter what
         # We will want to test what happens there too  
-        #cursor4.execute("""SELECT * FROM Vulnerabilities WHERE baseScore >= 7.0""")
+        # cursor4.execute("""SELECT * FROM Vulnerabilities WHERE baseScore >= 7.0""")
         results = (cursor.fetchall(), cursor2.fetchall(), cursor3.fetchall())
         return results
 
@@ -340,15 +338,15 @@ class DBFunctions:
                 cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
                 baseMetric = cve_detail.get("impact").get("baseMetricV3")
                 DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
-                                           cvssV3['attackComplexity'], "", "", cvssV3['privilegesRequired'],
-                                           cvssV3['userInteraction'],
-                                           cvssV3['confidentialityImpact'], cvssV3['integrityImpact'],
-                                           cvssV3['availabilityImpact'],
-                                           cvssV3['baseScore'], cvssV3['baseSeverity'],
-                                           baseMetric['exploitabilityScore'])
+                                               cvssV3['attackComplexity'], "", "", cvssV3['privilegesRequired'],
+                                               cvssV3['userInteraction'],
+                                               cvssV3['confidentialityImpact'], cvssV3['integrityImpact'],
+                                               cvssV3['availabilityImpact'],
+                                               cvssV3['baseScore'], cvssV3['baseSeverity'],
+                                               baseMetric['exploitabilityScore'])
             except:
-                DBFunctions.save_vulnerability(cve_meta_data['ID'], description, "N/A", "N/A", "","","N/A",
-                                               "N/A", "N/A","N/A","N/A","N/A","N/A","N/A","N/A")
+                DBFunctions.save_vulnerability(cve_meta_data['ID'], description, "N/A", "N/A", "", "", "N/A",
+                                               "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
             for item in cpe_list:
                 try:
                     cpe_match = item['cpe_match']
@@ -362,7 +360,7 @@ class DBFunctions:
                     print("No CPE Matches")
 
             i += 1
-            
+
     # Retrieves all data for specified ScanID
     @staticmethod
     def retrieve_scanID_data(scanID):
@@ -402,10 +400,21 @@ class DBFunctions:
             results.add(row[0])
 
         return results
-        
+
+    @staticmethod
+    def get_all_devices():
+        """Query the database for all saved devices
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute("""SELECT Model, Manufacturer from Devices""", ())
+        return cursor.fetchall()
+
 
 class VulnerabilityDB:
-    
+
     @staticmethod
     def get_all():
         """Query the database for a specific vulnerability
