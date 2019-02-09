@@ -31,19 +31,19 @@ class Reporter:
         canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 180,
                                  'Generated on: %s' % date.today().isoformat())
         canvas.setFont('Times-Roman', 9)
-        canvas.drawString(inch, 0.75 * inch, 'Page number of 1st page stuff')
+        canvas.drawString(inch, 0.75 * inch, 'Page %d' % doc.page)
         canvas.restoreState()
 
     def host_page(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Times-Roman', 9)
-        canvas.drawString(inch, 0.75 * inch, 'Page %d %s' % (doc.page, self.pageinfo))
+        canvas.drawString(inch, 0.75 * inch, 'Page %d' % doc.page)
         canvas.restoreState()
 
     def scan_page(self, canvas, doc):
         canvas.saveState()
         canvas.setFont('Times-Roman', 9)
-        canvas.drawString(inch, 0.75 * inch, 'Page %d %s' % (doc.page, self.pageinfo))
+        canvas.drawString(inch, 0.75 * inch, 'Page %d' % doc.page)
         canvas.restoreState()
 
     def build_pdf(self):
@@ -58,39 +58,39 @@ class Reporter:
         Story = [Spacer(1, 2 * inch)]
 
         # print styles to see what we can use
-        print('STYLES: ', self.styles.list())
+        # print('STYLES: ', self.styles.list())
 
         style = self.styles["Normal"]
 
-        #todo add data to page
-
         # Host data
-        Story.append(Paragraph('Hosts - - - - - - - - -', self.styles['Heading2']))
+        Story.append(Paragraph('Scanned Hosts ---------------------', self.styles['Heading2']))
         for h in self._report['hosts']:
             if h.get_display_val():
-                Story.append(Paragraph(h.get_display_val(), style))
-                Story.append(Spacer(1, 0.2 * inch))
+                hname = f'Hostname: {h.get_display_name()}'
+                ip = f'IP Address: {h.get_ip()}'
+                mac = f'MAC Address: {h.get_mac_address()}'
+                Story.append(Paragraph(hname, style))
+                Story.append(Paragraph(ip, style))
+                Story.append(Paragraph(mac, style))
                 Story.append(Spacer(1, 0.2 * inch))
 
+        # Next Pages
         Story.append(PageBreak())
 
         # cpe data
-        Story.append(Paragraph('CPEs - - - - - - - - -', self.styles['Heading2']))
+        Story.append(Paragraph('CPEs ---------------------', self.styles['Heading2']))
         for c in self._report['cpes']:
-            Story.append(Paragraph(c, style))
-            Story.append(Spacer(1, 0.2 * inch))
+            cpe = self._report['cpes'][c][0]
+            Story.append(Paragraph(cpe, style))
             Story.append(Spacer(1, 0.2 * inch))
 
-        # for i in range(20):
-        #     some_text = ('Attribute: %s. ' % i)*20
-        #     p = Paragraph(some_text, style)
-        #     Story.append(p)
-        #     Story.append(Spacer(1, 0.2 * inch))
-        #     Story.append(Paragraph('This is text!', style))
-        #     Story.append(Spacer(1, 0.2*inch))
-        # Story.append(Paragraph(self._report['cve'], self.styles['Heading1']))
-        #########
+        # Next Pages
+        Story.append(PageBreak())
 
+        # Vuln Data
+        Story.append(Paragraph('Vulnerabilities ---------------------', self.styles['Heading2']))
+        for v in self._report['vulns']:
+            Story.append(Paragraph(v, style))
 
         doc.build(Story, onFirstPage=self.title_page, onLaterPages=self.scan_page)
 
@@ -105,4 +105,3 @@ if __name__ == "__main__":
               }
     r = Reporter(report, 'pdf-test.pdf', 'Curtis')
     r.build_pdf()
-    

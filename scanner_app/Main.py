@@ -19,7 +19,6 @@ from util import DBFunctions as df, System, ExploitSearch
 from util.Reporter import Reporter
 
 
-
 # Main method to handle setting up and managing the UI
 def main():
     print("Scanner App Started...")
@@ -189,12 +188,6 @@ def main():
         else:
             print('No CVEs')
 
-
-
-
-
-
-
     def new_vuln_popup():
         """Click handler for new vuln button"""
         vp.VulnPopup.new_popup()
@@ -224,11 +217,10 @@ def main():
             'vulns': vulnerabilities
         }
         time = date.today().isoformat()
-        fname = asksaveasfilename(title='Save Your Report!', defaultextension='.pdf',
+        fname = asksaveasfilename(title='Select File to Save Report...', defaultextension='.pdf',
                                   initialfile='Report_'+str(time)+'.pdf')
         r = Reporter(report, fname, 'Curtis!')
         r.build_pdf()
-        r.print()
 
 
     def on_host_listbox_select(evt):
