@@ -262,7 +262,7 @@ def main():
 
     # Setup root ui
     root = tk.Tk()
-    root.title("Scanner App")
+    root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
 
