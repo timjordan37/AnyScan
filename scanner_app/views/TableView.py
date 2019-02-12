@@ -1,7 +1,8 @@
 import tkinter
 from tkinter import ttk
 
-class TableView():
+
+class TableView:
 
     """Sections is a list of strings, each string represents a section to be displayed"""
     _sections = None
@@ -61,3 +62,6 @@ class TableView():
         selected_item = self._tree.focus()
 
         return self._tree.item(selected_item)
+
+    def bind_method(self, btn_txt, method_to_bind):
+        self._tree.bind(btn_txt, method_to_bind)

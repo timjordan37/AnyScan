@@ -3,13 +3,17 @@ from datetime import date
 from tkinter.filedialog import asksaveasfilename
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from util.Reporter import Reporter
+from util.DataShare import DataShare
 
 
-class ScanDetailsView():
+class ScanDetailsView:
     host_name_entry_var = None
     mac_address_entry_var = None
     port_number_entry_var = None
     check_vulnerabilities_button = None
+    vulnerabilities = None
+    cpes = None
+    scanned_hosts = None
 
     def new_vuln_popup(self):
         """Click handler for new vuln button"""
@@ -23,23 +27,30 @@ class ScanDetailsView():
         """Click handler for the Settings button"""
         sp.SettingsPopup.new_popup()
 
+    def save_report_data(self, vulns, cpes, scanned_hosts):
+        self.vulnerabilities = vulns
+        self.cpes = cpes
+        self.scanned_hosts = scanned_hosts
+
     def on_report(self):
         """Click hanlder for report button"""
         print("User clicked 'Report'")
         # todo route data to
-        # nonlocal vulnerabilities
-        # nonlocal cpes
-        # nonlocal scanned_hosts
-        # report = {
-        #     'hosts': scanned_hosts,
-        #     'cpes': cpes,
-        #     'vulns': vulnerabilities
-        # }
-        # time = date.today().isoformat()
-        # fname = asksaveasfilename(title='Select File to Save Report...', defaultextension='.pdf',
-        #                           initialfile='Report_'+str(time)+'.pdf')
-        # r = Reporter(report, fname, 'Curtis!')
-        # r.build_pdf()
+        vulnerabilities = DataShare.get_vulns()
+        cpes = DataShare.get_cpes()
+        scanned_hosts = DataShare.get_hosts()
+        
+        if vulnerabilities and cpes and scanned_hosts:
+            report = {
+                'hosts': scanned_hosts,
+                'cpes': cpes,
+                'vulns': vulnerabilities
+            }
+            time = date.today().isoformat()
+            fname = asksaveasfilename(title='Select File to Save Report...', defaultextension='.pdf',
+                                      initialfile='Report_'+str(time)+'.pdf')
+            r = Reporter(report, fname, 'Curtis!')
+            r.build_pdf()
 
     def get_view(self, parent_frame):
         self.host_name_entry_var = tk.StringVar()

@@ -1,18 +1,22 @@
 import tkinter as tk
-from tkinter import ttk
 import enum
 from views.TableView import TableView
 from util import DBFunctions as dbf
+from util.DataShare import DataShare
 
 
-class VulnerabilitiesView():
+class VulnerabilitiesView:
 
     vuln_name_entry_var = None
     vuln_cvss_score_entry_var = None
     vuln_severity_entry_var = None
     vuln_score_entry_var = None
     search_button = None
+    pass_cve_button = None
     table_view = None
+
+    # Method to be called to get selected cve
+    on_selected_cve = None
 
     def get_view(self, parent_frame):
         self.vuln_name_entry_var = tk.StringVar()
@@ -80,6 +84,9 @@ class VulnerabilitiesView():
         self.search_button = tk.Button(frame, text="Search", command=self.on_search)
         self.search_button.grid(row=5, column=0, pady=(8, 8))
 
+        # self.pass_cve_button = tk.Button(frame, text="Pass CVE", command=self.on_cve_select)
+        # self.pass_cve_button.grid(row=5, column=1, pady=(8, 8))
+
         # TableView
         sections_tuple = TreeColumns.all_cases()
         all_vulns = dbf.DBFunctions.get_all_vulns()
@@ -89,6 +96,7 @@ class VulnerabilitiesView():
             data.append(list(vuln))
 
         self.table_view = TableView(frame, 6, sections_tuple, data)
+        self.table_view.bind_method('<ButtonRelease-1>', self.on_cve_select)
 
         return frame
 
@@ -128,7 +136,18 @@ class VulnerabilitiesView():
                 additional_param_str += " AND "
             query_str += (additional_param_str + param_str)
 
-        return (query_str, tuple(query_params_list))
+        return query_str, tuple(query_params_list)
+
+    def on_cve_select(self, event):
+        selected_value = self.table_view.get_selected_item()['values']
+        print('\n\n')
+        print(selected_value[1])
+        print('From Vuln View: ', selected_value)
+
+        if len(selected_value) > 0:
+            DataShare.set_selected_cve(selected_value[1])
+            self.on_selected_cve(selected_value[1])
+
 
 
 class TreeColumns(enum.Enum):

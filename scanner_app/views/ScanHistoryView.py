@@ -1,16 +1,15 @@
 import tkinter as tk
-from tkinter import ttk
 import enum
 from views.TableView import TableView
 from util import DBFunctions as dbf
-from util import System
 
 
-class ScanHistoryView():
+class ScanHistoryView:
 
     scan_id_entry_var = None
     scan_duration_entry_var = None
     scan_date_entry_var = None
+    vuln_score_entry_var = None
 
     """The Method to be called when a scan is selected"""
     on_selected_scan_completion = None
@@ -136,7 +135,8 @@ class ScanHistoryView():
             query_str += (additional_param_str + param_str)
 
         query_str += """ GROUP BY sh.ScanID """
-        return (query_str, tuple(query_params_list))
+        return query_str, tuple(query_params_list)
+
 
 class TreeColumns(enum.Enum):
     scan_id = 0

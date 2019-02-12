@@ -74,7 +74,7 @@ class PdfSize(enum.Enum):
         return pdf_sizes[int(pdf_int)]
 
 
-class SettingKey():
+class SettingKey:
     # Dictionary Keys
     setting_file_name = "settings.ini"
     config_key = "DEFAULT"
@@ -88,7 +88,7 @@ class SettingKey():
 
 
 """Singleton implementation: https://www.tutorialspoint.com/python_design_patterns/python_design_patterns_singleton.htm"""
-class Settings():
+class Settings:
     """Properties"""
     __instance = None
 
