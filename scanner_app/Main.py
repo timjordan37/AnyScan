@@ -103,10 +103,9 @@ def main():
         for vulnerability in sorted_scanned_vulns:
             vulnerabilities_listbox.insert(tk.END, vulnerability)
 
-        nonlocal vulnerabilities_header_label
-        nonlocal vulnerabilities_number_label
-        vulnerabilities_header_label['text'] = "Vulnerabilities: "
-        vulnerabilities_number_label['text'] = len(vulnerabilities)
+        nonlocal scan_details_view
+        scan_details_view.vulnerabilities_header_label['text'] = "Vulnerabilities: "
+        scan_details_view.vulnerabilities_number_label['text'] = len(vulnerabilities)
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
@@ -380,8 +379,6 @@ def main():
     scan_details_view = ScanDetailsView()
     scan_details_tab = scan_details_view.get_view(main_note_book)
     main_note_book.add(scan_details_tab, text="Scan Details")
-    nonlocal vulnerabilities_header_label
-    vulnerabilities_header_label = scan_details_view.vulnerabilities_header_label
 
     # Setup Vulnerabilities Tab
     vulnerabilities_view = VulnerabilitiesView()
