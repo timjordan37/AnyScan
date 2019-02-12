@@ -57,6 +57,40 @@ class DBFunctions:
 
         return True
 
+    # Updates a Vulnerability in the DB
+    @staticmethod
+    def update_vuln(vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
+                           customScoreReason, privilegesRequired,
+                           userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                           baseScore, baseSeverity, exploitabilityScore):
+        conn = sqlite3.connect("vulnDB.db")
+        cursor = conn.cursor()
+
+        vulnerability_info = (cveName, description, attackVector, attackComplexity, customScore,
+                              customScoreReason, privilegesRequired,
+                              userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                              baseScore, baseSeverity, exploitabilityScore, vulnID)
+
+        cursor.execute('''UPDATE Vulnerabilities 
+                        SET 
+                        cveName = ?,
+                        description = ?,
+                        attackVector = ?,
+                        attackComplexity = ?,
+                        customScore = ?,
+                        customScoreReason = ?,
+                        priviligesRequired = ?,
+                        userInteraction = ?,
+                        confidentialityImpact = ?,
+                        integrityImpact = ?,
+                        availabilityImpact = ?,
+                        baseScore = ?,
+                        baseSeverity = ?,
+                        exploitabilityScore = ? 
+                        WHERE VulnID = ?''', vulnerability_info)
+        conn.commit()
+
+
     # Saves a scan to the database
     @staticmethod
     def save_scan(Date, Duration):
@@ -283,6 +317,7 @@ class DBFunctions:
         # return all the fun stuff
         # return cves
 
+    @staticmethod
     def query_vulns(cve):
         """Query the database for a specific vulnerability
 
@@ -370,9 +405,6 @@ class DBFunctions:
         retrievalID = (scanID)
         cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
 
-        results = cursor.fetchone()
-        return results
-
     # Retrieves scanIDs and Dates for all Scans
     @staticmethod
     def retrieve_scan_history():
@@ -404,3 +436,50 @@ class DBFunctions:
             results.add(row[0])
 
         return results
+
+
+    """Scan Histort Methods"""
+    @staticmethod
+    def get_all_scans():
+        """Query the database for all saved scans
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute("""SELECT sh.ScanID as ScanID, 
+                                sh.Duration as Duration, 
+                                sh.ScanDate as Date, 
+                                (SELECT COUNT(*) from Hosts where ScanID = sh.ScanID) as HostCount 
+                                from ScanHistory sh JOIN Hosts h on sh.ScanID = h.ScanID 
+                                GROUP BY sh.ScanID""", ())
+        return cursor.fetchall()
+
+    @staticmethod
+    def get_all_where(query_str, query_params):
+        """Query the database for all saved entiries with the given string and params
+        """
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(query_str, query_params)
+            conn.commit()
+
+        except sqlite3.Error as er:
+            print
+            'er:', er.message
+
+        return cursor.fetchall()
+
+    """Vulnerabilities Methods"""
+    @staticmethod
+    def get_all_vulns():
+        """Query the database for all saved vulnerabilities
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities""", ())
+        return cursor.fetchall()
