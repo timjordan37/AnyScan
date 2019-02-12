@@ -6,6 +6,7 @@ from views.DetailsPopup import DetailsPopup
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
 from views.DevicesView import DevicesView
+from views.ScanHistoryView import ScanHistoryView
 from views.ReportsPopup import ReportsPopup
 from views.ExploitPopup import ExploitPopup
 from views.ExploitView import ExploitView
@@ -13,6 +14,13 @@ from pathlib import Path
 from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
+
+from util import DBFunctions as dbf, System
+from models.Host import Host
+# Main method to handle setting up and managing the UI
+
+HOME_IP = '192.168.1.1'  # default gateway, not really home
+
 import datetime
 import ctypes
 import sys
@@ -169,6 +177,29 @@ def main():
         # MAKE SURE TO VALIDATE INPUT
         scan_thread = SThread(0, "SCAN_THREAD_1", 5, scan_thread_completion)
         scan_thread.start()
+
+    def on_select_scan(id):
+        query = "SELECT * FROM Hosts WHERE ScanID = ?"
+        params = (id,)
+
+        data = dbf.DBFunctions.get_all_where(query, params)
+
+        curr_hosts = []
+        # for each host scanned
+        for host_raw in data:
+            ip = host_raw[1]
+            state = "Old Host"
+            mac = host_raw[2]
+            os_gen = host_raw[3]
+            os_family = host_raw[4]
+            name = host_raw[5]
+            vendor = host_raw[6]
+
+            curr_hosts.append(Host(ip, state, name, os_family, os_gen, vendor, mac))
+
+        set_host(curr_hosts)
+
+        # set_host(host)
 
     def on_check_vulnerabilities():
         """Click hanlder for check vulnerabilities button"""
@@ -361,6 +392,11 @@ def main():
     exploit_tab = exploit_view.get_view(main_note_book)
     main_note_book.add(exploit_tab, text='Exploits')
 
+    # Setup Scan History Tab
+    scan_history_view = ScanHistoryView()
+    scan_history_tab = scan_history_view.get_view(main_note_book)
+    main_note_book.add(scan_history_tab, text="Scan History")
+    scan_history_view.on_selected_scan_completion = on_select_scan
 
     # Run the program with UI
     root.geometry("800x500")

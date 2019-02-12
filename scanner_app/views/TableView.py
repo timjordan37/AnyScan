@@ -17,6 +17,9 @@ class TableView():
     """When each list is iterated through, the value in each index will be displayed under the section with the same index"""
     _data = []
 
+
+    _tree = None
+
     """
     sections: List of strings, the sections to be displayed
     data: List of lists, the data to be displayed, each list contains the items in the index that will be displayed in the tabel
@@ -40,3 +43,21 @@ class TableView():
             for collection in data:
                 tree.insert("", i, values=tuple(collection))
             i += 1
+
+        self._tree = tree
+
+    def reload_data(self, data):
+        print("DATA: ", data)
+        for i in self._tree.get_children():
+            self._tree.delete(i)
+
+        if len(data) != 0:
+            i = 0
+            for collection in data:
+                self._tree.insert("", i, values=tuple(collection))
+            i += 1
+
+    def get_selected_item(self):
+        selected_item = self._tree.focus()
+
+        return self._tree.item(selected_item)

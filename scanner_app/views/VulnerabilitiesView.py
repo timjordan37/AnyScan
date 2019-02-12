@@ -33,7 +33,7 @@ class VulnerabilitiesView():
         vuln_name_frame.grid(row=1, column=0, sticky="nsew")
         vuln_name_frame.grid_columnconfigure(1, weight=1)
 
-        vuln_name_label = tk.Label(vuln_name_frame, text="Host Name:")
+        vuln_name_label = tk.Label(vuln_name_frame, text="CVE Name:")
         vuln_name_label.grid(row=0, column=0, padx=(16, 0))
 
         self.vuln_name_entry_var.set("")
@@ -77,15 +77,12 @@ class VulnerabilitiesView():
         vuln_score_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         # Search Button
-        self.search_button = tk.Button(frame, text="Search")
+        self.search_button = tk.Button(frame, text="Search", command=self.on_search)
         self.search_button.grid(row=5, column=0, pady=(8, 8))
 
         # TableView
         sections_tuple = TreeColumns.all_cases()
-
-        # dbf.DBFunctions.save_vulnerability("a","a","a","a","a","a","a","a","a","a","a","a","a","a","a",)
-        # dbf.DBFunctions.save_vulnerability("b","b","b","b","b","b","b","b","b","b","b","b","b","b","b", )
-        all_vulns = dbf.VulnerabilityDB.get_all()
+        all_vulns = dbf.DBFunctions.get_all_vulns()
 
         data = []
         for vuln in all_vulns:
@@ -95,23 +92,60 @@ class VulnerabilitiesView():
 
         return frame
 
+    def on_search(self):
+        query_tuple = self.build_query_string()
+        data = dbf.DBFunctions.get_all_where(query_tuple[0], query_tuple[1])
+        self.table_view.reload_data(data)
+
+    def build_query_string(self):
+        query_str = """SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities"""
+        query_str_params_list = []
+        query_params_list = []
+
+        if self.vuln_name_entry_var.get() or self.vuln_cvss_score_entry_var.get() or self.vuln_score_entry_var.get() or self.vuln_severity_entry_var.get():
+            query_str += """ WHERE"""
+
+        if self.vuln_name_entry_var.get():
+            query_str_params_list.append(""" cveName LIKE (?) """)
+            query_params_list.append("%" + self.vuln_name_entry_var.get() + "%")
+
+        if self.vuln_cvss_score_entry_var.get():
+            query_str_params_list.append(""" CVSSScore = (?) """)
+            query_params_list.append(self.vuln_cvss_score_entry_var.get())
+
+        if self.vuln_score_entry_var.get():
+            query_str_params_list.append(""" baseScore = (?) """)
+            query_params_list.append(int(self.vuln_score_entry_var.get()))
+
+        if self.vuln_severity_entry_var.get():
+            query_str_params_list.append(""" baseSeverity = (?) """)
+            query_params_list.append(int(self.vuln_severity_entry_var.get()))
+
+        params_count = len(query_str_params_list)
+        for idx, param_str in enumerate(query_str_params_list):
+            additional_param_str = ""
+            if params_count > 1 and idx > 0:
+                additional_param_str += " AND "
+            query_str += (additional_param_str + param_str)
+
+        return (query_str, tuple(query_params_list))
+
 
 class TreeColumns(enum.Enum):
-    cve_name = 0
-    description = 1
-    cvssscore = 2
-    base_score = 3
-    severity = 4
+    id = 0
+    cveName = 1
+    cvssScore = 2
+    baseScore = 3
+    baseSeverity = 4
 
     @staticmethod
     def display_name_for_column(col):
         display_names = {
             0: "id",
             1: "CVE Name",
-            2: "Description",
-            3: "CVSS Score",
-            4: "Base Score",
-            5: "Severity",
+            2: "CVSS Score",
+            3: "Base Score",
+            4: "Base Severity",
         }
         return display_names[col]
 

@@ -401,6 +401,7 @@ class DBFunctions:
 
         return results
 
+
     @staticmethod
     def get_all_devices():
         """Query the database for all saved devices
@@ -412,29 +413,47 @@ class DBFunctions:
         cursor.execute("""SELECT Model, Manufacturer from Devices""", ())
         return cursor.fetchall()
 
-
-class VulnerabilityDB:
-
     @staticmethod
-    def get_all():
-        """Query the database for a specific vulnerability
-
-        :param cve: vulnerability to be searched for
+    def get_all_scans():
+        """Query the database for all saved scans
         """
 
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Vuln Query HERE")
 
-        cursor.execute("""SELECT * FROM Vulnerabilities""", ())
+        cursor.execute("""SELECT sh.ScanID as ScanID, 
+                                sh.Duration as Duration, 
+                                sh.ScanDate as Date, 
+                                (SELECT COUNT(*) from Hosts where ScanID = sh.ScanID) as HostCount 
+                                from ScanHistory sh JOIN Hosts h on sh.ScanID = h.ScanID 
+                                GROUP BY sh.ScanID""", ())
         return cursor.fetchall()
 
     @staticmethod
-    def remove_all():
+    def get_all_where(query_str, query_params):
+        """Query the database for all saved entiries with the given string and params
+        """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Remove all Vulns")
 
-        cursor.execute("""DELETE FROM Vulnerabilities""", ())
-        results = cursor.fetchone()
-        return results
+        try:
+            cursor.execute(query_str, query_params)
+            conn.commit()
+
+        except sqlite3.Error as er:
+            print
+            'er:', er.message
+
+        return cursor.fetchall()
+
+    """Vulnerabilities Methods"""
+    @staticmethod
+    def get_all_vulns():
+        """Query the database for all saved vulnerabilities
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities""", ())
+        return cursor.fetchall()
