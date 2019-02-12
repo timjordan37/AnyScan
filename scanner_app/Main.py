@@ -1,22 +1,27 @@
-import tkinter as tk
-from tkinter.filedialog import asksaveasfilename
-from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
-from views.DetailsPopup import DetailsPopup
-from views.ExploitPopup import ExploitPopup
-from pathlib import Path
-import random
-from util.Scanner import Scanner
-from util.SThread import SThread
-from util.STime import STimer
+# python imports
 import datetime
-from datetime import date
 import ctypes
 import sys
 import platform
 import os
+import random
+# 3rd party imports
+import tkinter as tk
+from tkinter import ttk
+from pathlib import Path
 from elevate import elevate
-from util import DBFunctions as df, System, ExploitSearch
-from util.Reporter import Reporter
+# custom modules imports
+from util.Scanner import Scanner
+from util.SThread import SThread
+from util.STime import STimer
+from util import DBFunctions as df, System
+from views.DetailsPopup import DetailsPopup
+from views.ScanDetailsView import ScanDetailsView
+from views.VulnerabilitiesView import VulnerabilitiesView
+from views.DevicesView import DevicesView
+from views.ScanHistoryView import ScanHistoryView
+from views.ExploitView import ExploitView
+from models.Host import Host
 
 
 # Main method to handle setting up and managing the UI
@@ -77,26 +82,26 @@ def main():
 
     def reload_vulnerabilities_listbox():
         """Update vulnerabilites box with found vulnerabilites"""
-        vulnerabilities_listbox.delete(0, tk.END)
-
-        # Sort according to the Host Sort Setting
-        reverse_sort = False
-
-        if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
-            reverse_sort = True
-            
-        sorted_scanned_vulns = sorted(vulnerabilities, reverse=reverse_sort)
-
-        if sorted_scanned_vulns is None:
-            return
-
-        for vulnerability in sorted_scanned_vulns:
-            vulnerabilities_listbox.insert(tk.END, vulnerability)
-
-        nonlocal vulnerabilities_header_label
-        nonlocal vulnerabilities_number_label
-        vulnerabilities_header_label['text'] = "Vulnerabilities: "
-        vulnerabilities_number_label['text'] = len(vulnerabilities)
+        # vulnerabilities_listbox.delete(0, tk.END)
+        #
+        # # Sort according to the Host Sort Setting
+        # reverse_sort = False
+        #
+        # if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
+        #     reverse_sort = True
+        #
+        # sorted_scanned_vulns = sorted(vulnerabilities, reverse=reverse_sort)
+        #
+        # if sorted_scanned_vulns is None:
+        #     return
+        #
+        # for vulnerability in sorted_scanned_vulns:
+        #     vulnerabilities_listbox.insert(tk.END, vulnerability)
+        #
+        # nonlocal vulnerabilities_header_label
+        # nonlocal vulnerabilities_number_label
+        # vulnerabilities_header_label['text'] = "Vulnerabilities: "
+        # vulnerabilities_number_label['text'] = len(vulnerabilities)
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
@@ -118,14 +123,13 @@ def main():
         print("Scan END")
 
         scan_button.config(state="normal")
-        check_vulnerabilities_button.config(state="normal")
+        scan_details_view.check_vulnerabilities_button.config(state="normal")
 
         # could get this from the scan itself
         scan_end_date = datetime.datetime.now()
         timedelta = scan_end_date - scan_start_date
         timedelta.total_seconds()
         ##
-
 
         last_row_id = df.DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
 
@@ -168,29 +172,52 @@ def main():
         scan_thread = SThread(0, "SCAN_THREAD_1", 5, scan_thread_completion)
         scan_thread.start()
 
-    def on_check_vulnerabilities():
-        """Click hanlder for check vulnerabilities button"""
-        if cpes:
-            set_cpes_vulns(cpes)
-        print("User clicked 'check vulnerabilities'")
+    def on_select_scan(id):
+        query = "SELECT * FROM Hosts WHERE ScanID = ?"
+        params = (id,)
 
-    def find_exploit():
-        """Click handler for exploitation search"""
-        nonlocal cve_selection
+        data = df.DBFunctions.get_all_where(query, params)
 
-        if cve_selection:
-            print(cve_selection)
-            es = ExploitSearch.ExploitSearcher(cve_selection)
-            es.search()
-            popup = ExploitPopup(es.get_results())
-            popup.new_pupup()
-            es.print_all()
-        else:
-            print('No CVEs')
+        curr_hosts = []
+        # for each host scanned
+        for host_raw in data:
+            ip = host_raw[1]
+            state = "Old Host"
+            mac = host_raw[2]
+            os_gen = host_raw[3]
+            os_family = host_raw[4]
+            name = host_raw[5]
+            vendor = host_raw[6]
 
-    def new_vuln_popup():
-        """Click handler for new vuln button"""
-        vp.VulnPopup.new_popup()
+            curr_hosts.append(Host(ip, state, name, os_family, os_gen, vendor, mac))
+
+        set_host(curr_hosts)
+
+        # set_host(host)
+
+    # def on_check_vulnerabilities():
+    #     """Click hanlder for check vulnerabilities button"""
+    #     if cpes:
+    #         set_cpes_vulns(cpes)
+    #     print("User clicked 'check vulnerabilities'")
+    #
+    # def find_exploit():
+    #     """Click handler for exploitation search"""
+    #     nonlocal cve_selection
+    #
+    #     if cve_selection:
+    #         print(cve_selection)
+    #         es = ExploitSearch.ExploitSearcher(cve_selection)
+    #         es.search()
+    #         popup = ExploitPopup(es.get_results())
+    #         popup.new_pupup()
+    #         es.print_all()
+    #     else:
+    #         print('No CVEs')
+
+    # def new_vuln_popup():
+    #     """Click handler for new vuln button"""
+    #     vp.VulnPopup.new_popup()
 
     def on_details():
         """Click handler for details button"""
@@ -204,25 +231,6 @@ def main():
             for item in cve_details:
                 print(item)
 
-    def on_report():
-        """Click hanlder for report button"""
-        print("User clicked 'Report'")
-
-        nonlocal vulnerabilities
-        nonlocal cpes
-        nonlocal scanned_hosts
-        report = {
-            'hosts': scanned_hosts,
-            'cpes': cpes,
-            'vulns': vulnerabilities
-        }
-        time = date.today().isoformat()
-        fname = asksaveasfilename(title='Select File to Save Report...', defaultextension='.pdf',
-                                  initialfile='Report_'+str(time)+'.pdf')
-        r = Reporter(report, fname, 'Curtis!')
-        r.build_pdf()
-
-
     def on_host_listbox_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
         # Note here that Tkinter passes an event object to onselect()
@@ -231,33 +239,29 @@ def main():
             return
 
         index = int(listbox.curselection()[0])
-        host_name_entry_var.set(scanned_hosts[index].get_display_name())
-        mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
-        port_number_entry_var.set(scanned_hosts[index].get_ip())
 
-    def on_vuln_listbox_select(evt):
-        """Click handler for vulnerabilities selection"""
-        listbox = evt.widget
-        if len(listbox.curselection()) == 0:
-            return
+        scan_details_view.host_name_entry_var.set(scanned_hosts[index].get_display_name())
+        scan_details_view.mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
+        scan_details_view.port_number_entry_var.set(scanned_hosts[index].get_ip())
 
-        nonlocal vulnerabilities_listbox
-        nonlocal vulnerability_label
-        nonlocal cve_selection
+    # def on_vuln_listbox_select(evt):
+        # """Click handler for vulnerabilities selection"""
+        # listbox = evt.widget
+        # if len(listbox.curselection()) == 0:
+        #     return
+        #
+        # index = int(listbox.curselection()[0])
+        #
+        # nonlocal vulnerability_label
+        # vulnerability_label['text'] = vulnerabilities[index]
+        print("TEMP")
 
-        vulnerability_label['text'] = vulnerabilities_listbox.get(listbox.curselection())
-        cve_selection = vulnerabilities_listbox.get(listbox.curselection())
-
-    def new_device_popup():
-        """Click handler for new device button"""
-        dp.DevicePopup.new_popup()
-
-    def on_settings():
-        """Click handler for the Settings button"""
-        show_settings_popup()
-
-    def show_settings_popup():
-        sp.SettingsPopup.new_popup()
+    # def on_settings():
+    #     """Click handler for the Settings button"""
+    #     show_settings_popup()
+    #
+    # def show_settings_popup():
+    #     sp.SettingsPopup.new_popup()
 
     # Variables
     vulnerabilities = []
@@ -267,7 +271,7 @@ def main():
 
     # Setup root ui
     root = tk.Tk()
-    root.title("Scanner App")
+    root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
 
@@ -340,116 +344,42 @@ def main():
     #################
     # Setup RightFrame
     #################
-    right_frame = tk.Frame(root)
-    right_frame.grid(row=0, column=1, sticky="nsew")
-    right_frame.grid_rowconfigure(6, weight=1)
-    right_frame.grid_columnconfigure(0, weight=1)
 
-    # Right frame header label
-    right_frame_header_label = tk.Label(right_frame, text="Host Info")
-    right_frame_header_label.grid(row=0, column=0, pady=(8, 8))
+    # Setup Notebook for right frame
+    rows = 0
+    while rows < 50:
+        root.columnconfigure(rows + 1, weight=1)
+        rows += 1
 
-    #  Host name UI
-    host_name_frame = tk.Frame(right_frame)
-    host_name_frame.grid(row=1, column=0, sticky="nsew")
-    host_name_frame.grid_columnconfigure(1, weight=1)
+    # Setup Root Notebook
+    main_note_book = ttk.Notebook(root)
+    main_note_book.grid(row=0, column=1, columnspan=50, rowspan=49, sticky="NESW")
 
-    host_name_label = tk.Label(host_name_frame, text="Host Name:")
-    host_name_label.grid(row=0, column=0, padx=(16, 0))
+    # Setup Scan Details Tab
+    scan_details_view = ScanDetailsView()
+    scan_details_tab = scan_details_view.get_view(main_note_book)
+    main_note_book.add(scan_details_tab, text="Scan Details")
 
-    host_name_entry_var = tk.StringVar()
-    host_name_entry_var.set("")
-    host_name_text_entry = tk.Entry(host_name_frame, textvariable=host_name_entry_var)
-    host_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
+    # Setup Vulnerabilities Tab
+    vulnerabilities_view = VulnerabilitiesView()
+    vulnerabilities_tab = vulnerabilities_view.get_view(main_note_book)
+    main_note_book.add(vulnerabilities_tab, text="Vulnerabilities")
 
-    #  MAC Address UI
-    mac_address_frame = tk.Frame(right_frame)
-    mac_address_frame.grid(row=2, column=0, sticky="nsew")
-    mac_address_frame.grid_columnconfigure(1, weight=1)
+    # Setup Devices Tab
+    devices_view = DevicesView()
+    devices_tab = devices_view.get_view(main_note_book)
+    main_note_book.add(devices_tab, text="Devices")
 
-    mac_address_label = tk.Label(mac_address_frame, text="MAC Address:")
-    mac_address_label.grid(row=0, column=0, padx=(16, 0))
+    # Setup Exploits Tab
+    exploit_view = ExploitView()
+    exploit_tab = exploit_view.get_view(main_note_book)
+    main_note_book.add(exploit_tab, text='Exploits')
 
-    mac_address_entry_var = tk.StringVar()
-    mac_address_entry_var.set("")
-    mac_address_text_entry = tk.Entry(mac_address_frame, textvariable=mac_address_entry_var)
-    mac_address_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
-
-    #  Port Number UI
-    port_number_frame = tk.Frame(right_frame)
-    port_number_frame.grid(row=3, column=0, sticky="nsew", pady=(0, 8))
-    port_number_frame.grid_columnconfigure(1, weight=1)
-
-    port_number_label = tk.Label(port_number_frame, text="IP:")
-    port_number_label.grid(row=0, column=0, padx=(16, 0))
-
-    port_number_entry_var = tk.StringVar()
-    port_number_entry_var.set("")
-    port_number_text_entry = tk.Entry(port_number_frame, textvariable=port_number_entry_var)
-    port_number_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
-
-    #################
-    # Check Vulnerabilities UI
-    #################
-    #
-    # Check Vulnerabilities button
-    check_vulnerabilities_button = tk.Button(right_frame, text="Find Exploit",
-                                             command=find_exploit)
-    check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
-    check_vulnerabilities_button.config(state="disabled")
-
-    #################
-    # Vulnerabilities listBox Frame
-    #################
-    #
-    vulnerabilities_frame = tk.Frame(right_frame)
-    vulnerabilities_frame.grid(row=5, column=0)
-
-    # Vulnerabilities ListBox label
-    vulnerabilities_header_label = tk.Label(vulnerabilities_frame, text="Vulnerabilities")
-    vulnerabilities_header_label.grid(row=0, column=0)
-
-    # Vulnerabilities number
-    vulnerabilities_number_label = tk.Label(vulnerabilities_frame, text="")
-    vulnerabilities_number_label.grid(row=0, column=1)
-
-    # Vulnerabilities selection label
-    vulnerability_label = tk.Label(vulnerabilities_frame, text="")
-    vulnerability_label.grid(row=0, column=2)
-
-    # Vulnerabilities listbox
-    vulnerabilities_listbox = tk.Listbox(right_frame)
-    vulnerabilities_listbox.grid(row=6, column=0, sticky="nsew", padx=(16, 16))
-    vulnerabilities_listbox.bind('<<ListboxSelect>>', on_vuln_listbox_select)
-    reload_vulnerabilities_listbox()
-
-    #################
-    # Vulnerabilities button frame
-    #################
-    #
-    vulnerabilities_button_frame = tk.Frame(right_frame)
-    vulnerabilities_button_frame.grid(row=7, column=0, pady=(8, 8))
-
-    # Details
-    vulnerability_details_button = tk.Button(vulnerabilities_button_frame, text="Details", command=on_details)
-    vulnerability_details_button.grid(row=0, column=0)
-
-    # Report
-    vulnerability_report_button = tk.Button(vulnerabilities_button_frame, text="Report", command=on_report)
-    vulnerability_report_button.grid(row=0, column=1)
-
-    # Add Vulnerability
-    add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
-                                           command=new_vuln_popup)
-    add_vulnerabilities_button.grid(row=0, column=2)
-
-    # Add Device
-    add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=new_device_popup)
-    add_vulnerabilities_button.grid(row=0, column=3)
-
-    # Settings
-    add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Settings", command=on_settings)
-    add_vulnerabilities_button.grid(row=0, column=4)
+    # Setup Scan History Tab
+    scan_history_view = ScanHistoryView()
+    scan_history_tab = scan_history_view.get_view(main_note_book)
+    main_note_book.add(scan_history_tab, text="Scan History")
+    scan_history_view.on_selected_scan_completion = on_select_scan
 
     # Run the program with UI
     root.geometry("800x500")
