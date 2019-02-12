@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import *
 import random
 from tkinter import ttk
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
@@ -88,26 +89,25 @@ def main():
 
     def reload_vulnerabilities_listbox():
         """Update vulnerabilites box with found vulnerabilites"""
-        # vulnerabilities_listbox.delete(0, tk.END)
-        #
-        # # Sort according to the Host Sort Setting
-        # reverse_sort = False
-        #
-        # if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
-        #     reverse_sort = True
-        #
-        # sorted_scanned_vulns = sorted(vulnerabilities, reverse=reverse_sort)
-        #
-        # if sorted_scanned_vulns is None:
-        #     return
-        #
-        # for vulnerability in sorted_scanned_vulns:
-        #     vulnerabilities_listbox.insert(tk.END, vulnerability)
-        #
-        # nonlocal vulnerabilities_header_label
-        # nonlocal vulnerabilities_number_label
-        # vulnerabilities_header_label['text'] = "Vulnerabilities: "
-        # vulnerabilities_number_label['text'] = len(vulnerabilities)
+        vulnerabilities_listbox.delete(0, tk.END)
+
+        # Sort according to the Host Sort Setting
+        reverse_sort = False
+
+        if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
+            reverse_sort = True
+
+        sorted_scanned_vulns = sorted(vulnerabilities, reverse=reverse_sort)
+
+        if sorted_scanned_vulns is None:
+            return
+
+        for vulnerability in sorted_scanned_vulns:
+            vulnerabilities_listbox.insert(tk.END, vulnerability)
+
+        nonlocal scan_details_view
+        scan_details_view.vulnerabilities_header_label['text'] = "Vulnerabilities: "
+        scan_details_view.vulnerabilities_number_label['text'] = len(vulnerabilities)
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
@@ -218,11 +218,11 @@ def main():
             popup = ExploitPopup(es.get_results())
             popup.new_pupup()
             es.print_all()
-            #todo make data viewable to user
+            # todo make data viewable to user
         else:
             print('HERE HERE jk')
             # why am I getting here before I run a scan or even hit the button???
-            
+
     def new_vuln_popup():
         """Click handler for new vuln button"""
         vp.VulnPopup.new_vuln()
@@ -279,6 +279,11 @@ def main():
         # vulnerability_label['text'] = vulnerabilities[index]
         print("TEMP")
 
+
+    def donothing():
+        filewin = Toplevel(root)
+        button = Button(filewin, text="Do nothing button")
+        button.pack()
 
     # Variables
     vulnerabilities = []
@@ -398,7 +403,33 @@ def main():
     main_note_book.add(scan_history_tab, text="Scan History")
     scan_history_view.on_selected_scan_completion = on_select_scan
 
+    # File Menu Bar
+    menubar = Menu(root)  # create menu bar
+    filemenu = Menu(menubar, tearoff=0)  # create a menu to add some stuff too
+
+    savemenu = Menu(menubar, tearoff=0)
+    savemenu.add_command(label="Save Device", command=dp.DevicePopup.new_popup)
+    savemenu.add_command(label="Save Vulnerability", command=vp.VulnPopup.new_vuln)
+    filemenu.add_cascade(label='Save', menu=savemenu)
+    filemenu.add_separator()  # more prettiness
+
+    settingsmenu = Menu(menubar, tearoff=0)
+    settingsmenu.add_command(label="Scan Settings", command=scan_details_view.on_settings)
+    filemenu.add_cascade(label='Settings', menu=settingsmenu)
+    filemenu.add_separator()  # pretty
+    filemenu.add_command(label="Exit", command=root.quit)
+
+    editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
+    editmenu.add_command(label="Undo", command=donothing)
+    filemenu.add_cascade(label='Edit 2', menu=editmenu)  # add the edit menu under File
+    
+    menubar.add_cascade(label="File", menu=filemenu)  # add file to menu bar
+    # On macOS there are some default things added to this menu, but are not added to the same menu
+    # under File. 
+    menubar.add_cascade(label='Edit', menu=editmenu)  # add edit to menu bar too, for fun
+
     # Run the program with UI
+    root.config(menu=menubar)
     root.geometry("800x500")
     root.minsize(800, 500)
     root.mainloop()
@@ -412,8 +443,10 @@ if __name__ == '__main__':
         except:
             return False
 
+
     def is_root():
         return os.getuid() == 0
+
 
     if platform.system() == 'Windows':
         if is_win_admin():

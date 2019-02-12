@@ -8,6 +8,7 @@ class ScanDetailsView():
     mac_address_entry_var = None
     port_number_entry_var = None
     check_vulnerabilities_button = None
+    vulnerabilities_header_label = None
 
     def new_vuln_popup(self):
         """Click handler for new vuln button"""
@@ -19,7 +20,7 @@ class ScanDetailsView():
 
     def on_settings(self):
         """Click handler for the Settings button"""
-        sp.SettingsPopup.new_vuln()
+        sp.SettingsPopup.new_popup()
 
     def get_view(self, parent_frame):
         self.host_name_entry_var = tk.StringVar()
