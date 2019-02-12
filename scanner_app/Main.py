@@ -397,12 +397,12 @@ def main():
 
     savemenu = Menu(menubar, tearoff=0)
     savemenu.add_command(label="Save Device", command=dp.DevicePopup.new_popup)
-    savemenu.add_command(label="Save Vulnerability", command=vp.VulnPopup.new_popup)
+    savemenu.add_command(label="Save Vulnerability", command=vp.VulnPopup.new_vuln)
     filemenu.add_cascade(label='Save', menu=savemenu)
     filemenu.add_separator()  # more prettiness
 
     settingsmenu = Menu(menubar, tearoff=0)
-    settingsmenu.add_command(label="Scan Settings", command=show_settings_popup)
+    settingsmenu.add_command(label="Scan Settings", command=scan_details_view.on_settings)
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
     filemenu.add_separator()  # pretty
     filemenu.add_command(label="Exit", command=root.quit)

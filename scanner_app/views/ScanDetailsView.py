@@ -19,7 +19,7 @@ class ScanDetailsView():
 
     def on_settings(self):
         """Click handler for the Settings button"""
-        sp.SettingsPopup.new_vuln()
+        sp.SettingsPopup.new_popup()
 
     def get_view(self, parent_frame):
         self.host_name_entry_var = tk.StringVar()
