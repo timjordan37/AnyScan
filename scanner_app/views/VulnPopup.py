@@ -4,7 +4,7 @@ from util import DBFunctions as df
 class VulnPopup():
 
     @staticmethod
-    def new_popup():
+    def new_vuln():
         cve_name = tk.StringVar()
         description = tk.StringVar()
         cvss_score = tk.StringVar()
