@@ -140,14 +140,11 @@ class VulnerabilitiesView:
 
     def on_cve_select(self, event):
         selected_value = self.table_view.get_selected_item()['values']
-        print('\n\n')
-        print(selected_value[1])
-        print('From Vuln View: ', selected_value)
+        print('From Vuln View: ', selected_value[1])
 
         if len(selected_value) > 0:
             DataShare.set_selected_cve(selected_value[1])
             self.on_selected_cve(selected_value[1])
-
 
 
 class TreeColumns(enum.Enum):

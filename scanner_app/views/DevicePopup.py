@@ -3,7 +3,7 @@ from util import DBFunctions as df
 from tkinter import messagebox
 
 
-class DevicePopup():
+class DevicePopup:
 
     @staticmethod
     def new_popup():

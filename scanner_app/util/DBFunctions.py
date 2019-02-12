@@ -59,6 +59,40 @@ class DBFunctions:
 
         return True
 
+    # Updates a Vulnerability in the DB
+    @staticmethod
+    def update_vuln(vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
+                           customScoreReason, privilegesRequired,
+                           userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                           baseScore, baseSeverity, exploitabilityScore):
+        conn = sqlite3.connect("vulnDB.db")
+        cursor = conn.cursor()
+
+        vulnerability_info = (cveName, description, attackVector, attackComplexity, customScore,
+                              customScoreReason, privilegesRequired,
+                              userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                              baseScore, baseSeverity, exploitabilityScore, vulnID)
+
+        cursor.execute('''UPDATE Vulnerabilities 
+                        SET 
+                        cveName = ?,
+                        description = ?,
+                        attackVector = ?,
+                        attackComplexity = ?,
+                        customScore = ?,
+                        customScoreReason = ?,
+                        priviligesRequired = ?,
+                        userInteraction = ?,
+                        confidentialityImpact = ?,
+                        integrityImpact = ?,
+                        availabilityImpact = ?,
+                        baseScore = ?,
+                        baseSeverity = ?,
+                        exploitabilityScore = ? 
+                        WHERE VulnID = ?''', vulnerability_info)
+        conn.commit()
+
+
     # Saves a scan to the database
     @staticmethod
     def save_scan(Date, Duration):

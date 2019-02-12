@@ -14,6 +14,7 @@ class ScanDetailsView:
     vulnerabilities = None
     cpes = None
     scanned_hosts = None
+    vulnerabilities_header_label = None
 
     def new_vuln_popup(self):
         """Click handler for new vuln button"""

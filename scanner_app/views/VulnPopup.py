@@ -1,7 +1,8 @@
 import tkinter as tk
 from util import DBFunctions as df
 
-class VulnPopup():
+
+class VulnPopup:
 
     @staticmethod
     def new_popup():

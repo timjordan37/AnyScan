@@ -8,6 +8,7 @@ import random
 # 3rd party imports
 import tkinter as tk
 from tkinter import ttk
+from tkinter import *
 from pathlib import Path
 from elevate import elevate
 # custom modules imports
@@ -22,6 +23,8 @@ from views.VulnerabilitiesView import VulnerabilitiesView
 from views.DevicesView import DevicesView
 from views.ScanHistoryView import ScanHistoryView
 from views.ExploitView import ExploitView
+from views.DevicePopup import DevicePopup
+from views.VulnPopup import VulnPopup
 from models.Host import Host
 
 
@@ -180,7 +183,8 @@ def main():
     def update_exploit_tab(cve):
         main_note_book.select(3)
         print(main_note_book.tab(3))
-        print('\nUPDATE CVE ON TAB HERE\n')
+        print('\nFROM MAIN: update cve tab here maybe? \n')
+        print(cve)
 
     def on_host_listbox_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
@@ -190,12 +194,16 @@ def main():
             return
 
         index = int(listbox.curselection()[0])
-
         hosts = DataShare.get_hosts()
 
         scan_details_view.host_name_entry_var.set(hosts[index].get_display_name())
         scan_details_view.mac_address_entry_var.set(hosts[index].get_mac_address())
         scan_details_view.port_number_entry_var.set(hosts[index].get_ip())
+
+    def donothing():
+        filewin = Toplevel(root)
+        button = Button(filewin, text="Do nothing button")
+        button.pack()
 
     # Setup root ui
     root = tk.Tk()
@@ -311,7 +319,34 @@ def main():
     main_note_book.add(scan_history_tab, text="Scan History")
     scan_history_view.on_selected_scan_completion = on_select_scan
 
+    # File Menu Bar
+    menubar = Menu(root)  # create menu bar
+    filemenu = Menu(menubar, tearoff=0)  # create a menu to add some stuff too
+
+    savemenu = Menu(menubar, tearoff=0)
+    savemenu.add_command(label="Save Device", command=DevicePopup.new_popup)
+    savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
+    filemenu.add_cascade(label='Save', menu=savemenu)
+    filemenu.add_separator()  # more prettiness
+
+    settingsmenu = Menu(menubar, tearoff=0)
+    settingsmenu.add_command(label="Scan Settings", command=scan_details_view.on_settings)
+    filemenu.add_cascade(label='Settings', menu=settingsmenu)
+    filemenu.add_separator()  # pretty
+    filemenu.add_command(label="Exit", command=root.quit)
+
+    editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
+    editmenu.add_command(label="Undo", command=donothing)
+    filemenu.add_cascade(label='Edit 2', menu=editmenu)  # add the edit menu under File
+    
+    menubar.add_cascade(label="File", menu=filemenu)  # add file to menu bar
+
+    # On macOS there are some default things added to this menu, but are not added to the same menu
+    # under File. 
+    menubar.add_cascade(label='Edit', menu=editmenu)  # add edit to menu bar too, for fun
+
     # Run the program with UI
+    root.config(menu=menubar)
     root.geometry("800x500")
     root.minsize(800, 500)
     root.mainloop()
