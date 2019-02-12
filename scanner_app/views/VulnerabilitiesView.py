@@ -78,7 +78,7 @@ class VulnerabilitiesView():
 
         # Search Button
         self.search_button = tk.Button(frame, text="Search", command=self.on_search)
-        self.search_button.grid(row=5, column=0, pady=(0, 8))
+        self.search_button.grid(row=5, column=0, pady=(8, 8))
 
         # TableView
         sections_tuple = TreeColumns.all_cases()

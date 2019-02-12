@@ -2,6 +2,7 @@ import tkinter as tk
 import enum
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 
+
 class ScanDetailsView():
     host_name_entry_var = None
     mac_address_entry_var = None
@@ -117,11 +118,13 @@ class ScanDetailsView():
         vulnerability_report_button.grid(row=0, column=0)
 
         # Add Vulnerability
-        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability", command=self.new_vuln_popup)
+        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
+                                               command=self.new_vuln_popup)
         add_vulnerabilities_button.grid(row=0, column=1)
 
         # Add Device
-        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device", command=self.new_device_popup)
+        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device",
+                                               command=self.new_device_popup)
         add_vulnerabilities_button.grid(row=0, column=2)
 
         # Settings

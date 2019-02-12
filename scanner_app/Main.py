@@ -1,25 +1,27 @@
 import tkinter as tk
 from tkinter import *
 import random
-import datetime
-
 from tkinter import ttk
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
+from views.DevicesView import DevicesView
 from views.ScanHistoryView import ScanHistoryView
 from views.ReportsPopup import ReportsPopup
 from views.ExploitPopup import ExploitPopup
+from views.ExploitView import ExploitView
 from pathlib import Path
 from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
+
 from util import DBFunctions as dbf, System
 from models.Host import Host
 # Main method to handle setting up and managing the UI
 
 HOME_IP = '192.168.1.1'  # default gateway, not really home
+
 import datetime
 import ctypes
 import sys
@@ -291,7 +293,7 @@ def main():
 
     # Setup root ui
     root = tk.Tk()
-    root.title("Scanner App")
+    root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
 
@@ -384,6 +386,16 @@ def main():
     vulnerabilities_view = VulnerabilitiesView()
     vulnerabilities_tab = vulnerabilities_view.get_view(main_note_book)
     main_note_book.add(vulnerabilities_tab, text="Vulnerabilities")
+
+    # Setup Devices Tab
+    devices_view = DevicesView()
+    devices_tab = devices_view.get_view(main_note_book)
+    main_note_book.add(devices_tab, text="Devices")
+
+    # Setup Exploits Tab
+    exploit_view = ExploitView()
+    exploit_tab = exploit_view.get_view(main_note_book)
+    main_note_book.add(exploit_tab, text='Exploits')
 
     # Setup Scan History Tab
     scan_history_view = ScanHistoryView()
