@@ -65,7 +65,7 @@ class DevicesView:
 
     def on_search(self):
         query_tuple = self.build_query_string()
-        data = dbf.DBFunctions.get_all_qhere(query_tuple[0], query_tuple[1])
+        data = dbf.DBFunctions.get_all_where(query_tuple[0], query_tuple[1])
         self.table_view.reload_data(data)
 
     def build_query_string(self):
