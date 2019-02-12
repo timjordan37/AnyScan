@@ -153,7 +153,9 @@ def main():
 
         data = df.DBFunctions.get_all_where(query, params)
         print(data)
-        # these need to be set, but not sure if the cpes and vulns are separated
+        # these need to be set, but not sure if the cpes and vulns are differentiate
+        # by scans like hosts are
+        # todo: set cpes and vulns in DataShare
         print(DataShare.get_cpes())
         print(DataShare.get_vulns())
 
