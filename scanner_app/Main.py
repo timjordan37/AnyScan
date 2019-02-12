@@ -1,7 +1,5 @@
 import tkinter as tk
 import random
-import datetime
-
 from tkinter import ttk
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from views.DetailsPopup import DetailsPopup
@@ -10,14 +8,11 @@ from views.VulnerabilitiesView import VulnerabilitiesView
 from views.DevicesView import DevicesView
 from views.ReportsPopup import ReportsPopup
 from views.ExploitPopup import ExploitPopup
+from views.ExploitView import ExploitView
 from pathlib import Path
 from helpers.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
-from util import DBFunctions as df, System
-# Main method to handle setting up and managing the UI
-
-HOME_IP = '192.168.1.1'  # default gateway, not really home
 import datetime
 import ctypes
 import sys
@@ -360,6 +355,12 @@ def main():
     devices_view = DevicesView()
     devices_tab = devices_view.get_view(main_note_book)
     main_note_book.add(devices_tab, text="Devices")
+
+    # Setup Exploits Tab
+    exploit_view = ExploitView()
+    exploit_tab = exploit_view.get_view(main_note_book)
+    main_note_book.add(exploit_tab, text='Exploits')
+
 
     # Run the program with UI
     root.geometry("800x500")
