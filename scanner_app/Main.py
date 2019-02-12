@@ -152,6 +152,10 @@ def main():
         params = (id,)
 
         data = df.DBFunctions.get_all_where(query, params)
+        print(data)
+        # these need to be set, but not sure if the cpes and vulns are separated
+        print(DataShare.get_cpes())
+        print(DataShare.get_vulns())
 
         curr_hosts = []
         # for each host scanned
@@ -182,6 +186,7 @@ def main():
 
     def update_exploit_tab(cve):
         main_note_book.select(3)
+        exploit_view.cve_var.set(cve)
         print(main_note_book.tab(3))
         print('\nFROM MAIN: update cve tab here maybe? \n')
         print(cve)
