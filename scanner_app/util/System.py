@@ -12,14 +12,14 @@ class ScanType(enum.Enum):
 
     @staticmethod
     def display_name_for_scan_type(type):
-        displayNames = {
+        display_names = {
             0: "Full Scan",
             1: "Script Scan",
             2: "UDP Scan",
             3: "Fast Scan",
             4: "Detect OS Service Scan"
         }
-        return displayNames[type]
+        return display_names[type]
 
     @staticmethod
     def scan_type_for_int(scan_int):
@@ -36,14 +36,13 @@ class SortType(enum.Enum):
     alphaASC = 0
     alphaDESC = 1
 
-
     @staticmethod
     def display_name_for_sort_type(type):
-        displayNames = {
+        display_names = {
             0: "Alphabetical ASC",
             1: "Alphabetical DESC"
         }
-        return displayNames[type]
+        return display_names[type]
 
     @staticmethod
     def sort_type_for_int(scan_int):
@@ -54,7 +53,28 @@ class SortType(enum.Enum):
         return sort_types[int(scan_int)]
 
 
-class SettingKey():
+class PdfSize(enum.Enum):
+    letter = 0
+    a4 = 1
+
+    @staticmethod
+    def display_name_for_pdf_size(type):
+        display_names = {
+            0: "Letter",
+            1: "A4"
+        }
+        return display_names[type]
+
+    @staticmethod
+    def pdf_size_for_int(pdf_int):
+        pdf_sizes = {
+            0: PdfSize.letter,
+            1: PdfSize.a4
+        }
+        return pdf_sizes[int(pdf_int)]
+
+
+class SettingKey:
     # Dictionary Keys
     setting_file_name = "settings.ini"
     config_key = "DEFAULT"
@@ -63,11 +83,12 @@ class SettingKey():
     scan_type = "SCAN_TYPE"
     host_sort_type = "HOST_SORT_TYPE"
     vuln_sort_type = "VULN_SORT_TYPE"
+    pdf_size = "PDF_SIZE"
 
 
 
 """Singleton implementation: https://www.tutorialspoint.com/python_design_patterns/python_design_patterns_singleton.htm"""
-class Settings():
+class Settings:
     """Properties"""
     __instance = None
 
@@ -94,6 +115,7 @@ class Settings():
                 SettingKey.scan_type: Settings.get_scan_type().value,
                 SettingKey.host_sort_type: Settings.get_host_sort_type().value,
                 SettingKey.vuln_sort_type: Settings.get_vuln_sort_type().value,
+                SettingKey.pdf_size: Settings.get_pdf_size().value
 
             }
 
@@ -138,7 +160,7 @@ class Settings():
 
     @staticmethod
     def get_host_sort_type():
-        if not SettingKey.host_sort_type in Settings.get_settings_dict():
+        if SettingKey.host_sort_type not in Settings.get_settings_dict():
             return SortType.alphaASC
 
         sort_type_raw = Settings.get_settings_dict()[SettingKey.host_sort_type]
@@ -156,7 +178,7 @@ class Settings():
 
     @staticmethod
     def get_vuln_sort_type():
-        if not SettingKey.vuln_sort_type in Settings.get_settings_dict():
+        if SettingKey.vuln_sort_type not in Settings.get_settings_dict():
             return SortType.alphaASC
 
         sort_type_raw = Settings.get_settings_dict()[SettingKey.vuln_sort_type]
@@ -167,5 +189,22 @@ class Settings():
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.vuln_sort_type] = str(new_sort_type.value)
+        with open(SettingKey.setting_file_name, 'w') as configfile:
+            config.write(configfile)
+
+    """PDF Sizes"""
+
+    @staticmethod
+    def get_pdf_size():
+        if SettingKey.pdf_size not in Settings.get_settings_dict():
+            return PdfSize.letter
+        pdf_size_raw = Settings.get_settings_dict()[SettingKey.pdf_size]
+        return PdfSize.pdf_size_for_int(pdf_size_raw)
+
+    @staticmethod
+    def set_pdf_size(new_pdf_size):
+        config = configparser.ConfigParser()
+        config.read(SettingKey.setting_file_name)
+        config[SettingKey.config_key][SettingKey.pdf_size] = str(new_pdf_size.value)
         with open(SettingKey.setting_file_name, 'w') as configfile:
             config.write(configfile)

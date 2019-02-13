@@ -1,10 +1,11 @@
 import tkinter as tk
 from util import DBFunctions as df
 
-class VulnPopup():
+
+class VulnPopup:
 
     @staticmethod
-    def new_vuln():
+    def new_popup():
         cve_name = tk.StringVar()
         description = tk.StringVar()
         cvss_score = tk.StringVar()

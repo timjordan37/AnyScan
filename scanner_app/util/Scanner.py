@@ -127,7 +127,6 @@ class Scanner:
 
         return hosts
 
-# Requires sudo must be ran from commandline
     def get_os_service_scan_details(self):
         """Runs scan to detemine OS and running service of given host"""
         self._scanned = True

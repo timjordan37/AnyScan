@@ -16,7 +16,6 @@ class DBFunctions:
         print('Inside DBFunctions save_device')
         print(device_info)
 
-        # todo debug why this isn't saving or throwing errors
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
             conn.commit()
@@ -37,7 +36,9 @@ class DBFunctions:
         cursor.execute('SELECT MAX(VulnID) FROM Vulnerabilities')
         conn.commit()
         maxIDTuple = cursor.fetchone()
+
         # print("LOOK TUPLE: ", maxIDTuple)
+
         maxID = maxIDTuple[0]
 
         if maxID is None:
@@ -321,11 +322,9 @@ class DBFunctions:
 
         :param cve: vulnerability to be searched for
         """
-
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         print("Vuln Query HERE")
-
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
 
@@ -402,6 +401,8 @@ class DBFunctions:
         cursor = conn.cursor()
         retrievalID = (scanID)
         cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
+        results = cursor.fetchall()
+        return results
 
     # Retrieves scanIDs and Dates for all Scans
     @staticmethod

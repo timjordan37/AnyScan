@@ -1,34 +1,31 @@
-import tkinter as tk
-from tkinter import *
-import random
-from tkinter import ttk
-from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
-from views.DetailsPopup import DetailsPopup
-from views.ScanDetailsView import ScanDetailsView
-from views.VulnerabilitiesView import VulnerabilitiesView
-from views.DevicesView import DevicesView
-from views.ScanHistoryView import ScanHistoryView
-from views.ReportsPopup import ReportsPopup
-from views.ExploitPopup import ExploitPopup
-from views.ExploitView import ExploitView
-from pathlib import Path
-from helpers.Scanner import Scanner
-from util.SThread import SThread
-from util.STime import STimer
-
-from util import DBFunctions as dbf, System
-from models.Host import Host
-# Main method to handle setting up and managing the UI
-
-HOME_IP = '192.168.1.1'  # default gateway, not really home
-
+# python imports
 import datetime
 import ctypes
 import sys
 import platform
 import os
+import random
+# 3rd party imports
+import tkinter as tk
+from tkinter import ttk
+from tkinter import *
+from pathlib import Path
 from elevate import elevate
-from util import DBFunctions as df, System, ExploitSearch
+# custom modules imports
+from util.Scanner import Scanner
+from util.SThread import SThread
+from util.STime import STimer
+from util.ExploitSearch import ExploitSearcher
+from util.DataShare import DataShare
+from util import DBFunctions as df, System
+from views.ScanDetailsView import ScanDetailsView
+from views.VulnerabilitiesView import VulnerabilitiesView
+from views.DevicesView import DevicesView
+from views.ScanHistoryView import ScanHistoryView
+from views.ExploitView import ExploitView
+from views.DevicePopup import DevicePopup
+from views.VulnPopup import VulnPopup
+from models.Host import Host
 
 
 # Main method to handle setting up and managing the UI
@@ -42,7 +39,7 @@ def main():
         """
         if value is None:
             # if the provided value is none, then update to the default header
-            host_count = len(scanned_hosts)
+            host_count = DataShare.get_hosts_total()
             host_count_text = f"({host_count}) Hosts Scanned".format()
             left_frame_header_label_var.set(host_count_text)
         else:
@@ -61,14 +58,14 @@ def main():
 
     def reset_left_header_label():
         """Update left header with number of hosts scanned"""
-        host_count = len(scanned_hosts)
+        host_count = DataShare.get_hosts_total()
         host_count_text = f"({host_count}) Hosts Scanned".format()
         left_frame_header_label_var.set(host_count_text)
 
     def reload_hosts_listbox():
         """Update hosts box with scanned hosts"""
         hosts_listbox.delete(0, tk.END)
-        nonlocal scanned_hosts
+        sorted_scanned_hosts = None
 
         # Sort according to the Host Sort Setting
         reverse_sort = False
@@ -76,38 +73,18 @@ def main():
         if System.Settings.get_host_sort_type() == System.SortType.alphaDESC:
             reverse_sort = True
 
-        sorted_scanned_hosts = sorted(scanned_hosts, key=lambda x: (x.get_display_name()), reverse=reverse_sort)
+        if DataShare.get_hosts():
+            sorted_scanned_hosts = sorted(DataShare.get_hosts(), key=lambda x: (x.get_display_name()), reverse=reverse_sort)
 
         if sorted_scanned_hosts is None:
             return
 
         # Update hosts to the sorted version to ensure details on select are correct
-        scanned_hosts = sorted_scanned_hosts
+        DataShare.set_hosts(sorted_scanned_hosts)
 
         for host in sorted_scanned_hosts:
             hosts_listbox.insert(tk.END, host.get_display_val())
-
-    def reload_vulnerabilities_listbox():
-        """Update vulnerabilites box with found vulnerabilites"""
-        vulnerabilities_listbox.delete(0, tk.END)
-
-        # Sort according to the Host Sort Setting
-        reverse_sort = False
-
-        if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
-            reverse_sort = True
-
-        sorted_scanned_vulns = sorted(vulnerabilities, reverse=reverse_sort)
-
-        if sorted_scanned_vulns is None:
-            return
-
-        for vulnerability in sorted_scanned_vulns:
-            vulnerabilities_listbox.insert(tk.END, vulnerability)
-
-        nonlocal scan_details_view
-        scan_details_view.vulnerabilities_header_label['text'] = "Vulnerabilities: "
-        scan_details_view.vulnerabilities_number_label['text'] = len(vulnerabilities)
+        reset_left_header_label()
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
@@ -121,7 +98,6 @@ def main():
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
         hosts = scan_host_entry_var.get()
         scanner = Scanner(hosts, ports)
-        nonlocal scanned_hosts
 
         print("Scan start")
         set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
@@ -131,11 +107,9 @@ def main():
         scan_button.config(state="normal")
         scan_details_view.check_vulnerabilities_button.config(state="normal")
 
-        # could get this from the scan itself
         scan_end_date = datetime.datetime.now()
         timedelta = scan_end_date - scan_start_date
         timedelta.total_seconds()
-        ##
 
         last_row_id = df.DBFunctions.save_scan(scan_start_date, timedelta.total_seconds())
 
@@ -152,24 +126,19 @@ def main():
         """Set scanned hosts for ui
         :param h: hosts found
         """
-        nonlocal scanned_hosts
-        scanned_hosts = h
-        reload_hosts_listbox()
+        if h:
+            DataShare.set_hosts(h)
+            reload_hosts_listbox()
 
     def get_hosts():
         """Get scanned hosts"""
-        nonlocal scanned_hosts
-        return scanned_hosts
+        return DataShare.get_hosts()
 
     def set_cpes_vulns(c):
         """Set vulnerabilities from cps"""
-        nonlocal cpes
-        cpes = c
-
-        nonlocal vulnerabilities
-        vulnerabilities = df.DBFunctions.query_cves(cpes)
+        DataShare.set_cpes(c)
+        DataShare.set_vulns(df.DBFunctions.query_cves(c))
         # reload ui
-        reload_vulnerabilities_listbox()
 
     # Click Handlers
     def on_scan():
@@ -182,7 +151,13 @@ def main():
         query = "SELECT * FROM Hosts WHERE ScanID = ?"
         params = (id,)
 
-        data = dbf.DBFunctions.get_all_where(query, params)
+        data = df.DBFunctions.get_all_where(query, params)
+        print(data)
+        # these need to be set, but not sure if the cpes and vulns are differentiate
+        # by scans like hosts are
+        # todo: set cpes and vulns in DataShare
+        print(DataShare.get_cpes())
+        print(DataShare.get_vulns())
 
         curr_hosts = []
         # for each host scanned
@@ -199,60 +174,21 @@ def main():
 
         set_host(curr_hosts)
 
-        # set_host(host)
-
-    def on_check_vulnerabilities():
-        """Click hanlder for check vulnerabilities button"""
-        if cpes:
-            set_cpes_vulns(cpes)
-        print("User clicked 'check vulnerabilities'")
-
-    def find_exploit():
-        """Click handler for exploitation search"""
-        nonlocal cve_selection
-
-        if cve_selection:
-            print(cve_selection)
-            es = ExploitSearch.ExploitSearcher(cve_selection)
+    def find_exploit(cve):
+        if cve:
+            es = ExploitSearcher(cve)
+            # when clicking in vuln tab this gets called very quickly and throws errors
             es.search()
-            popup = ExploitPopup(es.get_results())
-            popup.new_pupup()
-            es.print_all()
-            # todo make data viewable to user
+            if exploit_view:
+                exploit_view.update_es(es)
+                exploit_view.update_cve(cve)
         else:
-            print('HERE HERE jk')
-            # why am I getting here before I run a scan or even hit the button???
+            print('No CVE selected')
 
-    def new_vuln_popup():
-        """Click handler for new vuln button"""
-        vp.VulnPopup.new_vuln()
-
-    def on_details():
-        """Click handler for details button"""
-        print("User clicked 'Details'")
-        # todo set button to disabled until a scan is complete
-        if vulnerabilities and vulnerability_label['text']:
-            cve_name = vulnerability_label['text']
-            cve_details = df.DBFunctions.query_vulns(cve_name)
-            pop = DetailsPopup(cve_details)
-            pop.new_vuln()
-            for item in cve_details:
-                print(item)
-
-    def on_report():
-        """Click hanlder for report button"""
-        print("User clicked 'Report'")
-        report_generator = df.DBFunctions.query_report_info()
-        # Debugging work
-        # todo ensure report_generator has correct information print('From Main: ')
-        print(report_generator)
-        #
-        #
-        #
-        pop = ReportsPopup(report_generator)
-        pop.new_vuln()
-        for item in report_generator:
-            print(item)
+    def update_exploit_tab(cve):
+        main_note_book.select(3)
+        exploit_view.cve_var.set(cve)
+        # todo update exploit tab variables
 
     def on_host_listbox_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
@@ -262,34 +198,16 @@ def main():
             return
 
         index = int(listbox.curselection()[0])
+        hosts = DataShare.get_hosts()
 
-        scan_details_view.host_name_entry_var.set(scanned_hosts[index].get_display_name())
-        scan_details_view.mac_address_entry_var.set(scanned_hosts[index].get_mac_address())
-        scan_details_view.port_number_entry_var.set(scanned_hosts[index].get_ip())
-
-    def on_vuln_listbox_select(evt):
-        # """Click handler for vulnerabilities selection"""
-        # listbox = evt.widget
-        # if len(listbox.curselection()) == 0:
-        #     return
-        #
-        # index = int(listbox.curselection()[0])
-        #
-        # nonlocal vulnerability_label
-        # vulnerability_label['text'] = vulnerabilities[index]
-        print("TEMP")
-
+        scan_details_view.host_name_entry_var.set(hosts[index].get_display_name())
+        scan_details_view.mac_address_entry_var.set(hosts[index].get_mac_address())
+        scan_details_view.port_number_entry_var.set(hosts[index].get_ip())
 
     def donothing():
         filewin = Toplevel(root)
         button = Button(filewin, text="Do nothing button")
         button.pack()
-
-    # Variables
-    vulnerabilities = []
-    scanned_hosts = []
-    cpes = {}
-    cve_selection = ''
 
     # Setup root ui
     root = tk.Tk()
@@ -386,6 +304,8 @@ def main():
     vulnerabilities_view = VulnerabilitiesView()
     vulnerabilities_tab = vulnerabilities_view.get_view(main_note_book)
     main_note_book.add(vulnerabilities_tab, text="Vulnerabilities")
+    vulnerabilities_view.on_selected_cve = find_exploit
+    vulnerabilities_view.move_to_exploit = update_exploit_tab
 
     # Setup Devices Tab
     devices_view = DevicesView()
@@ -408,8 +328,8 @@ def main():
     filemenu = Menu(menubar, tearoff=0)  # create a menu to add some stuff too
 
     savemenu = Menu(menubar, tearoff=0)
-    savemenu.add_command(label="Save Device", command=dp.DevicePopup.new_popup)
-    savemenu.add_command(label="Save Vulnerability", command=vp.VulnPopup.new_vuln)
+    savemenu.add_command(label="Save Device", command=DevicePopup.new_popup)
+    savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
     filemenu.add_cascade(label='Save', menu=savemenu)
     filemenu.add_separator()  # more prettiness
 
