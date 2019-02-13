@@ -307,11 +307,6 @@ def main():
     vulnerabilities_view.on_selected_cve = find_exploit
     vulnerabilities_view.move_to_exploit = update_exploit_tab
 
-    # Setup Devices Tab
-    devices_view = DevicesView()
-    devices_tab = devices_view.get_view(main_note_book)
-    main_note_book.add(devices_tab, text="Devices")
-
     # Setup Exploits Tab
     exploit_view = ExploitView()
     exploit_tab = exploit_view.get_view(main_note_book)
@@ -328,7 +323,6 @@ def main():
     filemenu = Menu(menubar, tearoff=0)  # create a menu to add some stuff too
 
     savemenu = Menu(menubar, tearoff=0)
-    savemenu.add_command(label="Save Device", command=DevicePopup.new_popup)
     savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
     filemenu.add_cascade(label='Save', menu=savemenu)
     filemenu.add_separator()  # more prettiness

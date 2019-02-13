@@ -20,10 +20,6 @@ class ScanDetailsView:
         """Click handler for new vuln button"""
         vp.VulnPopup.new_vuln()
 
-    def new_device_popup(self):
-        """Click handler for new device button"""
-        dp.DevicePopup.new_vuln()
-
     def on_settings(self):
         """Click handler for the Settings button"""
         sp.SettingsPopup.new_popup()
@@ -153,11 +149,6 @@ class ScanDetailsView:
         add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
                                                command=self.new_vuln_popup)
         add_vulnerabilities_button.grid(row=0, column=1)
-
-        # Add Device
-        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Device",
-                                               command=self.new_device_popup)
-        add_vulnerabilities_button.grid(row=0, column=2)
 
         # Settings
         add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame,
