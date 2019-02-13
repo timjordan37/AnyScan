@@ -20,10 +20,8 @@ from util.DataShare import DataShare
 from util import DBFunctions as df, System
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
-from views.DevicesView import DevicesView
 from views.ScanHistoryView import ScanHistoryView
 from views.ExploitView import ExploitView
-from views.DevicePopup import DevicePopup
 from views.VulnPopup import VulnPopup
 from models.Host import Host
 

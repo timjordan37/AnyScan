@@ -1,7 +1,7 @@
 import tkinter as tk
 from datetime import date
 from tkinter.filedialog import asksaveasfilename
-from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
+from views import VulnPopup as vp, SettingsPopup as sp
 from util.Reporter import Reporter
 from util.DataShare import DataShare
 
