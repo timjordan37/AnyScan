@@ -18,11 +18,11 @@ class ScanDetailsView:
 
     def new_vuln_popup(self):
         """Click handler for new vuln button"""
-        vp.VulnPopup.new_popup()
+        vp.VulnPopup.new_vuln()
 
     def new_device_popup(self):
         """Click handler for new device button"""
-        dp.DevicePopup.new_popup()
+        dp.DevicePopup.new_vuln()
 
     def on_settings(self):
         """Click handler for the Settings button"""

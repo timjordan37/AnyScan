@@ -344,7 +344,6 @@ def main():
     filemenu.add_cascade(label='Edit 2', menu=editmenu)  # add the edit menu under File
     
     menubar.add_cascade(label="File", menu=filemenu)  # add file to menu bar
-
     # On macOS there are some default things added to this menu, but are not added to the same menu
     # under File. 
     menubar.add_cascade(label='Edit', menu=editmenu)  # add edit to menu bar too, for fun
@@ -364,8 +363,10 @@ if __name__ == '__main__':
         except:
             return False
 
+
     def is_root():
         return os.getuid() == 0
+
 
     if platform.system() == 'Windows':
         if is_win_admin():
