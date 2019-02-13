@@ -97,6 +97,7 @@ class VulnerabilitiesView:
 
         self.table_view = TableView(frame, 6, sections_tuple, data)
         self.table_view.bind_method('<ButtonRelease-1>', self.on_cve_select)
+        self.table_view.bind_method('<Double-Button-1>', self.on_cve_double_click)
 
         return frame
 
@@ -145,6 +146,14 @@ class VulnerabilitiesView:
         if len(selected_value) > 0:
             DataShare.set_selected_cve(selected_value[1])
             self.on_selected_cve(selected_value[1])
+
+    def on_cve_double_click(self, event):
+        selected_value = self.table_view.get_selected_item()['values']
+        print('From Vuln View DOULBE CLICK: ', selected_value[1])
+
+        if len(selected_value) > 0:
+            DataShare.set_selected_cve(selected_value[1])
+            self.move_to_exploit(selected_value[1])
 
 
 class TreeColumns(enum.Enum):

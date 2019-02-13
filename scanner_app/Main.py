@@ -177,21 +177,18 @@ def main():
     def find_exploit(cve):
         if cve:
             es = ExploitSearcher(cve)
+            # when clicking in vuln tab this gets called very quickly and throws errors
             es.search()
             if exploit_view:
                 exploit_view.update_es(es)
                 exploit_view.update_cve(cve)
-
-            #es.print_all()
         else:
             print('No CVE selected')
 
     def update_exploit_tab(cve):
         main_note_book.select(3)
         exploit_view.cve_var.set(cve)
-        print(main_note_book.tab(3))
-        print('\nFROM MAIN: update cve tab here maybe? \n')
-        print(cve)
+        # todo update exploit tab variables
 
     def on_host_listbox_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
@@ -308,6 +305,7 @@ def main():
     vulnerabilities_tab = vulnerabilities_view.get_view(main_note_book)
     main_note_book.add(vulnerabilities_tab, text="Vulnerabilities")
     vulnerabilities_view.on_selected_cve = find_exploit
+    vulnerabilities_view.move_to_exploit = update_exploit_tab
 
     # Setup Devices Tab
     devices_view = DevicesView()
@@ -318,7 +316,6 @@ def main():
     exploit_view = ExploitView()
     exploit_tab = exploit_view.get_view(main_note_book)
     main_note_book.add(exploit_tab, text='Exploits')
-    exploit_view.on_update_cve = update_exploit_tab
 
     # Setup Scan History Tab
     scan_history_view = ScanHistoryView()
