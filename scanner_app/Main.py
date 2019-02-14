@@ -17,6 +17,7 @@ from util.SThread import SThread
 from util.STime import STimer
 from util.ExploitSearch import ExploitSearcher
 from util.DataShare import DataShare
+from util.Theme import Theme
 from util import DBFunctions as df, System
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
@@ -278,7 +279,7 @@ def main():
     scan_button_frame.grid(row=5, column=0)
 
     # Setup Left frame scan button
-    scan_button = tk.Button(scan_button_frame, text="Scan", command=on_scan)
+    scan_button = tk.Button(scan_button_frame, text="Scan", command=on_scan, font=Theme.app_font_med, highlightcolor=Theme.app_orange)
     scan_button.grid(row=0, column=0, pady=(8, 8))
 
     #################
