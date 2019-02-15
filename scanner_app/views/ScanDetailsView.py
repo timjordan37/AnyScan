@@ -18,7 +18,7 @@ class ScanDetailsView:
 
     def new_vuln_popup(self):
         """Click handler for new vuln button"""
-        vp.VulnPopup.new_vuln()
+        vp.VulnPopup.new_popup()
 
     def on_settings(self):
         """Click handler for the Settings button"""
@@ -142,17 +142,17 @@ class ScanDetailsView:
 
         # Report
         vulnerability_report_button = tk.Button(vulnerabilities_button_frame,
-                                                text="Report", command=self.on_report)
+                                                text="View Scan Report", command=self.on_report)
         vulnerability_report_button.grid(row=0, column=0)
 
         # Add Vulnerability
-        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
+        add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame, text="Save Vulnerability",
                                                command=self.new_vuln_popup)
         add_vulnerabilities_button.grid(row=0, column=1)
 
         # Settings
         add_vulnerabilities_button = tk.Button(vulnerabilities_button_frame,
-                                               text="Settings", command=self.on_settings)
+                                               text="Scan Settings", command=self.on_settings)
         add_vulnerabilities_button.grid(row=0, column=3)
 
         return frame

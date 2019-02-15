@@ -17,6 +17,7 @@ from util.SThread import SThread
 from util.STime import STimer
 from util.ExploitSearch import ExploitSearcher
 from util.DataShare import DataShare
+from util import Reporter
 from util import DBFunctions as df, System
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
@@ -27,6 +28,8 @@ from models.Host import Host
 
 
 # Main method to handle setting up and managing the UI
+
+
 def main():
     print("Scanner App Started...")
 
@@ -320,11 +323,13 @@ def main():
     menubar = Menu(root)  # create menu bar
     filemenu = Menu(menubar, tearoff=0)  # create a menu to add some stuff too
 
+    # Save Vulnerability in file menu bar
     savemenu = Menu(menubar, tearoff=0)
     savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
     filemenu.add_cascade(label='Save', menu=savemenu)
     filemenu.add_separator()  # more prettiness
 
+    # Scan settings in file menu bar
     settingsmenu = Menu(menubar, tearoff=0)
     settingsmenu.add_command(label="Scan Settings", command=scan_details_view.on_settings)
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
@@ -333,7 +338,6 @@ def main():
 
     editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
     editmenu.add_command(label="Undo", command=donothing)
-    filemenu.add_cascade(label='Edit 2', menu=editmenu)  # add the edit menu under File
     
     menubar.add_cascade(label="File", menu=filemenu)  # add file to menu bar
     # On macOS there are some default things added to this menu, but are not added to the same menu
