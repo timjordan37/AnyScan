@@ -176,11 +176,7 @@ def main():
 
     def find_exploit(cve):
         if cve:
-            es = ExploitSearcher(cve)
-            # when clicking in vuln tab this gets called very quickly and throws errors
-            es.search()
             if exploit_view:
-                exploit_view.update_es(es)
                 exploit_view.update_cve(cve)
         else:
             print('No CVE selected')
