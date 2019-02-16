@@ -5,7 +5,6 @@ from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from util.Reporter import Reporter
 from util.DataShare import DataShare
 
-
 class ScanDetailsView:
     host_name_entry_var = None
     mac_address_entry_var = None

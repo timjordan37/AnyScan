@@ -29,6 +29,10 @@ from views.VulnPopup import VulnPopup
 from models.Host import Host
 
 
+from ttkthemes import ThemedStyle
+from ttkthemes import ThemedTk
+
+
 # Main method to handle setting up and managing the UI
 def main():
     print("Scanner App Started...")
@@ -211,15 +215,27 @@ def main():
         button.pack()
 
     # Setup root ui
-    root = tk.Tk()
+
+    root = ThemedTk("arc")
+    root.ttkStyle = ThemedStyle()
+    root.ttkStyle.set_theme("equilux")
+    # root = tk.Tk()
     root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
 
+    ttk_style = ttk.Style()
+    # ttk_style.theme_use("clam")
+    print("THEMES: ", ttk_style.theme_names())
+    print("USING BEF: ", ttk_style.theme_use())
+    # ttk_style.theme_use("scidgreen")
+    print("USING NOW: ", ttk_style.theme_use())
+    print("--", ttk_style.element_options('Button'))
+
     #################
     # Setup LeftFrame
     #################
-    left_frame = tk.Frame(root)
+    left_frame = ttk.Frame(root)
     left_frame.grid(row=0, column=0, sticky="nsew")
     left_frame.grid_rowconfigure(1, weight=1)
     left_frame.grid_columnconfigure(0, weight=1)
@@ -227,7 +243,7 @@ def main():
     # Setup Left Frame header Label
     left_frame_header_label_var = tk.StringVar()
     update_left_header_label(None)
-    left_frame_header_label = tk.Label(left_frame, textvariable=left_frame_header_label_var)
+    left_frame_header_label = ttk.Label(left_frame, textvariable=left_frame_header_label_var)
     left_frame_header_label.grid(row=0, column=0)
 
     # Setup Left frame HostListbox
@@ -237,54 +253,58 @@ def main():
     reload_hosts_listbox()
 
     # Setup scan host frame
-    scan_host_frame = tk.Frame(left_frame)
+    scan_host_frame = ttk.Frame(left_frame)
     scan_host_frame.grid(row=2, column=0)
 
     # Setup scan host label
-    scan_host_label = tk.Label(scan_host_frame, text="Hosts:")
+    scan_host_label = ttk.Label(scan_host_frame, text="Hosts:")
     scan_host_label.grid(row=0, column=0)
 
     # Setup scan host entry
     scan_host_entry_var = tk.StringVar()
     scan_host_entry_var.set("192.168.1.0/28")
-    scan_host_entry = tk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
+    scan_host_entry = ttk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
     scan_host_entry.grid(row=0, column=1)
 
     ## Setup scan port label frame
-    scan_port_label_frame = tk.Frame(left_frame)
+    scan_port_label_frame = ttk.Frame(left_frame)
     scan_port_label_frame.grid(row=3, column=0)
 
     ## Setup scan port label
-    port_start_label = tk.Label(scan_port_label_frame, text="Start Port")
+    port_start_label = ttk.Label(scan_port_label_frame, text="Start Port")
     port_start_label.grid(row=0, column=0, padx=(0, 8))
-    port_end_label = tk.Label(scan_port_label_frame, text="End Port")
+    port_end_label = ttk.Label(scan_port_label_frame, text="End Port")
     port_end_label.grid(row=0, column=1, padx=(8, 0))
 
     ## Setup scan port frame
-    scan_port_frame = tk.Frame(left_frame)
+    scan_port_frame = ttk.Frame(left_frame)
     scan_port_frame.grid(row=4, column=0)
 
     ## Setup scan port entries
     port_start_entry_var = tk.StringVar()
     port_start_entry_var.set("21")
-    port_start_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_start_entry_var)
+    port_start_entry = ttk.Entry(scan_port_frame, width=4, textvariable=port_start_entry_var)
     port_start_entry.grid(row=0, column=0, padx=(0, 16))
 
     port_end_entry_var = tk.StringVar()
     port_end_entry_var.set("30")
-    port_end_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_end_entry_var)
+    port_end_entry = ttk.Entry(scan_port_frame, width=4, textvariable=port_end_entry_var)
     port_end_entry.grid(row=0, column=1, padx=(16, 0))
 
-    scan_button_frame = tk.Frame(left_frame)
+    scan_button_frame = ttk.Frame(left_frame)
     scan_button_frame.grid(row=5, column=0)
 
     # Setup Left frame scan button
-    scan_button = tk.Button(scan_button_frame, text="Scan", command=on_scan, font=Theme.app_font_med, highlightcolor=Theme.app_orange)
+    scan_button = ttk.Button(scan_button_frame,
+                            text="Scan",
+                            command=on_scan)
+
     scan_button.grid(row=0, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
     #################
+
 
     # Setup Notebook for right frame
     rows = 0
@@ -294,6 +314,7 @@ def main():
 
     # Setup Root Notebook
     main_note_book = ttk.Notebook(root)
+
     main_note_book.grid(row=0, column=1, columnspan=50, rowspan=49, sticky="NESW")
 
     # Setup Scan Details Tab
