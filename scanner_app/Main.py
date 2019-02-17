@@ -218,6 +218,9 @@ def main():
 
     root = ThemedTk("arc")
     root.ttkStyle = ThemedStyle()
+    # Themes
+    # "'alt', 'scidsand', 'classic', 'scidblue', 'scidmint', 'scidgreen', 'equilux', 'default', 'scidpink', 'aqua',
+    # 'scidgrey', 'scidpurple', 'clam')
     root.ttkStyle.set_theme("equilux")
     # root = tk.Tk()
     root.title("GlenTest")
@@ -227,10 +230,6 @@ def main():
     ttk_style = ttk.Style()
     # ttk_style.theme_use("clam")
     print("THEMES: ", ttk_style.theme_names())
-    print("USING BEF: ", ttk_style.theme_use())
-    # ttk_style.theme_use("scidgreen")
-    print("USING NOW: ", ttk_style.theme_use())
-    print("--", ttk_style.element_options('Button'))
 
     #################
     # Setup LeftFrame
