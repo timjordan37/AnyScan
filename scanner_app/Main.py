@@ -222,14 +222,11 @@ def main():
     # "'alt', 'scidsand', 'classic', 'scidblue', 'scidmint', 'scidgreen', 'equilux', 'default', 'scidpink', 'aqua',
     # 'scidgrey', 'scidpurple', 'clam')
     root.ttkStyle.set_theme("equilux")
-    # root = tk.Tk()
     root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
 
     ttk_style = ttk.Style()
-    # ttk_style.theme_use("clam")
-    print("THEMES: ", ttk_style.theme_names())
 
     #################
     # Setup LeftFrame
