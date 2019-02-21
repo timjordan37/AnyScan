@@ -243,7 +243,7 @@ def main():
     left_frame_header_label.grid(row=0, column=0)
 
     # Setup Left frame HostListbox
-    hosts_listbox = tk.Listbox(left_frame, width="30")
+    hosts_listbox = tk.Listbox(left_frame, width="30", background="#222222", highlightcolor="Black", fg="Grey")
     hosts_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
     hosts_listbox.bind('<<ListboxSelect>>', on_host_listbox_select)
     reload_hosts_listbox()

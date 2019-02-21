@@ -19,7 +19,7 @@ class ScanDetailsView:
 
     def new_vuln_popup(self):
         """Click handler for new vuln button"""
-        vp.VulnPopup.new_vuln()
+        vp.VulnPopup.new_popup()
 
     def new_device_popup(self):
         """Click handler for new device button"""
@@ -133,7 +133,7 @@ class ScanDetailsView:
         vulnerability_label.grid(row=0, column=2)
 
         # Vulnerabilities listbox
-        vulnerabilities_listbox = tk.Listbox(frame)
+        vulnerabilities_listbox = tk.Listbox(frame, background="#222222", highlightcolor="Black", fg="Grey")
         vulnerabilities_listbox.grid(row=6, column=0, sticky="nsew", padx=(16, 16))
         # vulnerabilities_listbox.bind('<<ListboxSelect>>', on_vuln_listbox_select)
         # reload_vulnerabilities_listbox()
