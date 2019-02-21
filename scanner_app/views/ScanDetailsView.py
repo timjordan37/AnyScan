@@ -1,6 +1,7 @@
 import tkinter as tk
 from datetime import date
 from tkinter.filedialog import asksaveasfilename
+from tkinter import simpledialog
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from util.Reporter import Reporter
 from util.DataShare import DataShare
@@ -48,9 +49,14 @@ class ScanDetailsView:
                 'vulns': vulnerabilities
             }
             time = date.today().isoformat()
+            name = simpledialog.askstring("Enter Name...",
+                                          "Who is generating this report? \n"
+                                          "Note: This will be listed as the report Author.")
+
             fname = asksaveasfilename(title='Select File to Save Report...', defaultextension='.pdf',
                                       initialfile='Report_'+str(time)+'.pdf')
-            r = Reporter(report, fname, 'Curtis!')
+
+            r = Reporter(report, fname, name)
             r.build_pdf()
 
     def get_view(self, parent_frame):

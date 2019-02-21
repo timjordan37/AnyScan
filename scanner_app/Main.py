@@ -15,7 +15,6 @@ from elevate import elevate
 from util.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
-from util.ExploitSearch import ExploitSearcher
 from util.DataShare import DataShare
 from util import DBFunctions as df, System
 from views.ScanDetailsView import ScanDetailsView
