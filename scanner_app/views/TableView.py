@@ -74,5 +74,10 @@ class TableView:
 
         return self._tree.item(selected_item)
 
+    def get_selected_index(self):
+        selected_item = self._tree.focus()
+
+        return self._tree.index(selected_item)
+
     def bind_method(self, btn_txt, method_to_bind):
         self._tree.bind(btn_txt, method_to_bind)

@@ -88,12 +88,7 @@ def main():
         # Update hosts to the sorted version to ensure details on select are correct
         DataShare.set_hosts(sorted_scanned_hosts)
 
-        # for host in sorted_scanned_hosts:
-        #     hosts_listbox.insert(tk.END, host.get_display_val())
-        # reset_left_header_label()
-
-
-        data = list(map(lambda host: (host.get_ip(), host.get_display_name()), sorted_scanned_hosts))
+        data = list(map(lambda host: (host.get_ip(), host.get_display_name(), host.get_vendor()), sorted_scanned_hosts))
 
         hosts_table_view.reload_data(data)
 
@@ -201,14 +196,9 @@ def main():
         exploit_view.cve_var.set(cve)
         # todo update exploit tab variables
 
-    def on_host_tableview_select(evt):
+    def on_host_tableview_select(event):
         """Click handler to update right ui when user clicks on a host in left box"""
-        # Note here that Tkinter passes an event object to onselect()
-        listbox = evt.widget
-        if len(listbox.curselection()) == 0:
-            return
-
-        index = int(listbox.curselection()[0])
+        index = hosts_table_view.get_selected_index()
         hosts = DataShare.get_hosts()
 
         scan_details_view.host_name_entry_var.set(hosts[index].get_display_name())
@@ -222,13 +212,13 @@ def main():
 
     class TreeColumns(enum.Enum):
         name = 0
-        data = 1
+        mac_address = 1
 
         @staticmethod
         def display_name_for_column(col):
             display_names = {
-                0: "name",
-                1: "id"
+                0: "ip",
+                1: "name",
             }
             return display_names[col]
 
