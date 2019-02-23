@@ -27,6 +27,7 @@ from views.ExploitView import ExploitView
 from views.DevicePopup import DevicePopup
 from views.VulnPopup import VulnPopup
 from models.Host import Host
+from views.TableView import TableView
 
 
 from ttkthemes import ThemedStyle
@@ -67,9 +68,9 @@ def main():
         host_count_text = f"({host_count}) Hosts Scanned".format()
         left_frame_header_label_var.set(host_count_text)
 
-    def reload_hosts_listbox():
+    def reload_hosts_tableview():
         """Update hosts box with scanned hosts"""
-        hosts_listbox.delete(0, tk.END)
+        # hosts_listbox.delete(0, tk.END)
         sorted_scanned_hosts = None
 
         # Sort according to the Host Sort Setting
@@ -87,9 +88,14 @@ def main():
         # Update hosts to the sorted version to ensure details on select are correct
         DataShare.set_hosts(sorted_scanned_hosts)
 
-        for host in sorted_scanned_hosts:
-            hosts_listbox.insert(tk.END, host.get_display_val())
-        reset_left_header_label()
+        # for host in sorted_scanned_hosts:
+        #     hosts_listbox.insert(tk.END, host.get_display_val())
+        # reset_left_header_label()
+
+
+        data = list(map(lambda host: (host.get_ip(), host.get_display_name()), sorted_scanned_hosts))
+
+        hosts_table_view.reload_data(data)
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
@@ -133,7 +139,7 @@ def main():
         """
         if h:
             DataShare.set_hosts(h)
-            reload_hosts_listbox()
+            reload_hosts_tableview()
 
     def get_hosts():
         """Get scanned hosts"""
@@ -195,7 +201,7 @@ def main():
         exploit_view.cve_var.set(cve)
         # todo update exploit tab variables
 
-    def on_host_listbox_select(evt):
+    def on_host_tableview_select(evt):
         """Click handler to update right ui when user clicks on a host in left box"""
         # Note here that Tkinter passes an event object to onselect()
         listbox = evt.widget
@@ -214,9 +220,30 @@ def main():
         button = Button(filewin, text="Do nothing button")
         button.pack()
 
+    class TreeColumns(enum.Enum):
+        name = 0
+        data = 1
+
+        @staticmethod
+        def display_name_for_column(col):
+            display_names = {
+                0: "name",
+                1: "id"
+            }
+            return display_names[col]
+
+        @staticmethod
+        def all_cases():
+            cases = []
+
+            for col in TreeColumns:
+                cases.append(TreeColumns.display_name_for_column(col.value))
+
+            return cases
+
     # Setup root ui
 
-    root = ThemedTk("arc")
+    root = ThemedTk()
     root.ttkStyle = ThemedStyle()
     # Themes
     # "'alt', 'scidsand', 'classic', 'scidblue', 'scidmint', 'scidgreen', 'equilux', 'default', 'scidpink', 'aqua',
@@ -225,8 +252,6 @@ def main():
     root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
-
-    ttk_style = ttk.Style()
 
     #################
     # Setup LeftFrame
@@ -242,11 +267,12 @@ def main():
     left_frame_header_label = ttk.Label(left_frame, textvariable=left_frame_header_label_var)
     left_frame_header_label.grid(row=0, column=0)
 
-    # Setup Left frame HostListbox
-    hosts_listbox = tk.Listbox(left_frame, width="30", background="#222222", highlightcolor="Black", fg="Grey")
-    hosts_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
-    hosts_listbox.bind('<<ListboxSelect>>', on_host_listbox_select)
-    reload_hosts_listbox()
+    # Setup Left Frame Host TableView
+    sections_tuple = TreeColumns.all_cases()
+    data = []
+    hosts_table_view = TableView(left_frame, 1, sections_tuple, data)
+    hosts_table_view.bind_method('<ButtonRelease-1>', on_host_tableview_select)
+    reload_hosts_tableview()
 
     # Setup scan host frame
     scan_host_frame = ttk.Frame(left_frame)

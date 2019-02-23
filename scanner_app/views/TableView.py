@@ -40,7 +40,7 @@ class TableView:
         self._sections = sections
 
         tree = ttk.Treeview(self._parent_view, columns=tuple(self._sections))
-        tree.grid(row=6, column=0, sticky="nsew", pady=(0, 8))
+        tree.grid(row=self._grid_row, column=0, sticky="nsew", pady=(0, 8))
 
         for section in tuple(self._sections):
             tree.heading(section, text=section)
