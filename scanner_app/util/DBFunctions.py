@@ -174,6 +174,9 @@ class DBFunctions:
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), 
             FOREIGN KEY(Model) REFERENCES Devices(Model), 
             FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        cursor.execute('''CREATE TABLE ScanCVEs (ScanID TEXT,
+            CVE TEXT,
+            PRIMARY KEY(ScanID, CVE)''')
         conn.commit()
 
     @staticmethod
