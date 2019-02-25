@@ -4,7 +4,8 @@ from tkinter.filedialog import asksaveasfilename
 from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
 from util.Reporter import Reporter
 from util.DataShare import DataShare
-
+import enum
+from views.TableView import TableView
 from tkinter import ttk
 
 class ScanDetailsView:
@@ -133,10 +134,32 @@ class ScanDetailsView:
         vulnerability_label.grid(row=0, column=2)
 
         # Vulnerabilities listbox
-        vulnerabilities_listbox = tk.Listbox(frame, background="#222222", highlightcolor="Black", fg="Grey")
-        vulnerabilities_listbox.grid(row=6, column=0, sticky="nsew", padx=(16, 16))
-        # vulnerabilities_listbox.bind('<<ListboxSelect>>', on_vuln_listbox_select)
-        # reload_vulnerabilities_listbox()
+
+        class TreeColumns(enum.Enum):
+            cveName = 0
+
+            @staticmethod
+            def display_name_for_column(col):
+                display_names = {
+                    0: "cveName"
+                }
+                return display_names[col]
+
+            @staticmethod
+            def all_cases():
+                cases = []
+
+                for col in TreeColumns:
+                    cases.append(TreeColumns.display_name_for_column(col.value))
+
+                return cases
+
+        # TableView
+        sections_tuple = TreeColumns.all_cases()
+
+        data = []
+        vulnerabilities_tableview = TableView(frame, 6, sections_tuple, data)
+        vulnerabilities_tableview
 
         #################
         # Vulnerabilities button frame
