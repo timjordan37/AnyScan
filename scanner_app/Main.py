@@ -17,8 +17,8 @@ from util.SThread import SThread
 from util.STime import STimer
 from util.ExploitSearch import ExploitSearcher
 from util.DataShare import DataShare
-from util.Theme import Theme
 from util import DBFunctions as df, System
+from util import Theme
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
 from views.DevicesView import DevicesView
@@ -370,6 +370,22 @@ def main():
     settingsmenu = Menu(menubar, tearoff=0)
     settingsmenu.add_command(label="Scan Settings", command=scan_details_view.on_settings)
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
+    filemenu.add_separator()  # pretty
+
+    themesmenu = Menu(menubar, tearoff=0)
+    themesmenu.add_command(label="alt", command=Theme.set_theme)
+    themesmenu.add_command(label="scidsand", command=donothing)
+    themesmenu.add_command(label="classic", command=donothing)
+    themesmenu.add_command(label="scidblue", command=donothing)
+    themesmenu.add_command(label="scidmint", command=donothing)
+    themesmenu.add_command(label="scidgreen", command=donothing)
+    themesmenu.add_command(label="default", command=donothing)
+    themesmenu.add_command(label="scidpink", command=donothing)
+    themesmenu.add_command(label="aqua", command=donothing)
+    themesmenu.add_command(label="scidgrey", command=donothing)
+    themesmenu.add_command(label="scidpurple", command=donothing)
+    themesmenu.add_command(label="clam", command=donothing)
+    filemenu.add_cascade(label='Themes', menu=themesmenu)
     filemenu.add_separator()  # pretty
     filemenu.add_command(label="Exit", command=root.quit)
 
