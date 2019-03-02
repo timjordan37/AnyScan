@@ -15,7 +15,6 @@ from elevate import elevate
 from util.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
-from util.ExploitSearch import ExploitSearcher
 from util.DataShare import DataShare
 from util import DBFunctions as df, System
 from util import Theme
@@ -182,11 +181,7 @@ def main():
 
     def find_exploit(cve):
         if cve:
-            es = ExploitSearcher(cve)
-            # when clicking in vuln tab this gets called very quickly and throws errors
-            es.search()
             if exploit_view:
-                exploit_view.update_es(es)
                 exploit_view.update_cve(cve)
         else:
             print('No CVE selected')
