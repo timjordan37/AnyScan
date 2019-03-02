@@ -2,6 +2,7 @@ import tkinter as tk
 import enum
 from views.TableView import TableView
 from util import DBFunctions as dbf
+from tkinter import ttk
 
 
 class ScanHistoryView:
@@ -23,59 +24,59 @@ class ScanHistoryView:
         self.scan_date_entry_var = tk.StringVar()
         self.vuln_score_entry_var = tk.StringVar()
 
-        frame = tk.Frame(parent_frame)
+        frame = ttk.Frame(parent_frame)
         frame.grid(row=0, column=0, sticky="nsew")
         frame.grid_columnconfigure(0, weight=1)
 
         # header label
-        header_label = tk.Label(frame, text="Scan History Search")
+        header_label = ttk.Label(frame, text="Scan History Search")
         header_label.grid(row=0, column=0, pady=(8, 8))
 
         #  Vuln Name Search
-        scan_id_frame = tk.Frame(frame)
+        scan_id_frame = ttk.Frame(frame)
         scan_id_frame.grid(row=1, column=0, sticky="nsew")
         scan_id_frame.grid_columnconfigure(1, weight=1)
 
-        scan_id_label = tk.Label(scan_id_frame, text="Scan ID:")
+        scan_id_label = ttk.Label(scan_id_frame, text="Scan ID:")
         scan_id_label.grid(row=0, column=0, padx=(16, 0))
 
         self.scan_id_entry_var.set("")
-        scan_id_entry = tk.Entry(scan_id_frame, textvariable=self.scan_id_entry_var)
+        scan_id_entry = ttk.Entry(scan_id_frame, textvariable=self.scan_id_entry_var)
         scan_id_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         #  Vuln CVSS Score
-        scan_duration_frame = tk.Frame(frame)
+        scan_duration_frame = ttk.Frame(frame)
         scan_duration_frame.grid(row=2, column=0, sticky="nsew")
         scan_duration_frame.grid_columnconfigure(1, weight=1)
 
-        scan_duration_label = tk.Label(scan_duration_frame, text="Scan Duration:")
+        scan_duration_label = ttk.Label(scan_duration_frame, text="Scan Duration:")
         scan_duration_label.grid(row=0, column=0, padx=(16, 0))
 
         self.scan_duration_entry_var.set("")
-        scan_duration_entry = tk.Entry(scan_duration_frame, textvariable=self.scan_duration_entry_var)
+        scan_duration_entry = ttk.Entry(scan_duration_frame, textvariable=self.scan_duration_entry_var)
         scan_duration_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         #  Severity
-        scan_date_frame = tk.Frame(frame)
+        scan_date_frame = ttk.Frame(frame)
         scan_date_frame.grid(row=3, column=0, sticky="nsew")
         scan_date_frame.grid_columnconfigure(1, weight=1)
 
-        scan_date_label = tk.Label(scan_date_frame, text="Scan Date:")
+        scan_date_label = ttk.Label(scan_date_frame, text="Scan Date:")
         scan_date_label.grid(row=0, column=0, padx=(16, 0))
 
         self.scan_date_entry_var.set("")
-        scan_date_entry = tk.Entry(scan_date_frame, textvariable=self.scan_date_entry_var)
+        scan_date_entry = ttk.Entry(scan_date_frame, textvariable=self.scan_date_entry_var)
         scan_date_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
         # Search Button
-        button_frame = tk.Frame(frame)
+        button_frame = ttk.Frame(frame)
         button_frame.grid(row=5, column=0)
 
-        self.search_button = tk.Button(button_frame, text="Search", command=self.on_search)
+        self.search_button = ttk.Button(button_frame, text="Search", command=self.on_search)
         self.search_button.grid(row=0, column=0, pady=(8, 8))
 
         # Scan Details button
-        self.search_button = tk.Button(button_frame, text="Scan Details", command=self.on_scan_details)
+        self.search_button = ttk.Button(button_frame, text="Scan Details", command=self.on_scan_details)
         self.search_button.grid(row=0, column=1, pady=(8, 8))
 
         # TableView
