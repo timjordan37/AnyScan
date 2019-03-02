@@ -54,3 +54,9 @@ class Host:
             return self._vendor
         else:
             return ""
+
+    def get_vendor(self):
+        if self._vendor:
+            return self._vendor
+
+        return ""

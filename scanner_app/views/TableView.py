@@ -40,7 +40,7 @@ class TableView:
         self._sections = sections
 
         tree = ttk.Treeview(self._parent_view, columns=tuple(self._sections))
-        tree.grid(row=6, column=0, sticky="nsew", pady=(0, 8))
+        tree.grid(row=self._grid_row, column=0, sticky="nsew", pady=(0, 8))
 
         for section in tuple(self._sections):
             tree.heading(section, text=section)
@@ -73,6 +73,11 @@ class TableView:
         selected_item = self._tree.focus()
 
         return self._tree.item(selected_item)
+
+    def get_selected_index(self):
+        selected_item = self._tree.focus()
+
+        return self._tree.index(selected_item)
 
     def bind_method(self, btn_txt, method_to_bind):
         self._tree.bind(btn_txt, method_to_bind)
