@@ -18,6 +18,7 @@ from util.STime import STimer
 from util.ExploitSearch import ExploitSearcher
 from util.DataShare import DataShare
 from util import DBFunctions as df, System
+from util import Theme
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
 from views.DevicesView import DevicesView
@@ -26,6 +27,11 @@ from views.ExploitView import ExploitView
 from views.DevicePopup import DevicePopup
 from views.VulnPopup import VulnPopup
 from models.Host import Host
+from views.TableView import TableView
+
+
+from ttkthemes import ThemedStyle
+from ttkthemes import ThemedTk
 
 
 # Main method to handle setting up and managing the UI
@@ -62,9 +68,9 @@ def main():
         host_count_text = f"({host_count}) Hosts Scanned".format()
         left_frame_header_label_var.set(host_count_text)
 
-    def reload_hosts_listbox():
+    def reload_hosts_tableview():
         """Update hosts box with scanned hosts"""
-        hosts_listbox.delete(0, tk.END)
+        # hosts_listbox.delete(0, tk.END)
         sorted_scanned_hosts = None
 
         # Sort according to the Host Sort Setting
@@ -82,9 +88,9 @@ def main():
         # Update hosts to the sorted version to ensure details on select are correct
         DataShare.set_hosts(sorted_scanned_hosts)
 
-        for host in sorted_scanned_hosts:
-            hosts_listbox.insert(tk.END, host.get_display_val())
-        reset_left_header_label()
+        data = list(map(lambda host: (host.get_ip(), host.get_display_name(), host.get_vendor()), sorted_scanned_hosts))
+
+        hosts_table_view.reload_data(data)
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
@@ -128,7 +134,7 @@ def main():
         """
         if h:
             DataShare.set_hosts(h)
-            reload_hosts_listbox()
+            reload_hosts_tableview()
 
     def get_hosts():
         """Get scanned hosts"""
@@ -190,14 +196,9 @@ def main():
         exploit_view.cve_var.set(cve)
         # todo update exploit tab variables
 
-    def on_host_listbox_select(evt):
+    def on_host_tableview_select(event):
         """Click handler to update right ui when user clicks on a host in left box"""
-        # Note here that Tkinter passes an event object to onselect()
-        listbox = evt.widget
-        if len(listbox.curselection()) == 0:
-            return
-
-        index = int(listbox.curselection()[0])
+        index = hosts_table_view.get_selected_index()
         hosts = DataShare.get_hosts()
 
         scan_details_view.host_name_entry_var.set(hosts[index].get_display_name())
@@ -209,8 +210,35 @@ def main():
         button = Button(filewin, text="Do nothing button")
         button.pack()
 
+    class TreeColumns(enum.Enum):
+        name = 0
+        mac_address = 1
+
+        @staticmethod
+        def display_name_for_column(col):
+            display_names = {
+                0: "ip",
+                1: "name",
+            }
+            return display_names[col]
+
+        @staticmethod
+        def all_cases():
+            cases = []
+
+            for col in TreeColumns:
+                cases.append(TreeColumns.display_name_for_column(col.value))
+
+            return cases
+
     # Setup root ui
-    root = tk.Tk()
+
+    root = ThemedTk()
+    root.ttkStyle = ThemedStyle()
+    # Themes
+    # "'alt', 'scidsand', 'classic', 'scidblue', 'scidmint', 'scidgreen', 'equilux', 'default', 'scidpink', 'aqua',
+    # 'scidgrey', 'scidpurple', 'clam')
+    root.ttkStyle.set_theme("equilux")
     root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
@@ -218,7 +246,7 @@ def main():
     #################
     # Setup LeftFrame
     #################
-    left_frame = tk.Frame(root)
+    left_frame = ttk.Frame(root)
     left_frame.grid(row=0, column=0, sticky="nsew")
     left_frame.grid_rowconfigure(1, weight=1)
     left_frame.grid_columnconfigure(0, weight=1)
@@ -226,64 +254,69 @@ def main():
     # Setup Left Frame header Label
     left_frame_header_label_var = tk.StringVar()
     update_left_header_label(None)
-    left_frame_header_label = tk.Label(left_frame, textvariable=left_frame_header_label_var)
+    left_frame_header_label = ttk.Label(left_frame, textvariable=left_frame_header_label_var)
     left_frame_header_label.grid(row=0, column=0)
 
-    # Setup Left frame HostListbox
-    hosts_listbox = tk.Listbox(left_frame, width="30")
-    hosts_listbox.grid(row=1, column=0, sticky="nsew", padx=(2, 0))
-    hosts_listbox.bind('<<ListboxSelect>>', on_host_listbox_select)
-    reload_hosts_listbox()
+    # Setup Left Frame Host TableView
+    sections_tuple = TreeColumns.all_cases()
+    data = []
+    hosts_table_view = TableView(left_frame, 1, sections_tuple, data)
+    hosts_table_view.bind_method('<ButtonRelease-1>', on_host_tableview_select)
+    reload_hosts_tableview()
 
     # Setup scan host frame
-    scan_host_frame = tk.Frame(left_frame)
+    scan_host_frame = ttk.Frame(left_frame)
     scan_host_frame.grid(row=2, column=0)
 
     # Setup scan host label
-    scan_host_label = tk.Label(scan_host_frame, text="Hosts:")
+    scan_host_label = ttk.Label(scan_host_frame, text="Hosts:")
     scan_host_label.grid(row=0, column=0)
 
     # Setup scan host entry
     scan_host_entry_var = tk.StringVar()
     scan_host_entry_var.set("192.168.1.0/28")
-    scan_host_entry = tk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
+    scan_host_entry = ttk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
     scan_host_entry.grid(row=0, column=1)
 
     ## Setup scan port label frame
-    scan_port_label_frame = tk.Frame(left_frame)
+    scan_port_label_frame = ttk.Frame(left_frame)
     scan_port_label_frame.grid(row=3, column=0)
 
     ## Setup scan port label
-    port_start_label = tk.Label(scan_port_label_frame, text="Start Port")
+    port_start_label = ttk.Label(scan_port_label_frame, text="Start Port")
     port_start_label.grid(row=0, column=0, padx=(0, 8))
-    port_end_label = tk.Label(scan_port_label_frame, text="End Port")
+    port_end_label = ttk.Label(scan_port_label_frame, text="End Port")
     port_end_label.grid(row=0, column=1, padx=(8, 0))
 
     ## Setup scan port frame
-    scan_port_frame = tk.Frame(left_frame)
+    scan_port_frame = ttk.Frame(left_frame)
     scan_port_frame.grid(row=4, column=0)
 
     ## Setup scan port entries
     port_start_entry_var = tk.StringVar()
     port_start_entry_var.set("21")
-    port_start_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_start_entry_var)
+    port_start_entry = ttk.Entry(scan_port_frame, width=4, textvariable=port_start_entry_var)
     port_start_entry.grid(row=0, column=0, padx=(0, 16))
 
     port_end_entry_var = tk.StringVar()
     port_end_entry_var.set("30")
-    port_end_entry = tk.Entry(scan_port_frame, width=4, textvariable=port_end_entry_var)
+    port_end_entry = ttk.Entry(scan_port_frame, width=4, textvariable=port_end_entry_var)
     port_end_entry.grid(row=0, column=1, padx=(16, 0))
 
-    scan_button_frame = tk.Frame(left_frame)
+    scan_button_frame = ttk.Frame(left_frame)
     scan_button_frame.grid(row=5, column=0)
 
     # Setup Left frame scan button
-    scan_button = tk.Button(scan_button_frame, text="Scan", command=on_scan)
+    scan_button = ttk.Button(scan_button_frame,
+                            text="Scan",
+                            command=on_scan)
+
     scan_button.grid(row=0, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
     #################
+
 
     # Setup Notebook for right frame
     rows = 0
@@ -293,6 +326,7 @@ def main():
 
     # Setup Root Notebook
     main_note_book = ttk.Notebook(root)
+
     main_note_book.grid(row=0, column=1, columnspan=50, rowspan=49, sticky="NESW")
 
     # Setup Scan Details Tab
@@ -336,6 +370,27 @@ def main():
     settingsmenu = Menu(menubar, tearoff=0)
     settingsmenu.add_command(label="Scan Settings", command=scan_details_view.on_settings)
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
+    filemenu.add_separator()  # pretty
+
+    def change_theme(theme):
+        root.ttkStyle.set_theme(theme)
+
+    themesmenu = Menu(menubar, tearoff=0)
+    themesmenu.add_command(label="Alt", command=lambda: change_theme("alt"))
+    themesmenu.add_command(label="Aqua", command=lambda: change_theme("aqua"))
+    themesmenu.add_command(label="Clam", command=lambda: change_theme("clam"))
+    themesmenu.add_command(label="Classic", command=lambda: change_theme("classic"))
+    themesmenu.add_command(label="Default", command=lambda: change_theme("default"))
+    themesmenu.add_command(label="Equilux", command=lambda: change_theme("equilux"))
+    themesmenu.add_command(label="Scidblue", command=lambda: change_theme("scidblue"))
+    themesmenu.add_command(label="Scidgreen", command=lambda: change_theme("scidgreen"))
+    themesmenu.add_command(label="Scidgrey", command=lambda: change_theme("scidgrey"))
+    themesmenu.add_command(label="Scidmint", command=lambda: change_theme("scidmint"))
+    themesmenu.add_command(label="Scidpink", command=lambda: change_theme("scidpink"))
+    themesmenu.add_command(label="Scidpurple", command=lambda: change_theme("scidpurple"))
+    themesmenu.add_command(label="Scidsand", command=lambda: change_theme("scidsand"))
+
+    filemenu.add_cascade(label='Themes', menu=themesmenu)
     filemenu.add_separator()  # pretty
     filemenu.add_command(label="Exit", command=root.quit)
 
