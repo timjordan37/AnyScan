@@ -25,6 +25,7 @@ class VulnPopup:
         exploitability_score = tk.StringVar()
 
         # Creating the Popup Window
+
         root = tk.Toplevel(padx=1, pady=1)
         root.wm_title("Add Vulnerability")
         top_level_frame = ttk.Frame(root)
@@ -79,11 +80,8 @@ class VulnPopup:
         user_interaction_label.grid(column=0, row=8, padx=5, pady=5)
         user_interaction_entry.grid(column=1, row=8, padx=5, pady=5)
 
-
         confidentiality_impact_entry = ttk.Entry(top_level_frame, textvariable=confidentiality_impact)
         confidentiality_impact_label = ttk.Label(top_level_frame, text="Confidentiality Impact")
-        confidentiality_impact_label.grid(column=0, row=9, padx=5, pady=5)
-        confidentiality_impact_entry.grid(column=1, row=9, padx=5, pady=5)
 
         integrity_impact_entry = ttk.Entry(top_level_frame, textvariable=integrity_impact)
         integrity_impact_label = ttk.Label(top_level_frame, text="Integrity Impact")
@@ -113,10 +111,13 @@ class VulnPopup:
         # Function to call the save vulnerability function
         def save_vuln():
             if df.DBFunctions.save_vulnerability(cve_name.get(), description.get(), cvss_score.get(),
-                                              attack_vector.get(), attack_complexity.get(), custom_score.get(), custom_score_reason.get(),
-                                              privileges_required.get(), user_interaction.get(), confidentiality_impact.get(),
-                                              integrity_impact.get(), availability_impact.get(), base_score.get(), base_severity.get(),
-                                              exploitability_score.get()):
+                                                 attack_vector.get(), attack_complexity.get(), custom_score.get(),
+                                                 custom_score_reason.get(),
+                                                 privileges_required.get(), user_interaction.get(),
+                                                 confidentiality_impact.get(),
+                                                 integrity_impact.get(), availability_impact.get(), base_score.get(),
+                                                 base_severity.get(),
+                                                 exploitability_score.get()):
                 tk.messagebox.showinfo("Success", "Vulnerability Added Successfully")
 
             else:

@@ -2,7 +2,7 @@ import tkinter as tk
 from datetime import date
 from tkinter.filedialog import asksaveasfilename
 from tkinter import simpledialog
-from views import DevicePopup as dp, VulnPopup as vp, SettingsPopup as sp
+from views import VulnPopup as vp, SettingsPopup as sp
 from util.Reporter import Reporter
 from util.DataShare import DataShare
 import enum
@@ -22,10 +22,6 @@ class ScanDetailsView:
     def new_vuln_popup(self):
         """Click handler for new vuln button"""
         vp.VulnPopup.new_popup()
-
-    def new_device_popup(self):
-        """Click handler for new device button"""
-        dp.DevicePopup.new_vuln()
 
     def on_settings(self):
         """Click handler for the Settings button"""
@@ -185,14 +181,10 @@ class ScanDetailsView:
                                                command=self.new_vuln_popup)
         add_vulnerabilities_button.grid(row=0, column=1)
 
-        # Add Device
-        add_vulnerabilities_button = ttk.Button(vulnerabilities_button_frame, text="Add Device",
-                                               command=self.new_device_popup)
-        add_vulnerabilities_button.grid(row=0, column=2)
-
         # Settings
         add_vulnerabilities_button = ttk.Button(vulnerabilities_button_frame,
                                                text="Settings", command=self.on_settings)
+
         add_vulnerabilities_button.grid(row=0, column=3)
 
         return frame

@@ -16,14 +16,13 @@ from util.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 from util.DataShare import DataShare
+from util import Reporter
 from util import DBFunctions as df, System
 from util import Theme
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
-from views.DevicesView import DevicesView
 from views.ScanHistoryView import ScanHistoryView
 from views.ExploitView import ExploitView
-from views.DevicePopup import DevicePopup
 from views.VulnPopup import VulnPopup
 from models.Host import Host
 from views.TableView import TableView
@@ -34,6 +33,8 @@ from ttkthemes import ThemedTk
 
 
 # Main method to handle setting up and managing the UI
+
+
 def main():
     print("Scanner App Started...")
 
@@ -336,11 +337,6 @@ def main():
     vulnerabilities_view.on_selected_cve = find_exploit
     vulnerabilities_view.move_to_exploit = update_exploit_tab
 
-    # Setup Devices Tab
-    devices_view = DevicesView()
-    devices_tab = devices_view.get_view(main_note_book)
-    main_note_book.add(devices_tab, text="Devices")
-
     # Setup Exploits Tab
     exploit_view = ExploitView()
     exploit_tab = exploit_view.get_view(main_note_book)
@@ -356,12 +352,13 @@ def main():
     menubar = Menu(root)  # create menu bar
     filemenu = Menu(menubar, tearoff=0)  # create a menu to add some stuff too
 
+    # Save Vulnerability in file menu bar
     savemenu = Menu(menubar, tearoff=0)
-    savemenu.add_command(label="Save Device", command=DevicePopup.new_popup)
     savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
     filemenu.add_cascade(label='Save', menu=savemenu)
     filemenu.add_separator()  # more prettiness
 
+    # Scan settings in file menu bar
     settingsmenu = Menu(menubar, tearoff=0)
     settingsmenu.add_command(label="Scan Settings", command=scan_details_view.on_settings)
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
@@ -391,7 +388,6 @@ def main():
 
     editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
     editmenu.add_command(label="Undo", command=donothing)
-    filemenu.add_cascade(label='Edit 2', menu=editmenu)  # add the edit menu under File
     
     menubar.add_cascade(label="File", menu=filemenu)  # add file to menu bar
     # On macOS there are some default things added to this menu, but are not added to the same menu
