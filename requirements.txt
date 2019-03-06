@@ -4,19 +4,19 @@
 
 # Requirements without Version Specifiers
 Click
-Pillow
+#Pillow
 XLsxWriter
-certified
-charted
+certifi
+chardet
 click-plugins
 colorama
 elevate
 idea
-python-map
-report lab
+python-nmap
+reportlab
 requests
-setup tools
-shoran
+setuptools
+shodan
 ttkthemes
 urllib3
 
