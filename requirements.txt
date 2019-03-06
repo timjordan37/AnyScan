@@ -1,0 +1,24 @@
+#
+# Requirements for GlenTest
+#
+
+# Requirements without Version Specifiers
+Click
+Pillow
+XLsxWriter
+certified
+charted
+click-plugins
+colorama
+elevate
+idea
+python-map
+report lab
+requests
+setup tools
+shoran
+ttkthemes
+urllib3
+
+# Referencing for later additions
+### https://pip.pypa.io/en/latest/reference/pip_install/#requirements-file-format ###
