@@ -89,8 +89,7 @@ def main():
         DataShare.set_hosts(sorted_scanned_hosts)
 
         data = list(map(lambda host: (host.get_ip(), host.get_display_name(), host.get_vendor()), sorted_scanned_hosts))
-
-        hosts_table_view.reload_data(data)
+        hosts_table_view.reload_data(data[::-1])
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
