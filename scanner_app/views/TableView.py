@@ -28,13 +28,6 @@ class TableView:
     """
     def __init__(self, parent_view, grid_row, sections, data):
 
-        def get_CVE(a):
-            rowData = tree.focus()
-            full_row = tree.item(rowData)
-            cve_details = full_row['values']
-            pop = DetailsPopup(cve_details)
-            pop.new_popup()
-
         self._grid_row = grid_row
         self._parent_view = parent_view
         self._sections = sections
@@ -53,9 +46,6 @@ class TableView:
             for collection in data:
                 tree.insert("", i, values=tuple(collection))
             i += 1
-
-
-        tree.bind('<Double-Button-1>', get_CVE)
         self._tree = tree
 
     def reload_data(self, data):
