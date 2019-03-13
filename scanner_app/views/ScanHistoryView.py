@@ -88,7 +88,7 @@ class ScanHistoryView:
         for scan in all_scans:
             data.append(list(scan))
 
-        self.table_view = TableView(frame, 6, sections_tuple, data)
+        self.table_view = TableView(frame, 6, sections_tuple, data[::-1])
 
         return frame
 
