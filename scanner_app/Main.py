@@ -188,7 +188,7 @@ def main():
             print('No CVE selected')
 
     def update_exploit_tab(cve):
-        main_note_book.select(3)
+        main_note_book.select(2)
         exploit_view.cve_var.set(cve)
         # todo update exploit tab variables
 
