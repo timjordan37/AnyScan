@@ -96,7 +96,7 @@ class VulnerabilitiesView:
         for vuln in all_vulns:
             data.append(list(vuln))
 
-        self.table_view = TableView(frame, 6, sections_tuple, data)
+        self.table_view = TableView(frame, 6, sections_tuple, data[::-1])
         self.table_view.bind_method('<ButtonRelease-1>', self.on_cve_select)
         self.table_view.bind_method('<Double-Button-1>', self.on_cve_double_click)
 
