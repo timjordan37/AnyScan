@@ -1,8 +1,6 @@
-import ntpath
 import sqlite3
 import json
 from pathlib import Path
-from tkinter.filedialog import askopenfilename
 
 
 class DBFunctions:
@@ -352,9 +350,16 @@ class DBFunctions:
 
     # Imports Data from NVD JSON file
     @staticmethod
-    def import_NVD_JSON():
+    def import_NVD_JSON(json_fp=None):
+        if not json_fp:
+            # default file I've been using for testing. We could get rid of this for release
+            json_fp = Path("nvdcve-1.0-2019.json")
+            print(json_fp)
+        else:
+            # todo test for correct file type
+            json_fp = Path(json_fp)
+            print(json_fp)
 
-        json_fp = Path("nvdcve-1.0-2019.json")
         nvd_json = json.loads(json_fp.read_text())
         cve_items_list = nvd_json['CVE_Items']
 
@@ -482,19 +487,6 @@ class DBFunctions:
             'er:', er.message
 
         return cursor.fetchall()
-
-    @staticmethod
-    def update_import():
-        # Only takes json currently.
-        #path = askopenfilename(title='Select Database file to import...', defaultextension='.db', filetypes=(("database files", "*.db"),("datafeeds", "*.json"),("all files", "*.*")))
-        path = askopenfilename(title='Select Database file to import...', defaultextension='.json')
-        # ntpath for os compatibility with differing separators
-        # head and tail if path ends in backslash
-        head, tail = ntpath.split(path)
-        fname = tail or ntpath.basename(head)
-
-        print("\n\nDB IMPORT FILE")
-        print(fname)
 
     """Vulnerabilities Methods"""
     @staticmethod

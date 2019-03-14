@@ -5,9 +5,11 @@ import sys
 import platform
 import os
 import random
+import ntpath
 # 3rd party imports
 import tkinter as tk
 from tkinter import ttk
+from tkinter.filedialog import askopenfilename
 from tkinter import *
 from pathlib import Path
 from elevate import elevate
@@ -206,6 +208,23 @@ def main():
         button = Button(filewin, text="Do nothing button")
         button.pack()
 
+    def update_import():
+        # Only takes json currently.
+        #path = askopenfilename(title='Select Database file to import...', defaultextension='.db', filetypes=(("database files", "*.db"),("datafeeds", "*.json"),("all files", "*.*")))
+        path = askopenfilename(title='Select Database file to import...', filetypes=[('Json', '*.json')])
+
+        # ntpath for os compatibility with differing separators
+        # head and tail if path ends in backslash
+        head, tail = ntpath.split(path)
+        fname = tail or ntpath.basename(head)
+
+        if fname.endswith('.json'):
+        # for use to support multiple file types
+        # elif json_fp.endswith(('.json', '.db', '.xml'):
+            df.DBFunctions.import_NVD_JSON(fname)
+        else:
+            tk.messagebox.showerror("Error", "File must be of type: json")
+
     class TreeColumns(enum.Enum):
         name = 0
         mac_address = 1
@@ -356,12 +375,13 @@ def main():
     savemenu = Menu(menubar, tearoff=0)
     savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
     filemenu.add_cascade(label='Save', menu=savemenu)
-    filemenu.add_separator()  # more prettiness
 
     # DB import in file menu bar
     importmenu = Menu(menubar, tearoff=0)
-    importmenu.add_command(label="Database", command=df.DBFunctions.update_import)
+    importmenu.add_command(label="Database", command=update_import)
     filemenu.add_cascade(label="Import", menu=importmenu)
+
+    filemenu.add_separator()  # more prettiness
 
     # Scan settings in file menu bar
     settingsmenu = Menu(menubar, tearoff=0)
