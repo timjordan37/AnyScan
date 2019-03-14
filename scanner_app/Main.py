@@ -87,6 +87,7 @@ def main():
 
         # Update hosts to the sorted version to ensure details on select are correct
         DataShare.set_hosts(sorted_scanned_hosts)
+        reset_left_header_label()
 
         data = list(map(lambda host: (host.get_ip(), host.get_display_name(), host.get_vendor()), sorted_scanned_hosts))
 

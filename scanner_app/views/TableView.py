@@ -1,6 +1,6 @@
 import tkinter
 from tkinter import ttk
-from views.DetailsPopup import DetailsPopup
+from views.DevicePopup import DevicePopup
 
 
 class TableView:
@@ -32,7 +32,7 @@ class TableView:
             rowData = tree.focus()
             full_row = tree.item(rowData)
             cve_details = full_row['values']
-            pop = DetailsPopup(cve_details)
+            pop = DevicePopup(cve_details)
             pop.new_popup()
 
         self._grid_row = grid_row
