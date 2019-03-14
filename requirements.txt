@@ -4,7 +4,6 @@
 
 # Requirements without Version Specifiers
 Click
-#Pillow
 XLsxWriter
 certifi
 chardet
