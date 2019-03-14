@@ -90,7 +90,9 @@ def main():
 
         data = list(map(lambda host: (host.get_ip(), host.get_display_name(), host.get_vendor()), sorted_scanned_hosts))
 
-        hosts_table_view.reload_data(data)
+        # We need to reverse the data shown here because the table view will display the data in the reversed order
+        # this is needed so that clicking the tableview will result in the correct host being selected: Task189
+        hosts_table_view.reload_data(data[::-1])
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
