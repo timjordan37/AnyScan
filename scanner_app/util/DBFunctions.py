@@ -490,5 +490,6 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
-        cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities""", ())
+        cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities ORDER BY 
+        CVSSScore DESC""", ())
         return cursor.fetchall()

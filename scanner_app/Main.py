@@ -145,7 +145,15 @@ def main():
     def set_cpes_vulns(c):
         """Set vulnerabilities from cps"""
         DataShare.set_cpes(c)
-        DataShare.set_vulns(df.DBFunctions.query_cves(c))
+
+        # Sort according to the Vulnerability Sort Setting
+        reverse_sort = False
+
+        if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
+            reverse_sort = True
+
+        sorted_vulns = sorted(df.DBFunctions.query_cves(c), reverse=reverse_sort)
+        DataShare.set_vulns(sorted_vulns)
         # reload ui
 
     # Click Handlers
