@@ -350,9 +350,16 @@ class DBFunctions:
 
     # Imports Data from NVD JSON file
     @staticmethod
-    def import_NVD_JSON():
+    def import_NVD_JSON(json_fp=None):
+        if not json_fp:
+            # default file I've been using for testing. We could get rid of this for release
+            json_fp = Path("nvdcve-1.0-2019.json")
+            print(json_fp)
+        else:
+            # todo test for correct file type
+            json_fp = Path(json_fp)
+            print(json_fp)
 
-        json_fp = Path("nvdcve-1.0-2019.json")
         nvd_json = json.loads(json_fp.read_text())
         cve_items_list = nvd_json['CVE_Items']
 
