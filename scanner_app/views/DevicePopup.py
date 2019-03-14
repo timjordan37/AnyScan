@@ -22,17 +22,17 @@ class DevicePopup:
 
 
         # Adding the fields to the popup
-        related_mod = tk.Label(device_popup, text=self.model)
-        related_mod_label = tk.Label(device_popup, text="Model")
+        related_mod = ttk.Label(device_popup, text=self.model)
+        related_mod_label = ttk.Label(device_popup, text="Model")
         related_mod_label.grid(column=0, row=0, padx=5, pady=5)
         related_mod.grid(column=1, row=0, padx=5, pady=5)
 
-        cpe_uri_entry = tk.Label(device_popup, text=self.cpe_uri)
-        cpe_uri_label = tk.Label(device_popup, text="CPE URI")
+        cpe_uri_entry = ttk.Label(device_popup, text=self.cpe_uri)
+        cpe_uri_label = ttk.Label(device_popup, text="CPE URI")
         cpe_uri_label.grid(column=0, row=1, padx=5, pady=5)
         cpe_uri_entry.grid(column=1, row=1, padx=5, pady=5)
 
-        manufacturer_entry = tk.Label(device_popup, text=self.manufacturer)
-        manufacturer_label = tk.Label(device_popup, text="Manufacturer")
+        manufacturer_entry = ttk.Label(device_popup, text=self.manufacturer)
+        manufacturer_label = ttk.Label(device_popup, text="Manufacturer")
         manufacturer_label.grid(column=0, row=2, padx=5, pady=5)
         manufacturer_entry.grid(column=1, row=2, padx=5, pady=5)
