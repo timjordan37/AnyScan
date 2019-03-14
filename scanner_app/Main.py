@@ -16,9 +16,7 @@ from util.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 from util.DataShare import DataShare
-from util import Reporter
 from util import DBFunctions as df, System
-from util import Theme
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
 from views.ScanHistoryView import ScanHistoryView
@@ -359,6 +357,11 @@ def main():
     savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
     filemenu.add_cascade(label='Save', menu=savemenu)
     filemenu.add_separator()  # more prettiness
+
+    # DB import in file menu bar
+    importmenu = Menu(menubar, tearoff=0)
+    importmenu.add_command(label="Database", command=df.DBFunctions.update_import)
+    filemenu.add_cascade(label="Import", menu=importmenu)
 
     # Scan settings in file menu bar
     settingsmenu = Menu(menubar, tearoff=0)

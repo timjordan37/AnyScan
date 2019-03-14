@@ -1,6 +1,8 @@
+import ntpath
 import sqlite3
 import json
 from pathlib import Path
+from tkinter.filedialog import askopenfilename
 
 
 class DBFunctions:
@@ -480,6 +482,19 @@ class DBFunctions:
             'er:', er.message
 
         return cursor.fetchall()
+
+    @staticmethod
+    def update_import():
+        # Only takes json currently.
+        #path = askopenfilename(title='Select Database file to import...', defaultextension='.db', filetypes=(("database files", "*.db"),("datafeeds", "*.json"),("all files", "*.*")))
+        path = askopenfilename(title='Select Database file to import...', defaultextension='.json')
+        # ntpath for os compatibility with differing separators
+        # head and tail if path ends in backslash
+        head, tail = ntpath.split(path)
+        fname = tail or ntpath.basename(head)
+
+        print("\n\nDB IMPORT FILE")
+        print(fname)
 
     """Vulnerabilities Methods"""
     @staticmethod
