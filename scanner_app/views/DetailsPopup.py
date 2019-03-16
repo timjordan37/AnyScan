@@ -1,6 +1,8 @@
 import tkinter as tk
+import util.DBFunctions as dbf
 
-class DetailsPopup():
+
+class DetailsPopup:
     """Details pop up displays information about the selected CVE"""
 
     _cve_details = ''
@@ -40,6 +42,14 @@ class DetailsPopup():
         self.base_severity = cve_details[13]
         self.exploitability_score = cve_details[14]
 
+    def update_vuln(self):
+
+        dbf.DBFunctions.update_vuln(self.vuln_id,  self.cve_name, self.description, self.base_score,
+                                    self.attack_vector, self.attack_complexity, self.custom_score,
+                                    self.custom_score_reason, self.privileges_required, self.user_interaction,
+                                    self.confidentiality_impact, self.integrity_impact, self.availability_impact,
+                                    self.base_score, self.base_severity, self.exploitability_score)
+
     def new_popup(self):
 
         # Creating the Popup Window
@@ -74,12 +84,14 @@ class DetailsPopup():
         attack_complexity_entry.grid(column=1, row=4, padx=5, pady=5)
 
         custom_score_label = tk.Label(popup, text="Custom Score: ")
-        custom_score_entry = tk.Label(popup, text=self.custom_score)
+        custom_score_entry = tk.Entry(popup, textvariable=self.custom_score)
+        custom_score_entry.insert(0, self.custom_score)
         custom_score_label.grid(column=0, row=5, padx=5, pady=5)
         custom_score_entry.grid(column=1, row=5, padx=5, pady=5)
 
         custom_score_reason_label = tk.Label(popup, text="Custom Score Reason: ")
-        custom_score_reason_entry = tk.Label(popup, text=self.custom_score_reason)
+        custom_score_reason_entry = tk.Entry(popup, textvariable=self.custom_score_reason)
+        custom_score_reason_entry.insert(0,self.custom_score_reason)
         custom_score_reason_label.grid(column=0, row=7, padx=5, pady=5)
         custom_score_reason_entry.grid(column=1, row=7, padx=5, pady=5)
 
@@ -122,5 +134,8 @@ class DetailsPopup():
         exploitability_score_entry = tk.Label(popup, text=self.exploitability_score)
         exploitability_score_label.grid(column=0, row=15, padx=5, pady=5)
         exploitability_score_entry.grid(column=1, row=15, padx=5, pady=5)
+
+        update_button = tk.Button(popup, text="Update Vulnerability", command=self.update_vuln())
+        update_button.grid(columnspan=2, row=16, padx=5, pady=5)
 
 
