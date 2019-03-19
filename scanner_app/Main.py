@@ -272,7 +272,7 @@ def main():
     left_frame = ttk.Frame(root)
     left_frame.grid(row=0, column=0, sticky="nsew")
     left_frame.grid_rowconfigure(1, weight=1)
-    left_frame.grid_columnconfigure(0, weight=1)
+    left_frame.grid_columnconfigure(1, weight=1)
 
     # Setup Left Frame header Label
     left_frame_header_label_var = tk.StringVar()
@@ -429,7 +429,7 @@ def main():
 
     # Run the program with UI
     root.config(menu=menubar)
-    root.geometry("800x500")
+    root.geometry("1600x1000")
     root.minsize(800, 500)
     root.mainloop()
 
