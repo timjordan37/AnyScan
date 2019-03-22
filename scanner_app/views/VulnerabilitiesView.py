@@ -8,7 +8,7 @@ from tkinter import ttk
 """
 This class will display and sort all present vulnerabilities currently being stored in the database within a
 table displayed on the 'Vulnerabilities' tab.  Here users can also enter in specific search criteria in order to
-search for a specific vulnerability.
+search for a specific vulnerability.  Vulnerabilities should be sorted by highest CVSS score by default.
 """
 
 
