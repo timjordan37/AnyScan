@@ -5,6 +5,12 @@ from util import DBFunctions as dbf
 from util.DataShare import DataShare
 from tkinter import ttk
 
+"""
+This class will display and sort all present vulnerabilities currently being stored in the database within a
+table displayed on the 'Vulnerabilities' tab.  Here users can also enter in specific search criteria in order to
+search for a specific vulnerability.
+"""
+
 
 class VulnerabilitiesView:
 

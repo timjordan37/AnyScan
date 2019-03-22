@@ -233,6 +233,7 @@ def main():
         else:
             tk.messagebox.showerror("Error", "File must be of type: json")
 
+    # Set up tree columns to display IP and Device Names after a completed scan
     class TreeColumns(enum.Enum):
         name = 0
         mac_address = 1
@@ -397,9 +398,11 @@ def main():
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
     filemenu.add_separator()  # pretty
 
+    # Helper method to change application themes
     def change_theme(theme):
         root.ttkStyle.set_theme(theme)
 
+    # Added the ability for the user to change themes from the cascading file menu
     themesmenu = Menu(menubar, tearoff=0)
     themesmenu.add_command(label="Alt", command=lambda: change_theme("alt"))
     themesmenu.add_command(label="Aqua", command=lambda: change_theme("aqua"))
@@ -407,6 +410,7 @@ def main():
     themesmenu.add_command(label="Classic", command=lambda: change_theme("classic"))
     themesmenu.add_command(label="Default", command=lambda: change_theme("default"))
     themesmenu.add_command(label="Equilux", command=lambda: change_theme("equilux"))
+    themesmenu.add_separator()
     themesmenu.add_command(label="Scidblue", command=lambda: change_theme("scidblue"))
     themesmenu.add_command(label="Scidgreen", command=lambda: change_theme("scidgreen"))
     themesmenu.add_command(label="Scidgrey", command=lambda: change_theme("scidgrey"))
