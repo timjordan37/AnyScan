@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # pi_setup - A script to configure a KaliPi for development of ASU Group 9 Capstone
-# First argument must be new user name
+# First argument must be new system user name
 # Second argument must be GitHub account email
 # Third argument specifies Github SSH setup
 
@@ -16,7 +16,7 @@ function pause(){
 }
 
 ##### Main
-if [ $# -gt 0 ]; then
+if [ "$#" -lt 2 ]; then
 	echo "You must specify at first 2 arguments"
 	exit 1
 else
@@ -40,12 +40,13 @@ else
 		pause "Press [Enter] after navigating to your GitHub account and adding the new ssh key printed above."
 		cd /home/$1/git
 		ssh -T git@github.com
-		git clone GIT_SSH_PATH
+		git clone $GIT_SSH_PATH
 		cd
 	else
 		cd /home/$1/git
-		git clone GIT_CLONE_PATH
+		git clone $GIT_CLONE_PATH
 		cd
+	fi
 	# update OS and install needed packages
 	apt-get update
 	apt-get upgrade
@@ -54,4 +55,5 @@ else
 	apt-get install gedit
 	apt autoremove
 	apt-get install libtiff5-dev libjpeg62-turbo-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev libharfbuzz-dev libfribidi-dev tcl8.6-dev tk8.6-dev python3-tk
-	pip3 install -r /home/$1/git/grp9cap18/requirements.txt
+fi
+pip3 install -r /home/$1/git/grp9cap18/requirements.txt
