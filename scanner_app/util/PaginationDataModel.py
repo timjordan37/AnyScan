@@ -4,6 +4,9 @@ class PaginationDataModel:
     _items = []
     _cur_index = 0
 
+    def __init__(self):
+        self._items = []
+
     def __init__(self, items):
         self._items = items
 
@@ -22,7 +25,7 @@ class PaginationDataModel:
         else:
             return None
 
-    def prev_items(self):
+    def prev_item(self):
         prev_index = self._cur_index - 1
 
         if prev_index > 0 and prev_index < len(self._items):

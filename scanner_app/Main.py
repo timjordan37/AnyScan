@@ -200,6 +200,7 @@ def main():
     def update_exploit_tab(cve):
         main_note_book.select(2)
         exploit_view.cve_var.set(cve)
+        exploit_view.on_search()
         # todo update exploit tab variables
 
     def on_host_tableview_select(event):

@@ -151,7 +151,6 @@ class VulnerabilitiesView:
 
     def on_cve_double_click(self, event):
         selected_value = self.table_view.get_selected_item()['values']
-        print('From Vuln View DOULBE CLICK: ', selected_value[1])
 
         if len(selected_value) > 0:
             DataShare.set_selected_cve(selected_value[1])
