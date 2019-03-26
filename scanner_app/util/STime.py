@@ -1,5 +1,9 @@
 from threading import Timer
 
+"""
+A simple timer in order for the user to keep track of the duration of a scanning period.
+"""
+
 
 class STimer:
     @staticmethod

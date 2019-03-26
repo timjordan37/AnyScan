@@ -1,6 +1,12 @@
 import tkinter as tk
 import util.DBFunctions as dbf
 
+"""
+The following class creates a popup window when the user double clicks on a CVE listed in the 'Vulnerabilities' tab.
+The popup window displays various information about the selected CVE so that the user has more insight as to how 
+severe a specific vulnerability is.
+"""
+
 
 class DetailsPopup:
     """Details pop up displays information about the selected CVE"""

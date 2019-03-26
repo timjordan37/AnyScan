@@ -241,8 +241,8 @@ def main():
         @staticmethod
         def display_name_for_column(col):
             display_names = {
-                0: "ip",
-                1: "name",
+                0: "IP",
+                1: "Name",
             }
             return display_names[col]
 

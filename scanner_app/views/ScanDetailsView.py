@@ -151,7 +151,7 @@ class ScanDetailsView:
             @staticmethod
             def display_name_for_column(col):
                 display_names = {
-                    0: "cveName"
+                    0: "CVE Name"
                 }
                 return display_names[col]
 

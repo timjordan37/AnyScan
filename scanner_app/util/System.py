@@ -1,7 +1,8 @@
 import enum
 import configparser
 
-"""This System class will contain a Singleton class to manage the user settings per session"""
+"""This System class will contain a Singleton class to manage the user settings per user session"""
+
 
 class ScanType(enum.Enum):
     full_scan = 0
@@ -31,6 +32,7 @@ class ScanType(enum.Enum):
             4: ScanType.detect_os_service_scan
         }
         return scan_types[int(scan_int)]
+
 
 class SortType(enum.Enum):
     alphaASC = 0
@@ -86,13 +88,16 @@ class SettingKey:
     pdf_size = "PDF_SIZE"
 
 
+"""Singleton implementation: https://www.tutorialspoint.com/python_design_patterns/python_design_patterns_singleton
+.htm """
 
-"""Singleton implementation: https://www.tutorialspoint.com/python_design_patterns/python_design_patterns_singleton.htm"""
+
 class Settings:
     """Properties"""
     __instance = None
 
     """Methods"""
+
     # @staticmethod
     # def getInstance():
     #     """ Static access method. """
@@ -130,7 +135,6 @@ class Settings:
         #  it does exist, so we take another not to give us the correct value in context
         return not not config.read(SettingKey.setting_file_name)
 
-
     @staticmethod
     def get_settings_dict():
         config = configparser.ConfigParser()
@@ -140,6 +144,7 @@ class Settings:
     """Setting Methods"""
 
     """Scan Type"""
+
     @staticmethod
     def get_scan_type():
         if SettingKey.scan_type not in Settings.get_settings_dict():

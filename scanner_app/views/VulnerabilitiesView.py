@@ -173,7 +173,7 @@ class TreeColumns(enum.Enum):
     @staticmethod
     def display_name_for_column(col):
         display_names = {
-            0: "id",
+            0: "ID",
             1: "CVE Name",
             2: "CVSS Score",
             3: "Base Score",
