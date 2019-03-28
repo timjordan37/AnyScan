@@ -13,9 +13,6 @@ class DBFunctions:
         cursor = conn.cursor()
         device_info = (deviceName, deviceManufacturer, cpeURI)
 
-        print('Inside DBFunctions save_device')
-        print(device_info)
-
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
             conn.commit()
@@ -222,7 +219,6 @@ class DBFunctions:
         cves = []
         test_data = set()
         cursor = conn.cursor()
-        print("CVE Query HERE")
 
         # CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
         #         "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
@@ -324,7 +320,6 @@ class DBFunctions:
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Vuln Query HERE")
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
 

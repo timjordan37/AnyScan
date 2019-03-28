@@ -59,7 +59,6 @@ class TableView:
         self._tree = tree
 
     def reload_data(self, data):
-        print("DATA: ", data)
         for i in self._tree.get_children():
             self._tree.delete(i)
 

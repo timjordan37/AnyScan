@@ -106,11 +106,8 @@ def main():
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
         hosts = scan_host_entry_var.get()
         scanner = Scanner(hosts, ports)
-
-        print("Scan start")
         set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
         set_cpes_vulns(scanner.get_cpes())
-        print("Scan END")
 
         scan_button.config(state="normal")
         scan_details_view.check_vulnerabilities_button.config(state="normal")

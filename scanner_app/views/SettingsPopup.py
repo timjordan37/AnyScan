@@ -5,7 +5,6 @@ from util import System
 class SettingsPopup():
 
     def __init__(self):
-        print("Look, im a popup")
 
     @staticmethod
     def new_popup():
