@@ -1,4 +1,9 @@
-# Host object to represent the hosts retrieved through the scan
+"""
+This is a Host object to represent the hosts that are retrieved through various scans that will be performed by the
+user.
+"""
+
+
 class Host:
     _ip = ""
     _state = ""
@@ -50,7 +55,7 @@ class Host:
         """Get name of host or vendor if not found"""
         if self._name != "":
             return self._name
-        elif self._vendor != "" :
+        elif self._vendor != "":
             return self._vendor
         else:
             return ""

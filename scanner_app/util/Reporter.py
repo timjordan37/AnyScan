@@ -4,6 +4,11 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch
 from datetime import date
 
+"""
+This class pulls scan info from the DB and builds a PDF style report from that information.  The user can click the
+'Reports' button on the default page of the application, after a successful scan, and the PDF report will be 
+generated and displayed.
+"""
 
 
 class Reporter:

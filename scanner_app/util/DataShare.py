@@ -4,6 +4,11 @@ selected_host_index = None
 cpes = {}
 cve_selection = ''
 
+"""
+This class is a singleton class used to pass various data between the different tabs of the application.  This data
+is used in multiple different ways according to what specific tab the user is viewing at the time.
+"""
+
 
 class DataShare:
     """Singleton class to pass data between tabs for use throughout application"""
