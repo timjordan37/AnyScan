@@ -41,7 +41,6 @@ class FormView:
                 row.get_text_variable().set("")
                 text_view = tk.Text(row_frame, height=10)
                 text_view.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
-                text_view.insert(tk.END, "poop")
                 row._input_view = text_view
             elif row_type == FormRowType.button:
                 row_frame.grid(row=index, column=0)
