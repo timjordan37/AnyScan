@@ -133,6 +133,12 @@ class DBFunctions:
             cpeURI TEXT, 
             cveName TEXT, 
             PRIMARY KEY(cpeURI, cveName))''')
+        cursor.execute('''CREATE TABLE CPEVersions (
+                    cpe22 TEXT, 
+                    cpe23 TEXT, 
+            PRIMARY KEY(cpe22,cpe23))''')
+        # is there a reason this commit is here and below? Do we need 2?
+        # todo
         conn.commit()
         cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
             cveName TEXT,
@@ -365,7 +371,7 @@ class DBFunctions:
 
         i = 0
         for cve in cve_items_list:
-            cve_detail = cve_items_list[i]
+            cve_detail = cve_items_list[i] # can't this just be cve?
             cve_meta_data = cve_detail.get("cve").get("CVE_data_meta")
 
             description_data = cve_detail.get("cve").get("description").get("description_data")
