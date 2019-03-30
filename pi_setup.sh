@@ -17,9 +17,12 @@ function pause(){
 
 ##### Main
 if [ "$#" -lt 2 ]; then
-	echo "You must specify at first 2 arguments"
+	echo "You must specify at least first 2 arguments"
 	exit 1
 else
+	# update OS and install needed packages
+	apt-get update
+	apt-get upgrade
 	# delete default credentials
 	rm /etc/ssh/ssh_host_*
 	dpkg-reconfigure openssh-server
@@ -47,9 +50,7 @@ else
 		git clone $GIT_CLONE_PATH
 		cd
 	fi
-	# update OS and install needed packages
-	apt-get update
-	apt-get upgrade
+	
 	apt-get install python3
 	apt-get install python3-pip
 	apt-get install gedit
