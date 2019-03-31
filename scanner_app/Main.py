@@ -259,10 +259,8 @@ def main():
 
     root = ThemedTk()
     root.ttkStyle = ThemedStyle()
-    # Themes
-    # "'alt', 'scidsand', 'classic', 'scidblue', 'scidmint', 'scidgreen', 'equilux', 'default', 'scidpink', 'aqua',
-    # 'scidgrey', 'scidpurple', 'clam')
-    root.ttkStyle.set_theme("equilux")
+    theme = System.Settings.get_theme()
+    root.ttkStyle.set_theme(theme)
     root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
@@ -400,6 +398,7 @@ def main():
 
     def change_theme(theme):
         root.ttkStyle.set_theme(theme)
+        System.Settings.set_theme(theme)
 
     themesmenu = Menu(menubar, tearoff=0)
     themesmenu.add_command(label="Alt", command=lambda: change_theme("alt"))
