@@ -1,6 +1,7 @@
 import sqlite3
 import json
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 
 class DBFunctions:
@@ -216,6 +217,8 @@ class DBFunctions:
 
         cpeVuln = (cpe, cve)
 
+        # todo cpe version change
+
         cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
         conn.commit()
 
@@ -406,6 +409,24 @@ class DBFunctions:
                     print("No CPE Matches")
 
             i += 1
+
+    @staticmethod
+    def import_cve_verison_matches(nvd_file='official-cpe-dictionary_v2.3.xml'):
+        # assumes the default file is available
+        tree = ET.parse(nvd_file)
+        root = tree.getroot()
+        # cursor for DB addition
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        # get matches accoridng to xml namespace and adds to DB
+        for cpe in root.findall('{http://cpe.mitre.org/dictionary/2.0}cpe-item'):
+            tmp = cpe.find('{http://scap.nist.gov/schema/cpe-extension/2.3}cpe23-item')
+            pair = (cpe.attrib['name'], tmp.attrib['name'])
+            cursor.execute('''INSERT INTO CPEVersions VALUES(?, ?)''', pair)
+            conn.commit()
+
+
 
     # Retrieves all data for specified ScanID
     @staticmethod
