@@ -28,7 +28,7 @@ class PaginationDataModel:
     def prev_item(self):
         prev_index = self._cur_index - 1
 
-        if prev_index > 0 and prev_index < len(self._items):
+        if prev_index >= 0 and prev_index < len(self._items):
             self._cur_index -= 1
             return self._items[self._cur_index]
         else:
