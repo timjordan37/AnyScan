@@ -2,9 +2,7 @@ import tkinter as tk
 from util import System
 
 
-class SettingsPopup():
-
-    def __init__(self):
+class SettingsPopup:
 
     @staticmethod
     def new_popup():
