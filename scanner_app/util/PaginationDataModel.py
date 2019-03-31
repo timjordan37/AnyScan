@@ -39,3 +39,9 @@ class PaginationDataModel:
 
     def has_prev_item(self):
         return self.prev_items() is not None
+
+    def get_items_count(self):
+        return len(self._items)
+
+    def get_curr_index(self):
+        return self._cur_index
