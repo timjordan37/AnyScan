@@ -87,6 +87,7 @@ def main():
 
         # Update hosts to the sorted version to ensure details on select are correct
         DataShare.set_hosts(sorted_scanned_hosts)
+        reset_left_header_label()
 
         data = list(map(lambda host: (host.get_ip(), host.get_display_name(), host.get_vendor()), sorted_scanned_hosts))
 
@@ -259,10 +260,8 @@ def main():
 
     root = ThemedTk()
     root.ttkStyle = ThemedStyle()
-    # Themes
-    # "'alt', 'scidsand', 'classic', 'scidblue', 'scidmint', 'scidgreen', 'equilux', 'default', 'scidpink', 'aqua',
-    # 'scidgrey', 'scidpurple', 'clam')
-    root.ttkStyle.set_theme("equilux")
+    theme = System.Settings.get_theme()
+    root.ttkStyle.set_theme(theme)
     root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
@@ -400,6 +399,7 @@ def main():
     # Helper method to change application themes
     def change_theme(theme):
         root.ttkStyle.set_theme(theme)
+        System.Settings.set_theme(theme)
 
     # Added the ability for the user to change themes from the cascading file menu
     themes_menu = Menu(menubar, tearoff=0)

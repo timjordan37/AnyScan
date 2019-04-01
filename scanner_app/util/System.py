@@ -86,6 +86,7 @@ class SettingKey:
     host_sort_type = "HOST_SORT_TYPE"
     vuln_sort_type = "VULN_SORT_TYPE"
     pdf_size = "PDF_SIZE"
+    theme = "THEME"
 
 
 """Singleton implementation: https://www.tutorialspoint.com/python_design_patterns/python_design_patterns_singleton
@@ -213,3 +214,18 @@ class Settings:
         config[SettingKey.config_key][SettingKey.pdf_size] = str(new_pdf_size.value)
         with open(SettingKey.setting_file_name, 'w') as configfile:
             config.write(configfile)
+
+    @staticmethod
+    def get_theme():
+        if SettingKey.theme not in Settings.get_settings_dict():
+            return "equilux"
+        return Settings.get_settings_dict()[SettingKey.theme]
+
+    @staticmethod
+    def set_theme(theme):
+        config = configparser.ConfigParser()
+        config.read(SettingKey.setting_file_name)
+        config[SettingKey.config_key][SettingKey.theme] = theme
+        with open(SettingKey.setting_file_name, 'w') as configfile:
+            config.write(configfile)
+
