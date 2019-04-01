@@ -218,7 +218,7 @@ def main():
         button = Button(filewin, text="Do nothing button")
         button.pack()
 
-    def update_import():
+    def import_json():
         # Only takes json currently.
         #path = askopenfilename(title='Select Database file to import...', defaultextension='.db', filetypes=(("database files", "*.db"),("datafeeds", "*.json"),("all files", "*.*")))
         path = askopenfilename(title='Select Database file to import...', filetypes=[('Json', '*.json')])
@@ -234,6 +234,21 @@ def main():
             df.DBFunctions.import_NVD_JSON(fname)
         else:
             tk.messagebox.showerror("Error", "File must be of type: json")
+
+    def import_cpes():
+        path = askopenfilename(title='Select CPE Version Reference...', filetypes=[('XML', '*xml')])
+
+        # ntpath for os compatibility with differing separators
+        # head and tail if path ends in backslash
+        head, tail = ntpath.split(path)
+        fname = tail or ntpath.basename(head)
+
+        print(fname)
+
+        if fname.endswith('.xml'):
+            df.DBFunctions.import_cve_verison_matches(fname)
+        else:
+            tk.messagebox.showerror("Error", "File must be of type: xml")
 
     class TreeColumns(enum.Enum):
         name = 0
@@ -388,7 +403,8 @@ def main():
 
     # DB import in file menu bar
     importmenu = Menu(menubar, tearoff=0)
-    importmenu.add_command(label="Database", command=update_import)
+    importmenu.add_command(label="JSON Feed", command=import_json)
+    importmenu.add_command(label='CPEs', command=import_cpes)
     filemenu.add_cascade(label="Import", menu=importmenu)
 
     filemenu.add_separator()  # more prettiness

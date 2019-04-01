@@ -137,7 +137,8 @@ class DBFunctions:
         cursor.execute('''CREATE TABLE CPEVersions (
                     cpe22 TEXT, 
                     cpe23 TEXT, 
-            PRIMARY KEY(cpe22,cpe23))''')
+            PRIMARY KEY(cpe22,cpe23),
+            UNIQUE (cpe22, cpe23))''')
         # is there a reason this commit is here and below? Do we need 2?
         # todo
         conn.commit()
@@ -425,8 +426,6 @@ class DBFunctions:
             pair = (cpe.attrib['name'], tmp.attrib['name'])
             cursor.execute('''INSERT INTO CPEVersions VALUES(?, ?)''', pair)
             conn.commit()
-
-
 
     # Retrieves all data for specified ScanID
     @staticmethod
