@@ -211,7 +211,7 @@ class DBFunctions:
     def save_cpeVuln(cpe, cve):
         """Saves a new cpe\cve combo into the cpeVulns table
         :param cpe: cpe to import to db
-        :param cve; cve to import to db
+        :param cve: cve to import to db
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
@@ -526,3 +526,46 @@ class DBFunctions:
         cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities ORDER BY 
         CVSSScore DESC""", ())
         return cursor.fetchall()
+
+    @staticmethod
+    def cpe_version_reference(cpe22):
+        """Given the 2.2 version of a cpe return the 2.3 version
+
+        :param cpe22: assumed to be a valid cpe2.2
+        :return: CPE v2.3 given v2.2
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        # needs the comma the end so you are passing a tuple with 1 string not a sequence of however many chars
+        cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 = ?""", (cpe22,))
+
+        return cursor.fetchall()
+
+
+# TESTING
+if __name__=="__main__":
+    cpes_version_test = {
+        'cpe:/a:zzcms:zzcms:6.0', # yes
+        'cpe:/a:zzcms:zzcms:6.1', # yes
+        'cpe:/a:zzcms:zzcms:7.0', # yes
+        'cpe:/a:zzcms:zzcms:7.1', # yes
+        'cpe:/a:zzcms:zzcms:7.2', # yes
+        'cpe:/a:zzcms:zzcms:8.0', # yes
+        'cpe:/a:zzcms:zzcms:8.1', # yes
+        'cpe:/a:zzcms:zzcms:8.2', # yes
+        'cpe:/a:zzcms:zzcms:8.3', # yes
+        'cpe:/a:zzcms:zzcms:2018', # yes
+        'cpe:/a:zzcms:zzcms:2019', # yes
+        'thisshouldntwork', # no
+        'cpe:/a:zzzcms:zz.1', # no
+        'cpe:/a:zzzcms:zzzphp:1.6', # no
+        'cpe:/a:zzzs:zzzphp:1.6.1', # no
+        'cpeazzzcms:zphp:1.6.1', # no
+        'cpe:/a:%240.99_kindle_books_project:%240.99_kindle_books:6::~~~android~~' # yes
+    }
+
+    for item in cpes_version_test:
+        df = DBFunctions()
+        print(item)
+        print(df.cpe_version_reference(item))
