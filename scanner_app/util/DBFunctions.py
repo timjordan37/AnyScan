@@ -139,8 +139,7 @@ class DBFunctions:
                     cpe23 TEXT, 
             PRIMARY KEY(cpe22,cpe23),
             UNIQUE (cpe22, cpe23))''')
-        # is there a reason this commit is here and below? Do we need 2?
-        # todo
+        # todo is there a reason this commit is here and below? Do we need 2?
         conn.commit()
         cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
             cveName TEXT,
@@ -219,8 +218,20 @@ class DBFunctions:
         cpeVuln = (cpe, cve)
 
         # todo cpe version change
+        cpe_test = cpe[0:7]
+        if cpe_test != 'cpe:2.3':
+            error = f'\nCPE version 2.2: {cpe}\n'
+            print(error)
+            # update version to 2.3 if not already
+            cpe = DBFunctions.cpe_version_reference(cpe)
+            print(DBFunctions.cpe_version_reference(cpe))
 
-        cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
+        try:
+            cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
+        except sqlite3.IntegrityError:
+            # only works for python3.6 or greater
+            error = f'Combo already exist in DB:\nCVE {cve} \nCPE: {cpe}'
+            print(error)
         conn.commit()
 
     def query_cves(cpe_dict):
@@ -317,6 +328,7 @@ class DBFunctions:
 
         return test_data
 
+        # todo check if cpe versions clash
         # for hList in cpe_dict:
         #     for cpe in cpe_dict[hList]:
         #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
@@ -395,19 +407,20 @@ class DBFunctions:
                                                cvssV3['baseScore'], cvssV3['baseSeverity'],
                                                baseMetric['exploitabilityScore'])
             except:
+                # todo determine why this always errors
                 DBFunctions.save_vulnerability(cve_meta_data['ID'], description, "N/A", "N/A", "", "", "N/A",
                                                "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
             for item in cpe_list:
                 try:
                     cpe_match = item['cpe_match']
-                    for item in cpe_match:
+                    for match in cpe_match:
                         try:
-                            cpe_URI = item['cpe23Uri']
+                            cpe_URI = match['cpe23Uri']
                         except:
-                            cpe_URI = item['cpe22Uri']
+                            cpe_URI = match['cpe22Uri']
                         DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
-                except:
-                    print("No CPE Matches")
+                except KeyError:
+                    print('No CPE Match for ', cpe_URI)
 
             i += 1
 
@@ -537,14 +550,18 @@ class DBFunctions:
 
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        # needs the comma the end so you are passing a tuple with 1 string not a sequence of however many chars
+        # needs the comma at the end so you are passing
+        # a tuple with 1 string not a sequence of chars
         cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 = ?""", (cpe22,))
 
-        return cursor.fetchall()
+        cpe23 = cursor.fetchone()
+        if cpe23:
+            return cpe23[0]
 
 
 # TESTING
 if __name__=="__main__":
+    # quick unit testing, I'm sure python has something built in I could use
     cpes_version_test = {
         'cpe:/a:zzcms:zzcms:6.0', # yes
         'cpe:/a:zzcms:zzcms:6.1', # yes
@@ -566,6 +583,9 @@ if __name__=="__main__":
     }
 
     for item in cpes_version_test:
-        df = DBFunctions()
-        print(item)
-        print(df.cpe_version_reference(item))
+        print('Test item: ', item)
+        item = DBFunctions.cpe_version_reference(item)
+        if item:
+            print('Found: ', item)
+        else:
+            print('Not valid')
