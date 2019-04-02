@@ -125,6 +125,16 @@ def main():
         for host in get_hosts():
             df.DBFunctions.save_host(host, last_row_id)
 
+        query = "SELECT * FROM Hosts WHERE ScanID = ?"
+        host_tuple = df.DBFunctions.get_all_where(query, (last_row_id,))
+        hosts_with_ID = []
+
+        for id_host in host_tuple:
+            temp = Host(id_host[0], id_host[1], "Old Host", id_host[5], id_host[3], id_host[4], id_host[6], id_host[2])
+            hosts_with_ID.append(temp)
+
+        set_host(hosts_with_ID)
+
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
         waiting_scanner1.cancel()

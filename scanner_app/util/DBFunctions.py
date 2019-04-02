@@ -157,7 +157,8 @@ class DBFunctions:
             ip TEXT, 
             macAddress TEXT, 
             osFamily TEXT, 
-            osGen TEXT, name TEXT, 
+            osGen TEXT, 
+            name TEXT, 
             vendor TEXT, 
             ScanID INTEGER, 
             FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
@@ -421,3 +422,8 @@ class DBFunctions:
         cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities ORDER BY 
         CVSSScore DESC""", ())
         return cursor.fetchall()
+
+    @staticmethod
+    def save_cve_by_host():{
+
+    }
