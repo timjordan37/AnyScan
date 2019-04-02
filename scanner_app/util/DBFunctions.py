@@ -134,10 +134,6 @@ class DBFunctions:
             cveName TEXT, 
             PRIMARY KEY(cpeURI, cveName))''')
         conn.commit()
-        cursor.execute('''CREATE TABLE CPEVulns (
-            cpeURI TEXT, 
-            cveName TEXT, 
-            PRIMARY KEY(cpeURI, cveName))''')
         cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
             cveName TEXT,
             description TEXT, 
@@ -178,6 +174,12 @@ class DBFunctions:
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), 
             FOREIGN KEY(Model) REFERENCES Devices(Model), 
             FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        conn.commit()
+        cursor.execute('''CREATE TABLE CVE_By_Host (HostID INTEGER,
+            VulnID INTEGER,
+            PRIMARY KEY(HostID, VulnID),
+            FOREIGN KEY(HostID) REFERENCES Hosts(HostID),
+            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID)''')
         conn.commit()
 
     @staticmethod
@@ -223,11 +225,9 @@ class DBFunctions:
         :param cpe_dict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
         """
         conn = sqlite3.connect('vulnDB.db')
-        cves = []
-        test_data = set()
         cursor = conn.cursor()
+        cves = []
         print("CVE Query HERE")
-        # todo delete static testing to test on imported db
 
         for hList in cpe_dict:
             for cpe in cpe_dict[hList]:

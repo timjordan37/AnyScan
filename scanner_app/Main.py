@@ -179,6 +179,7 @@ def main():
         curr_hosts = []
         # for each host scanned
         for host_raw in data:
+            host_ID = host_raw[0]
             ip = host_raw[1]
             state = "Old Host"
             mac = host_raw[2]
@@ -187,7 +188,7 @@ def main():
             name = host_raw[5]
             vendor = host_raw[6]
 
-            curr_hosts.append(Host(ip, state, name, os_family, os_gen, vendor, mac))
+            curr_hosts.append(Host(host_ID, ip, state, name, os_family, os_gen, vendor, mac))
 
         set_host(curr_hosts)
 
