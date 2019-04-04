@@ -107,11 +107,8 @@ def main():
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
         hosts = scan_host_entry_var.get()
         scanner = Scanner(hosts, ports)
-
-        print("Scan start")
         set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
         set_cpes_vulns(scanner.get_cpes())
-        print("Scan END")
 
         scan_button.config(state="normal")
         scan_details_view.check_vulnerabilities_button.config(state="normal")
@@ -201,6 +198,7 @@ def main():
     def update_exploit_tab(cve):
         main_note_book.select(2)
         exploit_view.cve_var.set(cve)
+        exploit_view.on_search()
         # todo update exploit tab variables
 
     def on_host_tableview_select(event):
@@ -271,7 +269,7 @@ def main():
     left_frame = ttk.Frame(root)
     left_frame.grid(row=0, column=0, sticky="nsew")
     left_frame.grid_rowconfigure(1, weight=1)
-    left_frame.grid_columnconfigure(0, weight=1)
+    left_frame.grid_columnconfigure(1, weight=1)
 
     # Setup Left Frame header Label
     left_frame_header_label_var = tk.StringVar()
@@ -421,15 +419,15 @@ def main():
 
     editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
     editmenu.add_command(label="Undo", command=donothing)
-    
+
     menubar.add_cascade(label="File", menu=filemenu)  # add file to menu bar
     # On macOS there are some default things added to this menu, but are not added to the same menu
-    # under File. 
+    # under File.
     menubar.add_cascade(label='Edit', menu=editmenu)  # add edit to menu bar too, for fun
 
     # Run the program with UI
     root.config(menu=menubar)
-    root.geometry("800x500")
+    root.geometry("1600x1000")
     root.minsize(800, 500)
     root.mainloop()
 
