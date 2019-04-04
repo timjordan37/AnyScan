@@ -5,6 +5,12 @@ from util import DBFunctions as dbf
 from util.DataShare import DataShare
 from tkinter import ttk
 
+"""
+This class will display and sort all present vulnerabilities currently being stored in the database within a
+table displayed on the 'Vulnerabilities' tab.  Here users can also enter in specific search criteria in order to
+search for a specific vulnerability.  Vulnerabilities should be sorted by highest CVSS score by default.
+"""
+
 
 class VulnerabilitiesView:
 
@@ -166,7 +172,7 @@ class TreeColumns(enum.Enum):
     @staticmethod
     def display_name_for_column(col):
         display_names = {
-            0: "id",
+            0: "ID",
             1: "CVE Name",
             2: "CVSS Score",
             3: "Base Score",

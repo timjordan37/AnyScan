@@ -2,6 +2,13 @@ import nmap
 from util import DBFunctions as df, System
 from models.Host import Host
 
+"""
+This class handles the scanner portion of our application.  It handles the type of scan as well as information 
+retrieval regarding the scan details that are displayed on the default page as well as the scanned hosts that
+appear on the left hand side of the application.  This information will only be displayed post scan, provided
+that the scan has successfully detected devices connected to the current network.
+"""
+
 
 class Scanner:
     """Scanner class wraps nmap scans for quick scan types"""
@@ -39,7 +46,6 @@ class Scanner:
         """Quick scan of small port range with default arguments"""
         self._scanned = True
         return self._scanner.scan(self._ips, self._ports)
-
 
     def detect_os_service_scan(self):
         """Runs scan to detemine OS and running service of given host"""
@@ -89,6 +95,7 @@ class Scanner:
             return ""
 
     """Runs a scan of the given type"""
+
     def get_scan_details(self, scan_type):
         """Runs scan to detemine OS and running service of given host"""
         result = None
@@ -188,7 +195,7 @@ class Scanner:
                     ports = self._scanner[host][pro].keys()
                     # for each port print its state
                     for port in ports:
-                        print('Port: %s\tState: %s' %(port, self._scanner[host][pro][port]['state']))
+                        print('Port: %s\tState: %s' % (port, self._scanner[host][pro][port]['state']))
 
 
 class ScannerError(Exception):

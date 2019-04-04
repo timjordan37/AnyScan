@@ -3,6 +3,11 @@ import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+"""
+This class sets up our database and the various other search functions that we use in order to filter through our 
+data and display it properly to the user via the application.
+"""
+
 
 class DBFunctions:
 
@@ -60,9 +65,9 @@ class DBFunctions:
     # Updates a Vulnerability in the DB
     @staticmethod
     def update_vuln(vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, privilegesRequired,
-                           userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
-                           baseScore, baseSeverity, exploitabilityScore):
+                    customScoreReason, privilegesRequired,
+                    userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                    baseScore, baseSeverity, exploitabilityScore):
         conn = sqlite3.connect("vulnDB.db")
         cursor = conn.cursor()
 
@@ -89,7 +94,6 @@ class DBFunctions:
                         exploitabilityScore = ? 
                         WHERE VulnID = ?''', vulnerability_info)
         conn.commit()
-
 
     # Saves a scan to the database
     @staticmethod
@@ -477,7 +481,6 @@ class DBFunctions:
 
         return results
 
-
     @staticmethod
     def get_all_devices():
         """Query the database for all saved devices
@@ -523,6 +526,7 @@ class DBFunctions:
         return cursor.fetchall()
 
     """Vulnerabilities Methods"""
+
     @staticmethod
     def get_all_vulns():
         """Query the database for all saved vulnerabilities

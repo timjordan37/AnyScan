@@ -28,7 +28,6 @@ from views.VulnPopup import VulnPopup
 from models.Host import Host
 from views.TableView import TableView
 
-
 from ttkthemes import ThemedStyle
 from ttkthemes import ThemedTk
 
@@ -81,7 +80,8 @@ def main():
             reverse_sort = True
 
         if DataShare.get_hosts():
-            sorted_scanned_hosts = sorted(DataShare.get_hosts(), key=lambda x: (x.get_display_name()), reverse=reverse_sort)
+            sorted_scanned_hosts = sorted(DataShare.get_hosts(), key=lambda x: (x.get_display_name()),
+                                          reverse=reverse_sort)
 
         if sorted_scanned_hosts is None:
             return
@@ -216,9 +216,10 @@ def main():
         button = Button(filewin, text="Do nothing button")
         button.pack()
 
-    def import_json():
-        # Only takes json currently.
-        #path = askopenfilename(title='Select Database file to import...', defaultextension='.db', filetypes=(("database files", "*.db"),("datafeeds", "*.json"),("all files", "*.*")))
+    def update_import():
+        # Only takes json currently. path = askopenfilename(title='Select Database file to import...',
+        # defaultextension='.db', filetypes=(("database files", "*.db"),("datafeeds", "*.json"),("all files", "*.*")))
+
         path = askopenfilename(title='Select Database file to import...', filetypes=[('Json', '*.json')])
 
         # ntpath for os compatibility with differing separators
@@ -227,27 +228,13 @@ def main():
         fname = tail or ntpath.basename(head)
 
         if fname.endswith('.json'):
-        # for use to support multiple file types
-        # elif json_fp.endswith(('.json', '.db', '.xml'):
+            # for use to support multiple file types
+            # elif json_fp.endswith(('.json', '.db', '.xml'):
             df.DBFunctions.import_NVD_JSON(fname)
         else:
             tk.messagebox.showerror("Error", "File must be of type: json")
 
-    def import_cpes():
-        path = askopenfilename(title='Select CPE Version Reference...', filetypes=[('XML', '*xml')])
-
-        # ntpath for os compatibility with differing separators
-        # head and tail if path ends in backslash
-        head, tail = ntpath.split(path)
-        fname = tail or ntpath.basename(head)
-
-        print(fname)
-
-        if fname.endswith('.xml'):
-            df.DBFunctions.import_cve_verison_matches(fname)
-        else:
-            tk.messagebox.showerror("Error", "File must be of type: xml")
-
+    # Set up tree columns to display IP and Device Names after a completed scan
     class TreeColumns(enum.Enum):
         name = 0
         mac_address = 1
@@ -255,8 +242,8 @@ def main():
         @staticmethod
         def display_name_for_column(col):
             display_names = {
-                0: "ip",
-                1: "name",
+                0: "IP",
+                1: "Name",
             }
             return display_names[col]
 
@@ -314,21 +301,21 @@ def main():
     scan_host_entry = ttk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
     scan_host_entry.grid(row=0, column=1)
 
-    ## Setup scan port label frame
+    # Setup scan port label frame
     scan_port_label_frame = ttk.Frame(left_frame)
     scan_port_label_frame.grid(row=3, column=0)
 
-    ## Setup scan port label
+    # Setup scan port label
     port_start_label = ttk.Label(scan_port_label_frame, text="Start Port")
     port_start_label.grid(row=0, column=0, padx=(0, 8))
     port_end_label = ttk.Label(scan_port_label_frame, text="End Port")
     port_end_label.grid(row=0, column=1, padx=(8, 0))
 
-    ## Setup scan port frame
+    # Setup scan port frame
     scan_port_frame = ttk.Frame(left_frame)
     scan_port_frame.grid(row=4, column=0)
 
-    ## Setup scan port entries
+    # Setup scan port entries
     port_start_entry_var = tk.StringVar()
     port_start_entry_var.set("21")
     port_start_entry = ttk.Entry(scan_port_frame, width=4, textvariable=port_start_entry_var)
@@ -344,15 +331,14 @@ def main():
 
     # Setup Left frame scan button
     scan_button = ttk.Button(scan_button_frame,
-                            text="Scan",
-                            command=on_scan)
+                             text="Scan",
+                             command=on_scan)
 
     scan_button.grid(row=0, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
     #################
-
 
     # Setup Notebook for right frame
     rows = 0
@@ -399,10 +385,8 @@ def main():
 
     # DB import in file menu bar
     importmenu = Menu(menubar, tearoff=0)
-    importmenu.add_command(label="JSON Feed", command=import_json)
-    importmenu.add_command(label='CPEs', command=import_cpes)
+    importmenu.add_command(label="Database", command=update_import)
     filemenu.add_cascade(label="Import", menu=importmenu)
-
     filemenu.add_separator()  # more prettiness
 
     # Scan settings in file menu bar
@@ -411,27 +395,30 @@ def main():
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
     filemenu.add_separator()  # pretty
 
+    # Helper method to change application themes
     def change_theme(theme):
         root.ttkStyle.set_theme(theme)
         System.Settings.set_theme(theme)
 
-    themesmenu = Menu(menubar, tearoff=0)
-    themesmenu.add_command(label="Alt", command=lambda: change_theme("alt"))
-    themesmenu.add_command(label="Aqua", command=lambda: change_theme("aqua"))
-    themesmenu.add_command(label="Clam", command=lambda: change_theme("clam"))
-    themesmenu.add_command(label="Classic", command=lambda: change_theme("classic"))
-    themesmenu.add_command(label="Default", command=lambda: change_theme("default"))
-    themesmenu.add_command(label="Equilux", command=lambda: change_theme("equilux"))
-    themesmenu.add_command(label="Scidblue", command=lambda: change_theme("scidblue"))
-    themesmenu.add_command(label="Scidgreen", command=lambda: change_theme("scidgreen"))
-    themesmenu.add_command(label="Scidgrey", command=lambda: change_theme("scidgrey"))
-    themesmenu.add_command(label="Scidmint", command=lambda: change_theme("scidmint"))
-    themesmenu.add_command(label="Scidpink", command=lambda: change_theme("scidpink"))
-    themesmenu.add_command(label="Scidpurple", command=lambda: change_theme("scidpurple"))
-    themesmenu.add_command(label="Scidsand", command=lambda: change_theme("scidsand"))
+    # Added the ability for the user to change themes from the cascading file menu
+    themes_menu = Menu(menubar, tearoff=0)
+    themes_menu.add_command(label="Alt", command=lambda: change_theme("alt"))
+    themes_menu.add_command(label="Aqua", command=lambda: change_theme("aqua"))
+    themes_menu.add_command(label="Clam", command=lambda: change_theme("clam"))
+    themes_menu.add_command(label="Classic", command=lambda: change_theme("classic"))
+    themes_menu.add_command(label="Default", command=lambda: change_theme("default"))
+    themes_menu.add_command(label="Equilux", command=lambda: change_theme("equilux"))
+    themes_menu.add_separator()
+    themes_menu.add_command(label="Scidblue", command=lambda: change_theme("scidblue"))
+    themes_menu.add_command(label="Scidgreen", command=lambda: change_theme("scidgreen"))
+    themes_menu.add_command(label="Scidgrey", command=lambda: change_theme("scidgrey"))
+    themes_menu.add_command(label="Scidmint", command=lambda: change_theme("scidmint"))
+    themes_menu.add_command(label="Scidpink", command=lambda: change_theme("scidpink"))
+    themes_menu.add_command(label="Scidpurple", command=lambda: change_theme("scidpurple"))
+    themes_menu.add_command(label="Scidsand", command=lambda: change_theme("scidsand"))
 
-    filemenu.add_cascade(label='Themes', menu=themesmenu)
-    filemenu.add_separator()  # pretty
+    filemenu.add_cascade(label='Change Theme', menu=themes_menu)
+    filemenu.add_separator()
     filemenu.add_command(label="Exit", command=root.quit)
 
     editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
