@@ -34,7 +34,7 @@ class ScanDetailsView:
 
     def on_report(self):
         """Click hanlder for report button"""
-        # todo route data to
+        print("User clicked 'Report'")
         vulnerabilities = DataShare.get_vulns()
         cpes = DataShare.get_cpes()
         scanned_hosts = DataShare.get_hosts()
