@@ -1,6 +1,7 @@
 import sqlite3
 import json
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 """
 This class sets up our database and the various other search functions that we use in order to filter through our 
@@ -17,9 +18,6 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         device_info = (deviceName, deviceManufacturer, cpeURI)
-
-        print('Inside DBFunctions save_device')
-        print(device_info)
 
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
@@ -137,6 +135,12 @@ class DBFunctions:
             cpeURI TEXT, 
             cveName TEXT, 
             PRIMARY KEY(cpeURI, cveName))''')
+        cursor.execute('''CREATE TABLE CPEVersions (
+                    cpe22 TEXT, 
+                    cpe23 TEXT, 
+            PRIMARY KEY(cpe22,cpe23),
+            UNIQUE (cpe22, cpe23))''')
+        # todo is there a reason this commit is here and below? Do we need 2?
         conn.commit()
         cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
             cveName TEXT,
@@ -207,14 +211,28 @@ class DBFunctions:
     def save_cpeVuln(cpe, cve):
         """Saves a new cpe\cve combo into the cpeVulns table
         :param cpe: cpe to import to db
-        :param cve; cve to import to db
+        :param cve: cve to import to db
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
         cpeVuln = (cpe, cve)
 
-        cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
+        # todo cpe version change
+        cpe_test = cpe[0:7]
+        if cpe_test != 'cpe:2.3':
+            error = f'\nCPE version 2.2: {cpe}\n'
+            print(error)
+            # update version to 2.3 if not already
+            cpe = DBFunctions.cpe_version_reference(cpe)
+            print(DBFunctions.cpe_version_reference(cpe))
+
+        try:
+            cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
+        except sqlite3.IntegrityError:
+            # only works for python3.6 or greater
+            error = f'Combo already exist in DB:\nCVE {cve} \nCPE: {cpe}'
+            print(error)
         conn.commit()
 
     def query_cves(cpe_dict):
@@ -226,7 +244,6 @@ class DBFunctions:
         cves = []
         test_data = set()
         cursor = conn.cursor()
-        print("CVE Query HERE")
 
         # CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
         #         "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
@@ -311,6 +328,7 @@ class DBFunctions:
 
         return test_data
 
+        # todo check if cpe versions clash
         # for hList in cpe_dict:
         #     for cpe in cpe_dict[hList]:
         #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
@@ -328,7 +346,6 @@ class DBFunctions:
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Vuln Query HERE")
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
 
@@ -369,7 +386,7 @@ class DBFunctions:
 
         i = 0
         for cve in cve_items_list:
-            cve_detail = cve_items_list[i]
+            cve_detail = cve_items_list[i] # can't this just be cve?
             cve_meta_data = cve_detail.get("cve").get("CVE_data_meta")
 
             description_data = cve_detail.get("cve").get("description").get("description_data")
@@ -389,21 +406,38 @@ class DBFunctions:
                                                cvssV3['baseScore'], cvssV3['baseSeverity'],
                                                baseMetric['exploitabilityScore'])
             except:
+                # todo determine why this always errors
                 DBFunctions.save_vulnerability(cve_meta_data['ID'], description, "N/A", "N/A", "", "", "N/A",
                                                "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
             for item in cpe_list:
                 try:
                     cpe_match = item['cpe_match']
-                    for item in cpe_match:
+                    for match in cpe_match:
                         try:
-                            cpe_URI = item['cpe23Uri']
+                            cpe_URI = match['cpe23Uri']
                         except:
-                            cpe_URI = item['cpe22Uri']
+                            cpe_URI = match['cpe22Uri']
                         DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
-                except:
-                    print("No CPE Matches")
+                except KeyError:
+                    print('No CPE Match for ', cpe_URI)
 
             i += 1
+
+    @staticmethod
+    def import_cve_verison_matches(nvd_file='official-cpe-dictionary_v2.3.xml'):
+        # assumes the default file is available
+        tree = ET.parse(nvd_file)
+        root = tree.getroot()
+        # cursor for DB addition
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        # get matches accoridng to xml namespace and adds to DB
+        for cpe in root.findall('{http://cpe.mitre.org/dictionary/2.0}cpe-item'):
+            tmp = cpe.find('{http://scap.nist.gov/schema/cpe-extension/2.3}cpe23-item')
+            pair = (cpe.attrib['name'], tmp.attrib['name'])
+            cursor.execute('''INSERT INTO CPEVersions VALUES(?, ?)''', pair)
+            conn.commit()
 
     # Retrieves all data for specified ScanID
     @staticmethod
@@ -504,3 +538,53 @@ class DBFunctions:
         cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities ORDER BY 
         CVSSScore DESC""", ())
         return cursor.fetchall()
+
+    @staticmethod
+    def cpe_version_reference(cpe22):
+        """Given the 2.2 version of a cpe return the 2.3 version
+
+        :param cpe22: assumed to be a valid cpe2.2
+        :return: CPE v2.3 given v2.2
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        # needs the comma at the end so you are passing
+        # a tuple with 1 string not a sequence of chars
+        cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 = ?""", (cpe22,))
+
+        cpe23 = cursor.fetchone()
+        if cpe23:
+            return cpe23[0]
+
+
+# TESTING
+if __name__=="__main__":
+    # quick unit testing, I'm sure python has something built in I could use
+    cpes_version_test = {
+        'cpe:/a:zzcms:zzcms:6.0', # yes
+        'cpe:/a:zzcms:zzcms:6.1', # yes
+        'cpe:/a:zzcms:zzcms:7.0', # yes
+        'cpe:/a:zzcms:zzcms:7.1', # yes
+        'cpe:/a:zzcms:zzcms:7.2', # yes
+        'cpe:/a:zzcms:zzcms:8.0', # yes
+        'cpe:/a:zzcms:zzcms:8.1', # yes
+        'cpe:/a:zzcms:zzcms:8.2', # yes
+        'cpe:/a:zzcms:zzcms:8.3', # yes
+        'cpe:/a:zzcms:zzcms:2018', # yes
+        'cpe:/a:zzcms:zzcms:2019', # yes
+        'thisshouldntwork', # no
+        'cpe:/a:zzzcms:zz.1', # no
+        'cpe:/a:zzzcms:zzzphp:1.6', # no
+        'cpe:/a:zzzs:zzzphp:1.6.1', # no
+        'cpeazzzcms:zphp:1.6.1', # no
+        'cpe:/a:%240.99_kindle_books_project:%240.99_kindle_books:6::~~~android~~' # yes
+    }
+
+    for item in cpes_version_test:
+        print('Test item: ', item)
+        item = DBFunctions.cpe_version_reference(item)
+        if item:
+            print('Found: ', item)
+        else:
+            print('Not valid')

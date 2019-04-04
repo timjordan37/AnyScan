@@ -43,7 +43,6 @@ class ScanDetailsView:
     def on_report(self):
         """Click hanlder for report button"""
         print("User clicked 'Report'")
-        # todo route data to
         vulnerabilities = DataShare.get_vulns()
         cpes = DataShare.get_cpes()
         scanned_hosts = DataShare.get_hosts()
@@ -72,7 +71,7 @@ class ScanDetailsView:
 
         frame = ttk.Frame(parent_frame)
         frame.grid(row=0, column=0, sticky="nsew")
-        # frame.grid_rowconfigure(6, weight=1)
+        frame.grid_rowconfigure(6, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
         # Right frame header label

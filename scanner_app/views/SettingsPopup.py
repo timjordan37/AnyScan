@@ -7,10 +7,7 @@ Users can select from different host display settings, vulnerability display set
 even change the size of the generated report PDF file.
 """
 
-class SettingsPopup():
-
-    def __init__(self):
-        print("Look, im a popup")
+class SettingsPopup:
 
     @staticmethod
     def new_popup():

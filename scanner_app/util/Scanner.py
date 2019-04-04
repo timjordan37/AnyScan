@@ -101,19 +101,14 @@ class Scanner:
         result = None
         # Check scan type
         if scan_type == System.ScanType.full_scan:
-            print("Full Scan...")
             result = self.full_scan()
         elif scan_type == System.ScanType.script_scan:
-            print("Script Scan...")
             result = self.script_scan()
         elif scan_type == System.ScanType.udp_scan:
-            print("UDP Scan...")
             result = self.udp_scan()
         elif scan_type == System.ScanType.fast_scan:
-            print("Fast Scan...")
             result = self.fast_scan()
         elif scan_type == System.ScanType.detect_os_service_scan:
-            print("Detect OS Service Scan...")
             result = self.detect_os_service_scan()
 
         hosts = []
