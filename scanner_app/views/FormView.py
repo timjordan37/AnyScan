@@ -2,6 +2,14 @@ from tkinter import ttk
 import tkinter as tk
 import enum
 
+"""
+The following class sets up a collection of FormRow objects that are responsible for the information that is displayed
+within the 'Description' box on the 'Exploit' tab.  When users select a CVE and views exploit details, they can hit the
+'Next' and 'Prev' buttons and the 'Description' text box will update with the valid exploit information as long as 
+there are multiple exploits associated with the selected CVE.
+"""
+
+
 class FormView:
     # Collection of FormRow Objects
     _rows = []
@@ -86,6 +94,7 @@ class FormRow:
         if self._type == FormRowType.text:
             self._input_view.delete(1.0, tk.END)
             self._input_view.insert(tk.END, self._textvariable.get())
+
 
 class FormRowType(enum.Enum):
     entry = 0

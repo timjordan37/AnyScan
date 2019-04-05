@@ -1,3 +1,8 @@
+"""
+This class is responsible for the pagination of the  different exploit descriptions that are available to view on the
+'Exploit' tab  when the user hits 'Next' or 'Prev'.
+"""
+
 
 class PaginationDataModel:
 
