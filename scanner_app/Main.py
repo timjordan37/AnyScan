@@ -135,6 +135,17 @@ def main():
 
         set_host(hosts_with_ID)
 
+        ip_list = [*DataShare.get_cpes()]
+        cpe_list = DataShare.get_cpes()
+
+        for ip in ip_list:
+            for item in hosts_with_ID:
+                if item.get_ip() == ip:
+                    cpe_list[item.get_id()] = cpe_list.pop(ip)
+
+        DataShare.set_cpes(cpe_list)
+        df.DBFunctions.query_cves(cpe_list)
+
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
         waiting_scanner1.cancel()

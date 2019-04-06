@@ -207,6 +207,12 @@ class DBFunctions:
         conn.commit()
 
     @staticmethod
+    def save_cve_by_host(hostID, cpe):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        cursor.execute()
+
+    @staticmethod
     def save_cpeVuln(cpe, cve):
         """Saves a new cpe\cve combo into the cpeVulns table
         :param cpe: cpe to import to db
@@ -235,6 +241,7 @@ class DBFunctions:
                 cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
                 vul = cursor.fetchone()
                 if vul:
+                    DBFunctions.save_cve_by_host(hList, vul[1])
                     cves.append(vul[1])
         return cves
 
@@ -423,7 +430,3 @@ class DBFunctions:
         CVSSScore DESC""", ())
         return cursor.fetchall()
 
-    @staticmethod
-    def save_cve_by_host():{
-
-    }

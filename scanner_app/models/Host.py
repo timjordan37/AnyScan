@@ -62,3 +62,6 @@ class Host:
             return self._vendor
 
         return ""
+    def get_id(self):
+        """Get ID of host"""
+        return self._hostID
