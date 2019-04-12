@@ -1,7 +1,8 @@
+"""
+This System class will contain a Singleton class to manage the user settings per user session
+"""
 import enum
 import configparser
-
-"""This System class will contain a Singleton class to manage the user settings per user session"""
 
 
 class ScanType(enum.Enum):

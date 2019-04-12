@@ -4,14 +4,12 @@ from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch
 from datetime import date
 
-"""
-This class pulls scan info from the DB and builds a PDF style report from that information.  The user can click the
-'Reports' button on the default page of the application, after a successful scan, and the PDF report will be 
-generated and displayed.
-"""
-
 
 class Reporter:
+    """This class pulls scan info from the DB and builds a PDF style report from that information.  The user can
+    click the 'Reports' button on the default page of the application, after a successful scan, and the PDF
+    report will be generated and displayed.
+    """
     PAGE_HEIGHT = defaultPageSize[1]
     PAGE_WIDTH = defaultPageSize[0]
     styles = getSampleStyleSheet()
@@ -22,11 +20,22 @@ class Reporter:
     _authors = []
 
     def __init__(self, report, filename, authors):
+        """Create Reporter object
+
+        :param report: data to be included in report
+        :param filename: name to save file as
+        :param authors: name to be listed as author of report
+        """
         self._report = report
         self._filename = filename
         self._authors = authors
 
     def title_page(self, canvas, doc):
+        """Create a title page with headline, author, date, and page number
+
+        :param canvas: canvas to apply title page to
+        :param doc: document to include title page in
+        """
         canvas.saveState()
         canvas.setFont('Times-Bold', 16)
         canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 120, self.Title)
@@ -40,18 +49,32 @@ class Reporter:
         canvas.restoreState()
 
     def host_page(self, canvas, doc):
+        """
+
+        :param canvas: canvas to apply host page to
+        :param doc: document to add host page to
+        """
         canvas.saveState()
         canvas.setFont('Times-Roman', 9)
         canvas.drawString(inch, 0.75 * inch, 'Page %d' % doc.page)
         canvas.restoreState()
 
     def scan_page(self, canvas, doc):
+        """
+
+        :param canvas: canvas to apply scan page to
+        :param doc: document to add scan page to
+        """
         canvas.saveState()
         canvas.setFont('Times-Roman', 9)
         canvas.drawString(inch, 0.75 * inch, 'Page %d' % doc.page)
         canvas.restoreState()
 
     def build_pdf(self):
+        """Using different internal page methods and given the data provided build the report
+
+        :return:
+        """
         # doc options to abstract and set
         # doc.creator
         # doc.encrypt
@@ -105,8 +128,8 @@ class Reporter:
 
 # TESTING
 if __name__ == "__main__":
-    report = {'cve': '2019',
-              'some attribute': 'some data'
+    report_test = {'cve': '2019',
+                   'some attribute': 'some data'
               }
-    r = Reporter(report, 'pdf-test.pdf', 'Curtis')
+    r = Reporter(report_test, 'pdf-test.pdf', 'Curtis')
     r.build_pdf()
