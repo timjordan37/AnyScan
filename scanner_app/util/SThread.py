@@ -11,8 +11,8 @@ class SThread(threading.Thread):
 
         :param threadID: ID of thread
         :param name: name of thread
-        :param counter:
-        :param completion:
+        :param counter: interval to wait
+        :param completion: function to run after counter
         """
         threading.Thread.__init__(self)
         self.threadID = threadID
