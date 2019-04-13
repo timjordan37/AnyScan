@@ -167,12 +167,18 @@ def main():
         params = (id,)
 
         data = df.DBFunctions.get_all_where(query, params)
+        test = df.DBFunctions.retrieve_scanID_data(id)
         print(data)
+        print('\n')
+        print(test)
         # these need to be set, but not sure if the cpes and vulns are differentiate
         # by scans like hosts are
         # todo: set cpes and vulns in DataShare
+        print('\n\n\n\n')
         print(DataShare.get_cpes())
+        print('\n\n')
         print(DataShare.get_vulns())
+        print('\n\n\n\n')
 
         curr_hosts = []
         # for each host scanned

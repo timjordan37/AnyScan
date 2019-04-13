@@ -510,8 +510,8 @@ class DBFunctions:
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        retrievalID = scanID
-        cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
+        retrievalID = int(scanID)
+        cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ?''', (retrievalID,))
         results = cursor.fetchall()
         return results
 
