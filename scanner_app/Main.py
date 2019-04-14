@@ -123,6 +123,27 @@ def main():
         for host in get_hosts():
             df.DBFunctions.save_host(host, last_row_id)
 
+        query = "SELECT * FROM Hosts WHERE ScanID = ?"
+        host_tuple = df.DBFunctions.get_all_where(query, (last_row_id,))
+        hosts_with_ID = []
+
+        for id_host in host_tuple:
+            temp = Host(id_host[0], id_host[1], "Old Host", id_host[5], id_host[3], id_host[4], id_host[6], id_host[2])
+            hosts_with_ID.append(temp)
+
+        set_host(hosts_with_ID)
+
+        ip_list = [*DataShare.get_cpes()]
+        cpe_list = DataShare.get_cpes()
+
+        for ip in ip_list:
+            for item in hosts_with_ID:
+                if item.get_ip() == ip:
+                    cpe_list[item.get_id()] = cpe_list.pop(ip)
+
+        DataShare.set_cpes(cpe_list)
+        df.DBFunctions.query_cves(cpe_list)
+
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
         waiting_scanner1.cancel()
@@ -183,6 +204,7 @@ def main():
         curr_hosts = []
         # for each host scanned
         for host_raw in data:
+            host_ID = host_raw[0]
             ip = host_raw[1]
             state = "Old Host"
             mac = host_raw[2]
@@ -191,7 +213,7 @@ def main():
             name = host_raw[5]
             vendor = host_raw[6]
 
-            curr_hosts.append(Host(ip, state, name, os_family, os_gen, vendor, mac))
+            curr_hosts.append(Host(host_ID, ip, state, name, os_family, os_gen, vendor, mac))
 
         set_host(curr_hosts)
 

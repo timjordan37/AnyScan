@@ -150,7 +150,7 @@ class Scanner:
                 name = val_arr[0]
                 os_gen = val_arr[1]
                 os_family = val_arr[2]
-                hosts.append(Host(host, state, name, os_family, os_gen, vendor, mac))
+                hosts.append(Host(0, host, state, name, os_family, os_gen, vendor, mac))
 
         return hosts
 
