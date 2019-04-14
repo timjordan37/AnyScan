@@ -1,11 +1,13 @@
 import tkinter as tk
 from util import System
 
+"""
+The following class builds a popup window that allows the user to change various different scan settings.
+Users can select from different host display settings, vulnerability display settings, scan type, and they can 
+even change the size of the generated report PDF file.
+"""
 
-class SettingsPopup():
-
-    def __init__(self):
-        print("Look, im a popup")
+class SettingsPopup:
 
     @staticmethod
     def new_popup():
