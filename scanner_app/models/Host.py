@@ -5,6 +5,7 @@ user.
 
 
 class Host:
+    _hostID = ""
     _ip = ""
     _state = ""
     _name = ""
@@ -13,7 +14,8 @@ class Host:
     _vendor = ""
     _macAddress = ""
 
-    def __init__(self, ip, state, name, osFamily, osGen, vendor, macAddress):
+    def __init__(self, hostID, ip, state, name, osFamily, osGen, vendor, macAddress):
+        self._hostID = hostID
         self._ip = ip
         self._state = state
         self._name = name
@@ -65,3 +67,8 @@ class Host:
             return self._vendor
 
         return ""
+      
+    def get_id(self):
+        """Get ID of host"""
+        return self._hostID
+

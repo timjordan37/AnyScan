@@ -165,7 +165,8 @@ class DBFunctions:
             ip TEXT, 
             macAddress TEXT, 
             osFamily TEXT, 
-            osGen TEXT, name TEXT, 
+            osGen TEXT, 
+            name TEXT, 
             vendor TEXT, 
             ScanID INTEGER, 
             FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
@@ -182,6 +183,12 @@ class DBFunctions:
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), 
             FOREIGN KEY(Model) REFERENCES Devices(Model), 
             FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        conn.commit()
+        cursor.execute('''CREATE TABLE CVE_By_Host (HostID INTEGER,
+            VulnID INTEGER,
+            PRIMARY KEY(HostID, VulnID),
+            FOREIGN KEY(HostID) REFERENCES Hosts(HostID),
+            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID)''')
         conn.commit()
 
     @staticmethod
@@ -205,6 +212,14 @@ class DBFunctions:
         hostID = maxID
         scan_info = (hostID, host._ip, host._macAddress, host._osFamily, host._osGen, host._name, host._vendor, scanID)
         cursor.execute('''INSERT INTO Hosts VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', scan_info)
+        conn.commit()
+
+    @staticmethod
+    def save_cve_by_host(hostID, cve):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        host_cve = (hostID, cve)
+        cursor.execute('''INSERT INTO CVE_By_Host VALUES(?,?)''', host_cve)
         conn.commit()
 
     @staticmethod
@@ -241,102 +256,18 @@ class DBFunctions:
         :param cpe_dict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
         """
         conn = sqlite3.connect('vulnDB.db')
-        cves = []
-        test_data = set()
         cursor = conn.cursor()
+        cves = []
+        print("CVE Query HERE")
 
-        # CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d35:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d40:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d45:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d50:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d55:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d60:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d65:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d15:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x49:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x49:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x49:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d21:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d32:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d33:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d34:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d61:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d62:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d63:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:*:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r3:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r4:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r8:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r9:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r3:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r4:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r5:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r7:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r8:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:*:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r3:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r4:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r5:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r6:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r7:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r8:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r9:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:*:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d15:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d16:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d26:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d27:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d35:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d50:*:*:*:*:*:*"]
-        #
-        # for cps in CP:
-        #     cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cps,))
-        #     test_str = cursor.fetchone()
-        #     if test_str:
-        #         cves.append(test_str[1])
-        #     else:
-        #         print("NOT FOUND")
-        # return cves
-        # todo delete static testing to test on imported db
-
-        cursor.execute('''SELECT cveName FROM CPEvulns''')
-        for row in cursor:
-            test_data.add(row[0])
-
-        return test_data
-
-        # todo check if cpe versions clash
-        # for hList in cpe_dict:
-        #     for cpe in cpe_dict[hList]:
-        #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
-        #         vul = cursor.fetchone()
-        #         if vul:
-        #             cves.append(vul[1])
-        # return all the fun stuff
-        # return cves
+        for hList in cpe_dict:
+            for cpe in cpe_dict[hList]:
+                cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
+                vul = cursor.fetchone()
+                if vul:
+                    DBFunctions.save_cve_by_host(hList, vul[1])
+                    cves.append(vul[1])
+        return cves
 
     @staticmethod
     def query_vulns(cve):
@@ -588,3 +519,4 @@ if __name__=="__main__":
             print('Found: ', item)
         else:
             print('Not valid')
+
