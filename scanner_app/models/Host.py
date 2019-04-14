@@ -1,4 +1,9 @@
-# Host object to represent the hosts retrieved through the scan
+"""
+This is a Host object to represent the hosts that are retrieved through various scans that will be performed by the
+user.
+"""
+
+
 class Host:
     _hostID = ""
     _ip = ""
@@ -52,7 +57,7 @@ class Host:
         """Get name of host or vendor if not found"""
         if self._name != "":
             return self._name
-        elif self._vendor != "" :
+        elif self._vendor != "":
             return self._vendor
         else:
             return ""
@@ -62,6 +67,8 @@ class Host:
             return self._vendor
 
         return ""
+      
     def get_id(self):
         """Get ID of host"""
         return self._hostID
+
