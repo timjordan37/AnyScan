@@ -212,6 +212,7 @@ class DBFunctions:
         cursor = conn.cursor()
         host_cve = (hostID, cve)
         cursor.execute('''INSERT INTO CVE_By_Host VALUES(?,?)''', host_cve)
+        conn.commit()
 
     @staticmethod
     def save_cpeVuln(cpe, cve):
