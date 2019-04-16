@@ -1,6 +1,5 @@
 import tkinter
 from tkinter import ttk
-from views.DevicePopup import DevicePopup
 
 """
 The following class deals with populating the different tree column sections in each specific tab.  
@@ -20,16 +19,15 @@ class TableView:
 
     """Data is a list of lists to be displayed in the table view"""
     """Each List in this list should have the same amount of items as sections"""
-    """When each list is iterated through, the value in each index will be displayed under the section with the same index"""
+    """When each list is iterated through, the value in each index will be displayed under the section with the same 
+    index """
 
     _data = []
 
     _tree = None
 
-    """
-    sections: List of strings, the sections to be displayed
-    data: List of lists, the data to be displayed, each list contains the items in the index that will be displayed in the tabel
-    """
+    """sections: List of strings, the sections to be displayed data: List of lists, the data to be displayed, 
+    each list contains the items in the index that will be displayed in the table """
 
     def __init__(self, parent_view, grid_row, sections, data):
 

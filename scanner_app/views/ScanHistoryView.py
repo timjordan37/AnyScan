@@ -20,6 +20,7 @@ class ScanHistoryView:
     vuln_score_entry_var = None
 
     """The Method to be called when a scan is selected"""
+
     on_selected_scan_completion = None
     
     search_button = None
@@ -36,11 +37,13 @@ class ScanHistoryView:
         frame.grid_rowconfigure(6, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        # header label
+        """header label"""
+
         header_label = ttk.Label(frame, text="Scan History Search")
         header_label.grid(row=0, column=0, pady=(8, 8))
 
-        #  Vuln Name Search
+        """Vuln Name Search"""
+
         scan_id_frame = ttk.Frame(frame)
         scan_id_frame.grid(row=1, column=0, sticky="nsew")
         scan_id_frame.grid_columnconfigure(1, weight=1)
@@ -52,7 +55,8 @@ class ScanHistoryView:
         scan_id_entry = ttk.Entry(scan_id_frame, textvariable=self.scan_id_entry_var)
         scan_id_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        #  Vuln CVSS Score
+        """Vuln CVSS Score"""
+
         scan_duration_frame = ttk.Frame(frame)
         scan_duration_frame.grid(row=2, column=0, sticky="nsew")
         scan_duration_frame.grid_columnconfigure(1, weight=1)
@@ -64,7 +68,8 @@ class ScanHistoryView:
         scan_duration_entry = ttk.Entry(scan_duration_frame, textvariable=self.scan_duration_entry_var)
         scan_duration_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        #  Severity
+        """Severity"""
+
         scan_date_frame = ttk.Frame(frame)
         scan_date_frame.grid(row=3, column=0, sticky="nsew")
         scan_date_frame.grid_columnconfigure(1, weight=1)
@@ -76,18 +81,21 @@ class ScanHistoryView:
         scan_date_entry = ttk.Entry(scan_date_frame, textvariable=self.scan_date_entry_var)
         scan_date_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        # Search Button
+        """Search Button"""
+
         button_frame = ttk.Frame(frame)
         button_frame.grid(row=5, column=0)
 
         self.search_button = ttk.Button(button_frame, text="Search", command=self.on_search)
         self.search_button.grid(row=0, column=0, pady=(8, 8))
 
-        # Scan Details button
+        """Scan Details button"""
+
         self.search_button = ttk.Button(button_frame, text="Scan Details", command=self.on_scan_details)
         self.search_button.grid(row=0, column=1, pady=(8, 8))
 
-        # TableView
+        """TableView"""
+
         sections_tuple = TreeColumns.all_cases()
 
         all_scans = dbf.DBFunctions.get_all_scans()
@@ -109,7 +117,7 @@ class ScanHistoryView:
         selected_value = self.table_view.get_selected_item()["values"]
 
         if len(selected_value) > 0:
-            # System.Settings.get_instance().current_selected_scan_id = selected_value[0]
+            """System.Settings.get_instance().current_selected_scan_id = selected_value[0]"""
             self.on_selected_scan_completion(selected_value[0])
 
     def build_query_string(self):
@@ -148,6 +156,9 @@ class ScanHistoryView:
 
 
 class TreeColumns(enum.Enum):
+
+    """Set up tree columns to be displayed on appropriate tab"""
+
     scan_id = 0
     scan_duration = 1
     scan_date = 2

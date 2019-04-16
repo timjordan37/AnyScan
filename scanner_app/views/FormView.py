@@ -11,7 +11,8 @@ there are multiple exploits associated with the selected CVE.
 
 
 class FormView:
-    # Collection of FormRow Objects
+    """Collection of FormRow Objects"""
+
     _rows = []
     _super_frame = None
 

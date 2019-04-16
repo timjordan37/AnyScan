@@ -188,7 +188,6 @@ class DBFunctions:
                     cpe23 TEXT, 
             PRIMARY KEY(cpe22,cpe23),
             UNIQUE (cpe22, cpe23))''')
-        # todo is there a reason this commit is here and below? Do we need 2?
         conn.commit()
         cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
             cveName TEXT,

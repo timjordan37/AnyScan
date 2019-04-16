@@ -60,7 +60,8 @@ class DetailsPopup:
 
     def new_popup(self):
 
-        # Creating the Popup Window
+        """Creating the Popup Window"""
+
         root = tk.Toplevel(padx=10, pady=10)
         root.wm_title("Vulnerability Details")
         top_level_frame = ttk.Frame(root)
@@ -68,7 +69,8 @@ class DetailsPopup:
         root.grid_columnconfigure(0, weight=1)
         root.grid_rowconfigure(0, weight=1)
 
-        # Adding the fields to the popup
+        """Adding the fields to the popup"""
+
         vuln_id_label = ttk.Label(top_level_frame, text="Vulnerability ID: ")
         vuln_id_entry = ttk.Label(top_level_frame, text=self.vuln_id)
         vuln_id_label.grid(column=0, row=0, padx=5, pady=5)

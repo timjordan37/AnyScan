@@ -12,7 +12,8 @@ class SettingsPopup:
     @staticmethod
     def new_popup():
 
-        # Setup root ui
+        """Setup root ui"""
+
         root = tk.Toplevel()
         root.title("Scanner App - Settings")
 
@@ -25,7 +26,8 @@ class SettingsPopup:
         host_sort_radio_btn_frame.grid_rowconfigure(1, weight=1)
         host_sort_radio_btn_frame.grid_columnconfigure(0, weight=1)
 
-        # setup sort options
+        """Setup sort options"""
+
         sort_options = []
         for opt in System.SortType:
             sort_options.append((System.SortType.display_name_for_sort_type(opt.value), opt.value))
@@ -43,7 +45,8 @@ class SettingsPopup:
                                command=on_sort_select, anchor="w", width=24, justify="left")
             b.pack()
 
-        # setup vuln sort options
+        """Setup vuln sort options"""
+
         vuln_sort_settings_header_label = tk.Label(root, text="Vulnerability Display Settings",
                                                    font='Helvetica 14 bold', anchor="w", width=24)
         vuln_sort_settings_header_label.grid(row=2, column=0)
@@ -70,7 +73,8 @@ class SettingsPopup:
                                command=on_vuln_sort_select, anchor="w", width=24, justify="left")
             b.pack()
 
-        # setup scan type options
+        """setup scan type options"""
+
         scan_type_settings_header_label = tk.Label(root, text="Scan Type", font='Helvetica 14 bold', anchor="w",
                                                    width=24)
         scan_type_settings_header_label.grid(row=4, column=0, pady=(16, 0))
@@ -97,7 +101,8 @@ class SettingsPopup:
                                command=on_scan_type_select, anchor="w", width=24, justify="left")
             b.pack()
 
-        # setup pdf size options
+        """setup pdf size options"""
+
         pdf_size_settings_header_label = tk.Label(root, text="Report PDF Size", font="Helvetica 14 bold", anchor="w",
                                                   width=24)
         pdf_size_settings_header_label.grid(row=6, column=0, pady=(16, 0))

@@ -29,7 +29,7 @@ class VulnPopup:
         base_severity = tk.StringVar()
         exploitability_score = tk.StringVar()
 
-        # Creating the Popup Window
+        """Creating the Popup Window"""
 
         root = tk.Toplevel(padx=1, pady=1)
         root.wm_title("Add Vulnerability")
@@ -38,7 +38,8 @@ class VulnPopup:
         root.grid_columnconfigure(0, weight=1)
         root.grid_rowconfigure(0, weight=1)
 
-        # Adding the fields to the popup
+        """Adding the fields to the popup"""
+
         cve_name_entry = ttk.Entry(top_level_frame, textvariable=cve_name)
         cve_name_label = ttk.Label(top_level_frame, text="CPE Name")
         cve_name_label.grid(column=0, row=0, padx=5, pady=5)
@@ -114,7 +115,8 @@ class VulnPopup:
         exploitability_score_label.grid(column=0, row=14, padx=5, pady=5)
         exploitability_score_entry.grid(column=1, row=14, padx=5, pady=5)
 
-        # Function to call the save vulnerability function
+        """Function to call the save vulnerability function"""
+
         def save_vuln():
             if df.DBFunctions.save_vulnerability(cve_name.get(), description.get(), cvss_score.get(),
                                                  attack_vector.get(), attack_complexity.get(), custom_score.get(),
@@ -131,6 +133,7 @@ class VulnPopup:
 
             top_level_frame.destroy()
 
-        # Adding the save button to the popup window
+        """Adding the save button to the popup window"""
+
         save_button = ttk.Button(top_level_frame, text="Save", command=save_vuln)
         save_button.grid(columnspan=2, row=16, padx=5, pady=5)

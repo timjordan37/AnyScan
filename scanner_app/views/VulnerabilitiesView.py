@@ -22,7 +22,8 @@ class VulnerabilitiesView:
     pass_cve_button = None
     table_view = None
 
-    # Method to be called to get selected cve
+    """Method to be called to get selected cve"""
+
     on_selected_cve = None
 
     def get_view(self, parent_frame):
@@ -31,16 +32,20 @@ class VulnerabilitiesView:
         self.vuln_severity_entry_var = tk.StringVar()
         self.vuln_score_entry_var = tk.StringVar()
 
+        """Set up parent frame"""
+
         frame = ttk.Frame(parent_frame)
         frame.grid(row=0, column=0, sticky="nsew")
         frame.grid_rowconfigure(6, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        # header label
+        """header label"""
+
         header_label = ttk.Label(frame, text="Vulnerabilities Search")
         header_label.grid(row=0, column=0, pady=(8, 8))
 
-        #  Vuln Name Search
+        """Vuln Name Search"""
+
         vuln_name_frame = ttk.Frame(frame)
         vuln_name_frame.grid(row=1, column=0, sticky="nsew")
         vuln_name_frame.grid_columnconfigure(1, weight=1)
@@ -52,7 +57,8 @@ class VulnerabilitiesView:
         host_name_text_entry = ttk.Entry(vuln_name_frame, textvariable=self.vuln_name_entry_var)
         host_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        #  Vuln CVSS Score
+        """Vuln CVSS Score"""
+
         vuln_cvss_frame = ttk.Frame(frame)
         vuln_cvss_frame.grid(row=2, column=0, sticky="nsew")
         vuln_cvss_frame.grid_columnconfigure(1, weight=1)
@@ -64,7 +70,8 @@ class VulnerabilitiesView:
         mac_address_text_entry = ttk.Entry(vuln_cvss_frame, textvariable=self.vuln_cvss_score_entry_var)
         mac_address_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        #  Severity
+        """Severity"""
+
         severity_frame = ttk.Frame(frame)
         severity_frame.grid(row=3, column=0, sticky="nsew")
         severity_frame.grid_columnconfigure(1, weight=1)
@@ -76,7 +83,8 @@ class VulnerabilitiesView:
         vuln_severity_text_entry = ttk.Entry(severity_frame, textvariable=self.vuln_severity_entry_var)
         vuln_severity_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        #  Score
+        """Score"""
+
         score_frame = ttk.Frame(frame)
         score_frame.grid(row=4, column=0, sticky="nsew")
         score_frame.grid_columnconfigure(1, weight=1)
@@ -88,14 +96,16 @@ class VulnerabilitiesView:
         vuln_score_text_entry = ttk.Entry(score_frame, textvariable=self.vuln_score_entry_var)
         vuln_score_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        # Search Button
+        """Search Button"""
+
         self.search_button = ttk.Button(frame, text="Search", command=self.on_search)
         self.search_button.grid(row=5, column=0, pady=(8, 8))
 
         # self.pass_cve_button = tk.Button(frame, text="Pass CVE", command=self.on_cve_select)
         # self.pass_cve_button.grid(row=5, column=1, pady=(8, 8))
 
-        # TableView
+        """TableView"""
+
         sections_tuple = TreeColumns.all_cases()
         all_vulns = dbf.DBFunctions.get_all_vulns()
 
@@ -163,6 +173,9 @@ class VulnerabilitiesView:
 
 
 class TreeColumns(enum.Enum):
+
+    """Set up tree columns to be displayed on appropriate tab"""
+
     id = 0
     cveName = 1
     cvssScore = 2

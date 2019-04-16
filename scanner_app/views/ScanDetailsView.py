@@ -74,11 +74,13 @@ class ScanDetailsView:
         frame.grid_rowconfigure(6, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        # Right frame header label
+        """Right frame header label"""
+
         header_label = ttk.Label(frame, text="Host Info")
         header_label.grid(row=0, column=0, pady=(8, 8))
 
-        #  Host name UI
+        """Host name UI"""
+
         host_name_frame = ttk.Frame(frame)
         host_name_frame.grid(row=1, column=0, sticky="nsew")
         host_name_frame.grid_columnconfigure(1, weight=1)
@@ -90,7 +92,8 @@ class ScanDetailsView:
         host_name_text_entry = ttk.Entry(host_name_frame, textvariable=self.host_name_entry_var)
         host_name_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        #  MAC Address UI
+        """MAC Address UI"""
+
         mac_address_frame = ttk.Frame(frame)
         mac_address_frame.grid(row=2, column=0, sticky="nsew")
         mac_address_frame.grid_columnconfigure(1, weight=1)
@@ -102,7 +105,8 @@ class ScanDetailsView:
         mac_address_text_entry = ttk.Entry(mac_address_frame, textvariable=self.mac_address_entry_var)
         mac_address_text_entry.grid(row=0, column=1, sticky="nsew", padx=(0, 16))
 
-        #  Port Number UI
+        """Port Number UI"""
+
         port_number_frame = ttk.Frame(frame)
         port_number_frame.grid(row=3, column=0, sticky="nsew", pady=(0, 8))
         port_number_frame.grid_columnconfigure(1, weight=1)
@@ -117,8 +121,9 @@ class ScanDetailsView:
         #################
         # Check Vulnerabilities UI
         #################
-        #
-        # Check Vulnerabilities button
+
+        """Check Vulnerabilities button"""
+
         self.check_vulnerabilities_button = ttk.Button(frame, text="Check Vulnerabilities")
         self.check_vulnerabilities_button.grid(row=4, column=0, pady=(0, 8))
         self.check_vulnerabilities_button.config(state="disabled")
@@ -126,25 +131,29 @@ class ScanDetailsView:
         #################
         # Vulnerabilities listBox Frame
         #################
-        #
+
         vulnerabilities_frame = ttk.Frame(frame)
         vulnerabilities_frame.grid(row=5, column=0)
 
-        # Vulnerabilities ListBox label
+        """Vulnerabilities ListBox label"""
+
         vulnerabilities_header_label = ttk.Label(vulnerabilities_frame, text="Vulnerabilities")
         vulnerabilities_header_label.grid(row=0, column=0)
 
-        # Vulnerabilities number
+        """Vulnerabilities number"""
+
         vulnerabilities_number_label = ttk.Label(vulnerabilities_frame, text="")
         vulnerabilities_number_label.grid(row=0, column=1)
 
-        # Vulnerabilities selection label
+        """Vulnerabilities selection label"""
+
         vulnerability_label = ttk.Label(vulnerabilities_frame, text="")
         vulnerability_label.grid(row=0, column=2)
 
-        # Vulnerabilities listbox
+        """Vulnerabilities listbox"""
 
         class TreeColumns(enum.Enum):
+            """Set up tree columns to be displayed on appropriate tab"""
             cveName = 0
 
             @staticmethod
@@ -163,7 +172,8 @@ class ScanDetailsView:
 
                 return cases
 
-        # TableView
+        """TableView"""
+
         sections_tuple = TreeColumns.all_cases()
 
         data = []
@@ -173,22 +183,25 @@ class ScanDetailsView:
         #################
         # Vulnerabilities button frame
         #################
-        #
+
         vulnerabilities_button_frame = ttk.Frame(frame)
         vulnerabilities_button_frame.grid(row=7, column=0, pady=(8, 8))
 
-        # Report
+        """Report"""
+
         vulnerability_report_button = ttk.Button(vulnerabilities_button_frame,
                                                  text="Report",
                                                  command=self.on_report)
         vulnerability_report_button.grid(row=0, column=0)
 
-        # Add Vulnerability
+        """Add Vulnerability"""
+
         add_vulnerabilities_button = ttk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
                                                 command=self.new_vuln_popup)
         add_vulnerabilities_button.grid(row=0, column=1)
 
-        # Settings
+        """Settings"""
+
         add_vulnerabilities_button = ttk.Button(vulnerabilities_button_frame,
                                                 text="Settings", command=self.on_settings)
 
