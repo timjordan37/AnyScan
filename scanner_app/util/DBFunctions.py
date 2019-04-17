@@ -306,6 +306,7 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         cves = []
+        vulns = {}
         print("\nDBFunctions 309 query_cves\n")
 
         for hList in cpe_dict:
@@ -322,12 +323,19 @@ class DBFunctions:
 
 
                 cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
-                vul = cursor.fetchone()
+                value = cursor.fetchone()
+                if value:
+                    vulns[hList] = value[1]
+                    print('Host: ', hList)
+                    print('Vuln: ', value)
 
-                print('Vuln: ', vul)
-                if vul:
-                    DBFunctions.save_cve_by_host(hList, vul[1])
-                    cves.append(vul[1])
+        conn.commit()
+        conn.close()
+
+        if vulns:
+            for host, vuln in vulns.items():
+                DBFunctions.save_cve_by_host(host, vuln)
+                cves.append(vuln)
         return cves
 
     @staticmethod
