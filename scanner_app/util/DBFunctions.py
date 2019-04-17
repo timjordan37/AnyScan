@@ -184,8 +184,8 @@ class DBFunctions:
             cveName TEXT, 
             PRIMARY KEY(cpeURI, cveName))''')
         cursor.execute('''CREATE TABLE CPEVersions (
-                    cpe22 TEXT, 
-                    cpe23 TEXT, 
+                    cpe22 TEXT NOT NULL, 
+                    cpe23 TEXT NOT NULL, 
             PRIMARY KEY(cpe22,cpe23),
             UNIQUE (cpe22, cpe23))''')
         # todo is there a reason this commit is here and below? Do we need 2?
@@ -236,7 +236,7 @@ class DBFunctions:
             VulnID INTEGER,
             PRIMARY KEY(HostID, VulnID),
             FOREIGN KEY(HostID) REFERENCES Hosts(HostID),
-            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID)''')
+            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID))''')
         conn.commit()
 
     @staticmethod
@@ -372,20 +372,18 @@ class DBFunctions:
         nvd_json = json.loads(json_fp.read_text())
         cve_items_list = nvd_json['CVE_Items']
 
-        i = 0
         for cve in cve_items_list:
-            cve_detail = cve_items_list[i] # can't this just be cve?
-            cve_meta_data = cve_detail.get("cve").get("CVE_data_meta")
+            cve_meta_data = cve.get("cve").get("CVE_data_meta")
 
-            description_data = cve_detail.get("cve").get("description").get("description_data")
+            description_data = cve.get("cve").get("description").get("description_data")
             description = description_data[0].get("value")
 
-            configurations = cve_detail['configurations']
+            configurations = cve['configurations']
             cpe_list = configurations['nodes']
 
             try:
-                cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
-                baseMetric = cve_detail.get("impact").get("baseMetricV3")
+                cvssV3 = cve.get("impact").get("baseMetricV3").get("cvssV3")
+                baseMetric = cve.get("impact").get("baseMetricV3")
                 DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
                                                cvssV3['attackComplexity'], "", "", cvssV3['privilegesRequired'],
                                                cvssV3['userInteraction'],
@@ -407,9 +405,7 @@ class DBFunctions:
                             cpe_URI = match['cpe22Uri']
                         DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
                 except KeyError:
-                    print('No CPE Match for ', cpe_URI)
-
-            i += 1
+                    print('No CVE Match for CPE: ', cpe_URI)
 
     @staticmethod
     def import_cve_verison_matches(nvd_file='official-cpe-dictionary_v2.3.xml'):

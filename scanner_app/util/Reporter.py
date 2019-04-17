@@ -1,4 +1,4 @@
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.platypus import BaseDocTemplate, Frame, NextPageTemplate, PageTemplate, SimpleDocTemplate, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.rl_config import defaultPageSize
 from reportlab.lib.units import inch
@@ -38,11 +38,11 @@ class Reporter:
         """
         canvas.saveState()
         canvas.setFont('Times-Bold', 16)
-        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 120, self.Title)
+        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 220, self.Title)
         canvas.setFont('Times-Bold', 14)
-        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 160,
+        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 260,
                                  'Created by: %s' % self._authors)
-        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 180,
+        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 280,
                                  'Generated on: %s' % date.today().isoformat())
         canvas.setFont('Times-Roman', 9)
         canvas.drawString(inch, 0.75 * inch, 'Page %d' % doc.page)
@@ -55,6 +55,8 @@ class Reporter:
         :param doc: document to add host page to
         """
         canvas.saveState()
+        canvas.setFont('Times-Bold', 16)
+        canvas.drawCentredString(self.PAGE_WIDTH / 2.0, self.PAGE_HEIGHT - 60, "Hosts")
         canvas.setFont('Times-Roman', 9)
         canvas.drawString(inch, 0.75 * inch, 'Page %d' % doc.page)
         canvas.restoreState()
@@ -72,8 +74,6 @@ class Reporter:
 
     def build_pdf(self):
         """Using different internal page methods and given the data provided build the report
-
-        :return:
         """
         # doc options to abstract and set
         # doc.creator
@@ -81,46 +81,70 @@ class Reporter:
         # doc.author
         # doc.subject
         # doc.title
-        doc = SimpleDocTemplate(self._filename)
-        # create story with space first
-        Story = [Spacer(1, 2 * inch)]
-
-        # print styles to see what we can use
-        # print('STYLES: ', self.styles.list())
-
         style = self.styles["Normal"]
+        doc = BaseDocTemplate(self._filename)
 
-        # Host data
-        Story.append(Paragraph('Scanned Hosts ---------------------', self.styles['Heading2']))
-        for h in self._report['hosts']:
-            if h.get_display_val():
-                hname = f'Hostname: {h.get_display_name()}'
-                ip = f'IP Address: {h.get_ip()}'
-                mac = f'MAC Address: {h.get_mac_address()}'
-                Story.append(Paragraph(hname, style))
-                Story.append(Paragraph(ip, style))
-                Story.append(Paragraph(mac, style))
-                Story.append(Spacer(1, 0.2 * inch))
+        # Flowables to be added to document
+        Story = []
 
-        # Next Pages
+        # could create different sized frames and set addPageTemplate frames to array frames=[frame1, frame2]
+        standard_frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id='sframe')
+
+        Story.append(NextPageTemplate('host'))
+        # space for title page
         Story.append(PageBreak())
+        #todo add data to report per host
+        Story.append(Paragraph('test here' * 500, style))
 
-        # cpe data
-        Story.append(Paragraph('CPEs ---------------------', self.styles['Heading2']))
-        for c in self._report['cpes']:
-            cpe = self._report['cpes'][c][0]
-            Story.append(Paragraph(cpe, style))
-            Story.append(Spacer(1, 0.2 * inch))
-
-        # Next Pages
         Story.append(PageBreak())
+        Story.append(Paragraph('test 2' * 500, style))
 
-        # Vuln Data
-        Story.append(Paragraph('Vulnerabilities ---------------------', self.styles['Heading2']))
-        for v in self._report['vulns']:
-            Story.append(Paragraph(v, style))
+        doc.addPageTemplates([PageTemplate(id='title', frames=standard_frame, onPage=self.title_page),
+                              PageTemplate(id='host', frames=standard_frame, onPage=self.host_page)])
 
-        doc.build(Story, onFirstPage=self.title_page, onLaterPages=self.scan_page)
+        doc.build(Story)
+
+
+
+        # create story with space first
+        # Story = [Spacer(1, 2 * inch)]
+        #
+        # # print styles to see what we can use
+        # # print('STYLES: ', self.styles.list())
+        #
+
+        #
+        # # Host data
+        # Story.append(Paragraph('Scanned Hosts ---------------------', self.styles['Heading2']))
+        # for h in self._report['hosts']:
+        #     if h.get_display_val():
+        #         hname = f'Hostname: {h.get_display_name()}'
+        #         ip = f'IP Address: {h.get_ip()}'
+        #         mac = f'MAC Address: {h.get_mac_address()}'
+        #         Story.append(Paragraph(hname, style))
+        #         Story.append(Paragraph(ip, style))
+        #         Story.append(Paragraph(mac, style))
+        #         Story.append(Spacer(1, 0.2 * inch))
+        #
+        # # Next Pages
+        # Story.append(PageBreak())
+        #
+        # # cpe data
+        # Story.append(Paragraph('CPEs ---------------------', self.styles['Heading2']))
+        # for c in self._report['cpes']:
+        #     cpe = self._report['cpes'][c][0]
+        #     Story.append(Paragraph(cpe, style))
+        #     Story.append(Spacer(1, 0.2 * inch))
+        #
+        # # Next Pages
+        # Story.append(PageBreak())
+        #
+        # # Vuln Data
+        # Story.append(Paragraph('Vulnerabilities ---------------------', self.styles['Heading2']))
+        # for v in self._report['vulns']:
+        #     Story.append(Paragraph(v, style))
+        #
+        # doc.build(Story, onFirstPage=self.title_page, onLaterPages=self.scan_page)
 
     def print(self):
         print(self._report)
