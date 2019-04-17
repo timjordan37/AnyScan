@@ -178,6 +178,7 @@ def main():
             reverse_sort = True
 
         sorted_vulns = sorted(df.DBFunctions.query_cves(c), reverse=reverse_sort)
+        print('From Main 181, sorted_vulns: ', sorted_vulns)
         DataShare.set_vulns(sorted_vulns)
         # reload ui
 
@@ -202,15 +203,17 @@ def main():
         # by scans like hosts are
         # todo: set cpes and vulns in DataShare
         print('\n\n\n\nCPES')
+        #todo this changes depending on if a scan has been run 
         print(DataShare.get_cpes())
         print('\n\nVULNS')
+        #todo these are 2.2 cpes...
         print(DataShare.get_vulns())
         print('\n\n\n\n')
 
         curr_hosts = []
         # for each host scanned
         for host_raw in data:
-            host_ID = host_raw[0]
+            host_id = host_raw[0]
             ip = host_raw[1]
             state = "Old Host"
             mac = host_raw[2]
@@ -219,7 +222,7 @@ def main():
             name = host_raw[5]
             vendor = host_raw[6]
 
-            curr_hosts.append(Host(host_ID, ip, state, name, os_family, os_gen, vendor, mac))
+            curr_hosts.append(Host(host_id, ip, state, name, os_family, os_gen, vendor, mac))
 
         set_host(curr_hosts)
 

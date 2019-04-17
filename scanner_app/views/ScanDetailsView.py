@@ -44,11 +44,11 @@ class ScanDetailsView:
     def on_report(self):
         """Click hanlder for report button"""
         print("User clicked 'Report'")
-        vulnerabilities = DataShare.get_vulns()
 
         #todo get correct data from current scan
         # vulnerabilities = DBFunctions.
 
+        vulnerabilities = DataShare.get_vulns()
         cpes = DataShare.get_cpes()
         scanned_hosts = DataShare.get_hosts()
 
