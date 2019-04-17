@@ -146,7 +146,7 @@ def main():
 
         DataShare.set_cpes(cpe_list)
         cves = df.DBFunctions.query_cves(cpe_list)
-        print ('CVEs found, maybe: ')
+        print ('Main 149 CVEs found, maybe: ')
         print(cves)
 
         update_left_header_label(f"Scan finished in {timedelta} seconds")
@@ -169,7 +169,10 @@ def main():
 
     def set_cpes_vulns(c):
         """Set vulnerabilities from cps"""
+        print("Main 172 set_cpes_vulns   cpes:\n")
+        print(c)
         DataShare.set_cpes(c)
+
 
         # Sort according to the Vulnerability Sort Setting
         reverse_sort = False
@@ -178,7 +181,7 @@ def main():
             reverse_sort = True
 
         sorted_vulns = sorted(df.DBFunctions.query_cves(c), reverse=reverse_sort)
-        print('From Main 181, sorted_vulns: ', sorted_vulns)
+        print('From Main 184, sorted_vulns: ', sorted_vulns)
         DataShare.set_vulns(sorted_vulns)
         # reload ui
 
@@ -203,7 +206,7 @@ def main():
         # by scans like hosts are
         # todo: set cpes and vulns in DataShare
         print('\n\n\n\nCPES')
-        #todo this changes depending on if a scan has been run 
+        #todo this changes depending on if a scan has been run
         print(DataShare.get_cpes())
         print('\n\nVULNS')
         #todo these are 2.2 cpes...

@@ -281,7 +281,6 @@ class DBFunctions:
 
         cpeVuln = (cpe, cve)
 
-        # todo cpe version change
         cpe_test = cpe[0:7]
         if cpe_test != 'cpe:2.3':
             error = f'\nCPE version 2.2: {cpe}\n'
@@ -298,6 +297,7 @@ class DBFunctions:
             print(error)
         conn.commit()
 
+    @staticmethod
     def query_cves(cpe_dict):
         """query DB for CVEs according to CPEs found by scanner
 
@@ -306,12 +306,25 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         cves = []
-        print("CVE Query HERE")
+        print("\nDBFunctions 309 query_cves\n")
 
         for hList in cpe_dict:
             for cpe in cpe_dict[hList]:
+                print('CPE: ', cpe)
+
+                cpe_test = cpe[0:7]
+                if cpe_test != 'cpe:2.3':
+                    error = f'DBFunctions 317 CPE version 2.2: {cpe}'
+                    print(error)
+                    # update version to 2.3 if not already
+                    cpe = DBFunctions.cpe_version_reference(cpe)
+                    print('DBFunciton 321 CPE23: ', cpe)
+
+
                 cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
                 vul = cursor.fetchone()
+
+                print('Vuln: ', vul)
                 if vul:
                     DBFunctions.save_cve_by_host(hList, vul[1])
                     cves.append(vul[1])
@@ -559,11 +572,20 @@ class DBFunctions:
         :return: CPE v2.3 given v2.2
         """
 
+        if not cpe22:
+            return
+
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
+
+        #todo why is this happening twice?
+        print('DBFunctions 582 cpe22: ', cpe22)
+        cpe22 += '%'
+        print('DBFunctions 584 cpe22 updated: ', cpe22)
+
         # needs the comma at the end so you are passing
         # a tuple with 1 string not a sequence of chars
-        cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 = ?""", (cpe22,))
+        cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 LIKE ?""", (cpe22,))
 
         cpe23 = cursor.fetchone()
         if cpe23:
