@@ -2,6 +2,13 @@ import nmap
 from util import DBFunctions as df, System
 from models.Host import Host
 
+"""
+This class handles the scanner portion of our application.  It handles the type of scan as well as information 
+retrieval regarding the scan details that are displayed on the default page as well as the scanned hosts that
+appear on the left hand side of the application.  This information will only be displayed post scan, provided
+that the scan has successfully detected devices connected to the current network.
+"""
+
 
 class Scanner:
     """Scanner class wraps nmap scans for quick scan types"""
@@ -39,7 +46,6 @@ class Scanner:
         """Quick scan of small port range with default arguments"""
         self._scanned = True
         return self._scanner.scan(self._ips, self._ports)
-
 
     def detect_os_service_scan(self):
         """Runs scan to detemine OS and running service of given host"""
@@ -89,24 +95,20 @@ class Scanner:
             return ""
 
     """Runs a scan of the given type"""
+
     def get_scan_details(self, scan_type):
         """Runs scan to detemine OS and running service of given host"""
         result = None
         # Check scan type
         if scan_type == System.ScanType.full_scan:
-            print("Full Scan...")
             result = self.full_scan()
         elif scan_type == System.ScanType.script_scan:
-            print("Script Scan...")
             result = self.script_scan()
         elif scan_type == System.ScanType.udp_scan:
-            print("UDP Scan...")
             result = self.udp_scan()
         elif scan_type == System.ScanType.fast_scan:
-            print("Fast Scan...")
             result = self.fast_scan()
         elif scan_type == System.ScanType.detect_os_service_scan:
-            print("Detect OS Service Scan...")
             result = self.detect_os_service_scan()
 
         hosts = []
@@ -123,7 +125,7 @@ class Scanner:
                 name = val_arr[0]
                 os_gen = val_arr[1]
                 os_family = val_arr[2]
-                hosts.append(Host(host, state, name, os_family, os_gen, vendor, mac))
+                hosts.append(Host(0, host, state, name, os_family, os_gen, vendor, mac))
 
         return hosts
 
@@ -193,7 +195,7 @@ class Scanner:
                     ports = self._scanner[host][pro].keys()
                     # for each port print its state
                     for port in ports:
-                        print('Port: %s\tState: %s' %(port, self._scanner[host][pro][port]['state']))
+                        print('Port: %s\tState: %s' % (port, self._scanner[host][pro][port]['state']))
 
 
 class ScannerError(Exception):

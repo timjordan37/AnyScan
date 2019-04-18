@@ -3,6 +3,11 @@ from util import DBFunctions as df
 
 from tkinter import ttk
 
+"""
+The following class creates a popup window that allows the user to add a specific type of vulnerability 
+to the current list of vulnerabilities present in the database
+"""
+
 
 class VulnPopup:
 
@@ -74,7 +79,6 @@ class VulnPopup:
         privileges_required_label.grid(column=0, row=7, padx=5, pady=5)
         privileges_required_entry.grid(column=1, row=7, padx=5, pady=5)
 
-
         user_interaction_entry = ttk.Entry(top_level_frame, textvariable=user_interaction)
         user_interaction_label = ttk.Label(top_level_frame, text="User Interaction")
         user_interaction_label.grid(column=0, row=8, padx=5, pady=5)
@@ -82,6 +86,8 @@ class VulnPopup:
 
         confidentiality_impact_entry = ttk.Entry(top_level_frame, textvariable=confidentiality_impact)
         confidentiality_impact_label = ttk.Label(top_level_frame, text="Confidentiality Impact")
+        confidentiality_impact_label.grid(column=0, row=8, padx=5, pady=5)
+        confidentiality_impact_entry.grid(column=1, row=8, padx=5, pady=5)
 
         integrity_impact_entry = ttk.Entry(top_level_frame, textvariable=integrity_impact)
         integrity_impact_label = ttk.Label(top_level_frame, text="Integrity Impact")

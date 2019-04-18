@@ -9,6 +9,14 @@ import enum
 from views.TableView import TableView
 from tkinter import ttk
 
+"""
+This class generates the UI displayed on the default tab when the application is initially launched.
+This will display host information when a host is selected from the 'Hosts Scanned' section on the left,
+as well as display vulnerabilities present directly after a scan is run.  The vulnerabilities will be
+displayed by CVE name and sorted from highest to lowest CVSS Score.
+"""
+
+
 class ScanDetailsView:
     host_name_entry_var = None
     mac_address_entry_var = None
@@ -35,11 +43,10 @@ class ScanDetailsView:
     def on_report(self):
         """Click hanlder for report button"""
         print("User clicked 'Report'")
-        # todo route data to
         vulnerabilities = DataShare.get_vulns()
         cpes = DataShare.get_cpes()
         scanned_hosts = DataShare.get_hosts()
-        
+
         if vulnerabilities and cpes and scanned_hosts:
             report = {
                 'hosts': scanned_hosts,
@@ -52,7 +59,7 @@ class ScanDetailsView:
                                           "Note: This will be listed as the report Author.")
 
             fname = asksaveasfilename(title='Select File to Save Report...', defaultextension='.pdf',
-                                      initialfile='Report_'+str(time)+'.pdf')
+                                      initialfile='Report_' + str(time) + '.pdf')
 
             r = Reporter(report, fname, name)
             r.build_pdf()
@@ -64,7 +71,7 @@ class ScanDetailsView:
 
         frame = ttk.Frame(parent_frame)
         frame.grid(row=0, column=0, sticky="nsew")
-        # frame.grid_rowconfigure(6, weight=1)
+        frame.grid_rowconfigure(6, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
         # Right frame header label
@@ -143,7 +150,7 @@ class ScanDetailsView:
             @staticmethod
             def display_name_for_column(col):
                 display_names = {
-                    0: "cveName"
+                    0: "CVE Name"
                 }
                 return display_names[col]
 
@@ -172,18 +179,18 @@ class ScanDetailsView:
 
         # Report
         vulnerability_report_button = ttk.Button(vulnerabilities_button_frame,
-                                                text="Report",
-                                                command=self.on_report)
+                                                 text="Report",
+                                                 command=self.on_report)
         vulnerability_report_button.grid(row=0, column=0)
 
         # Add Vulnerability
         add_vulnerabilities_button = ttk.Button(vulnerabilities_button_frame, text="Add Vulnerability",
-                                               command=self.new_vuln_popup)
+                                                command=self.new_vuln_popup)
         add_vulnerabilities_button.grid(row=0, column=1)
 
         # Settings
         add_vulnerabilities_button = ttk.Button(vulnerabilities_button_frame,
-                                               text="Settings", command=self.on_settings)
+                                                text="Settings", command=self.on_settings)
 
         add_vulnerabilities_button.grid(row=0, column=3)
 

@@ -2,9 +2,13 @@ import tkinter
 from tkinter import ttk
 from views.DevicePopup import DevicePopup
 
+"""
+The following class deals with populating the different tree column sections in each specific tab.  
+The methods in the class pull scan info from the database in order to populate the tables.
+"""
+
 
 class TableView:
-
     """Sections is a list of strings, each string represents a section to be displayed"""
     _sections = None
 
@@ -17,8 +21,8 @@ class TableView:
     """Data is a list of lists to be displayed in the table view"""
     """Each List in this list should have the same amount of items as sections"""
     """When each list is iterated through, the value in each index will be displayed under the section with the same index"""
-    _data = []
 
+    _data = []
 
     _tree = None
 
@@ -26,6 +30,7 @@ class TableView:
     sections: List of strings, the sections to be displayed
     data: List of lists, the data to be displayed, each list contains the items in the index that will be displayed in the tabel
     """
+
     def __init__(self, parent_view, grid_row, sections, data):
 
         def get_CVE(a):
@@ -54,12 +59,10 @@ class TableView:
                 tree.insert("", i, values=tuple(collection))
             i += 1
 
-
         tree.bind('<Double-Button-1>', get_CVE)
         self._tree = tree
 
     def reload_data(self, data):
-        print("DATA: ", data)
         for i in self._tree.get_children():
             self._tree.delete(i)
 
