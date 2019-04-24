@@ -1,0 +1,23 @@
+#
+# Requirements for GlenTest
+#
+
+# Requirements without Version Specifiers
+Click
+XLsxWriter
+certifi
+chardet
+click-plugins
+colorama
+elevate
+idea
+python-nmap
+reportlab
+requests
+setuptools
+shodan
+ttkthemes
+urllib3
+
+# Referencing for later additions
+### https://pip.pypa.io/en/latest/reference/pip_install/#requirements-file-format ###

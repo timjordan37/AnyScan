@@ -5,9 +5,12 @@ import sys
 import platform
 import os
 import random
+import ntpath
 # 3rd party imports
 import tkinter as tk
 from tkinter import ttk
+from tkinter.filedialog import askopenfilename
+from tkinter import messagebox
 from tkinter import *
 from pathlib import Path
 from elevate import elevate
@@ -16,9 +19,7 @@ from util.Scanner import Scanner
 from util.SThread import SThread
 from util.STime import STimer
 from util.DataShare import DataShare
-from util import Reporter
 from util import DBFunctions as df, System
-from util import Theme
 from views.ScanDetailsView import ScanDetailsView
 from views.VulnerabilitiesView import VulnerabilitiesView
 from views.ScanHistoryView import ScanHistoryView
@@ -26,7 +27,6 @@ from views.ExploitView import ExploitView
 from views.VulnPopup import VulnPopup
 from models.Host import Host
 from views.TableView import TableView
-
 
 from ttkthemes import ThemedStyle
 from ttkthemes import ThemedTk
@@ -46,7 +46,7 @@ def main():
         if value is None:
             # if the provided value is none, then update to the default header
             host_count = DataShare.get_hosts_total()
-            host_count_text = f"({host_count}) Hosts Scanned".format()
+            host_count_text = "({host_count}) Hosts Scanned".format()
             left_frame_header_label_var.set(host_count_text)
         else:
             # else
@@ -80,17 +80,21 @@ def main():
             reverse_sort = True
 
         if DataShare.get_hosts():
-            sorted_scanned_hosts = sorted(DataShare.get_hosts(), key=lambda x: (x.get_display_name()), reverse=reverse_sort)
+            sorted_scanned_hosts = sorted(DataShare.get_hosts(), key=lambda x: (x.get_display_name()),
+                                          reverse=reverse_sort)
 
         if sorted_scanned_hosts is None:
             return
 
         # Update hosts to the sorted version to ensure details on select are correct
         DataShare.set_hosts(sorted_scanned_hosts)
+        reset_left_header_label()
 
         data = list(map(lambda host: (host.get_ip(), host.get_display_name(), host.get_vendor()), sorted_scanned_hosts))
 
-        hosts_table_view.reload_data(data)
+        # We need to reverse the data shown here because the table view will display the data in the reversed order
+        # this is needed so that clicking the tableview will result in the correct host being selected: Task189
+        hosts_table_view.reload_data(data[::-1])
 
     def scan_thread_completion():
         """Scan given inputs, update associated ui, and save scan data"""
@@ -104,11 +108,8 @@ def main():
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
         hosts = scan_host_entry_var.get()
         scanner = Scanner(hosts, ports)
-
-        print("Scan start")
         set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
         set_cpes_vulns(scanner.get_cpes())
-        print("Scan END")
 
         scan_button.config(state="normal")
         scan_details_view.check_vulnerabilities_button.config(state="normal")
@@ -121,6 +122,27 @@ def main():
 
         for host in get_hosts():
             df.DBFunctions.save_host(host, last_row_id)
+
+        query = "SELECT * FROM Hosts WHERE ScanID = ?"
+        host_tuple = df.DBFunctions.get_all_where(query, (last_row_id,))
+        hosts_with_ID = []
+
+        for id_host in host_tuple:
+            temp = Host(id_host[0], id_host[1], "Old Host", id_host[5], id_host[3], id_host[4], id_host[6], id_host[2])
+            hosts_with_ID.append(temp)
+
+        set_host(hosts_with_ID)
+
+        ip_list = [*DataShare.get_cpes()]
+        cpe_list = DataShare.get_cpes()
+
+        for ip in ip_list:
+            for item in hosts_with_ID:
+                if item.get_ip() == ip:
+                    cpe_list[item.get_id()] = cpe_list.pop(ip)
+
+        DataShare.set_cpes(cpe_list)
+        df.DBFunctions.query_cves(cpe_list)
 
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
@@ -143,7 +165,15 @@ def main():
     def set_cpes_vulns(c):
         """Set vulnerabilities from cps"""
         DataShare.set_cpes(c)
-        DataShare.set_vulns(df.DBFunctions.query_cves(c))
+
+        # Sort according to the Vulnerability Sort Setting
+        reverse_sort = False
+
+        if System.Settings.get_vuln_sort_type() == System.SortType.alphaDESC:
+            reverse_sort = True
+
+        sorted_vulns = sorted(df.DBFunctions.query_cves(c), reverse=reverse_sort)
+        DataShare.set_vulns(sorted_vulns)
         # reload ui
 
     # Click Handlers
@@ -168,6 +198,7 @@ def main():
         curr_hosts = []
         # for each host scanned
         for host_raw in data:
+            host_ID = host_raw[0]
             ip = host_raw[1]
             state = "Old Host"
             mac = host_raw[2]
@@ -176,7 +207,7 @@ def main():
             name = host_raw[5]
             vendor = host_raw[6]
 
-            curr_hosts.append(Host(ip, state, name, os_family, os_gen, vendor, mac))
+            curr_hosts.append(Host(host_ID, ip, state, name, os_family, os_gen, vendor, mac))
 
         set_host(curr_hosts)
 
@@ -188,8 +219,9 @@ def main():
             print('No CVE selected')
 
     def update_exploit_tab(cve):
-        main_note_book.select(3)
+        main_note_book.select(2)
         exploit_view.cve_var.set(cve)
+        exploit_view.on_search()
         # todo update exploit tab variables
 
     def on_host_tableview_select(event):
@@ -206,6 +238,25 @@ def main():
         button = Button(filewin, text="Do nothing button")
         button.pack()
 
+    def update_import():
+        # Only takes json currently. path = askopenfilename(title='Select Database file to import...',
+        # defaultextension='.db', filetypes=(("database files", "*.db"),("datafeeds", "*.json"),("all files", "*.*")))
+
+        path = askopenfilename(title='Select Database file to import...', filetypes=[('Json', '*.json')])
+
+        # ntpath for os compatibility with differing separators
+        # head and tail if path ends in backslash
+        head, tail = ntpath.split(path)
+        fname = tail or ntpath.basename(head)
+
+        if fname.endswith('.json'):
+            # for use to support multiple file types
+            # elif json_fp.endswith(('.json', '.db', '.xml'):
+            df.DBFunctions.import_NVD_JSON(fname)
+        else:
+            tk.messagebox.showerror("Error", "File must be of type: json")
+
+    # Set up tree columns to display IP and Device Names after a completed scan
     class TreeColumns(enum.Enum):
         name = 0
         mac_address = 1
@@ -213,8 +264,8 @@ def main():
         @staticmethod
         def display_name_for_column(col):
             display_names = {
-                0: "ip",
-                1: "name",
+                0: "IP",
+                1: "Name",
             }
             return display_names[col]
 
@@ -231,10 +282,8 @@ def main():
 
     root = ThemedTk()
     root.ttkStyle = ThemedStyle()
-    # Themes
-    # "'alt', 'scidsand', 'classic', 'scidblue', 'scidmint', 'scidgreen', 'equilux', 'default', 'scidpink', 'aqua',
-    # 'scidgrey', 'scidpurple', 'clam')
-    root.ttkStyle.set_theme("equilux")
+    theme = System.Settings.get_theme()
+    root.ttkStyle.set_theme(theme)
     root.title("GlenTest")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
@@ -245,7 +294,7 @@ def main():
     left_frame = ttk.Frame(root)
     left_frame.grid(row=0, column=0, sticky="nsew")
     left_frame.grid_rowconfigure(1, weight=1)
-    left_frame.grid_columnconfigure(0, weight=1)
+    left_frame.grid_columnconfigure(1, weight=1)
 
     # Setup Left Frame header Label
     left_frame_header_label_var = tk.StringVar()
@@ -274,21 +323,21 @@ def main():
     scan_host_entry = ttk.Entry(scan_host_frame, textvariable=scan_host_entry_var)
     scan_host_entry.grid(row=0, column=1)
 
-    ## Setup scan port label frame
+    # Setup scan port label frame
     scan_port_label_frame = ttk.Frame(left_frame)
     scan_port_label_frame.grid(row=3, column=0)
 
-    ## Setup scan port label
+    # Setup scan port label
     port_start_label = ttk.Label(scan_port_label_frame, text="Start Port")
     port_start_label.grid(row=0, column=0, padx=(0, 8))
     port_end_label = ttk.Label(scan_port_label_frame, text="End Port")
     port_end_label.grid(row=0, column=1, padx=(8, 0))
 
-    ## Setup scan port frame
+    # Setup scan port frame
     scan_port_frame = ttk.Frame(left_frame)
     scan_port_frame.grid(row=4, column=0)
 
-    ## Setup scan port entries
+    # Setup scan port entries
     port_start_entry_var = tk.StringVar()
     port_start_entry_var.set("21")
     port_start_entry = ttk.Entry(scan_port_frame, width=4, textvariable=port_start_entry_var)
@@ -304,15 +353,14 @@ def main():
 
     # Setup Left frame scan button
     scan_button = ttk.Button(scan_button_frame,
-                            text="Scan",
-                            command=on_scan)
+                             text="Scan",
+                             command=on_scan)
 
     scan_button.grid(row=0, column=0, pady=(8, 8))
 
     #################
     # Setup RightFrame
     #################
-
 
     # Setup Notebook for right frame
     rows = 0
@@ -356,6 +404,11 @@ def main():
     savemenu = Menu(menubar, tearoff=0)
     savemenu.add_command(label="Save Vulnerability", command=VulnPopup.new_popup)
     filemenu.add_cascade(label='Save', menu=savemenu)
+
+    # DB import in file menu bar
+    importmenu = Menu(menubar, tearoff=0)
+    importmenu.add_command(label="Database", command=update_import)
+    filemenu.add_cascade(label="Import", menu=importmenu)
     filemenu.add_separator()  # more prettiness
 
     # Scan settings in file menu bar
@@ -364,40 +417,51 @@ def main():
     filemenu.add_cascade(label='Settings', menu=settingsmenu)
     filemenu.add_separator()  # pretty
 
+    # Helper method to change application themes
     def change_theme(theme):
         root.ttkStyle.set_theme(theme)
+        System.Settings.set_theme(theme)
 
-    themesmenu = Menu(menubar, tearoff=0)
-    themesmenu.add_command(label="Alt", command=lambda: change_theme("alt"))
-    themesmenu.add_command(label="Aqua", command=lambda: change_theme("aqua"))
-    themesmenu.add_command(label="Clam", command=lambda: change_theme("clam"))
-    themesmenu.add_command(label="Classic", command=lambda: change_theme("classic"))
-    themesmenu.add_command(label="Default", command=lambda: change_theme("default"))
-    themesmenu.add_command(label="Equilux", command=lambda: change_theme("equilux"))
-    themesmenu.add_command(label="Scidblue", command=lambda: change_theme("scidblue"))
-    themesmenu.add_command(label="Scidgreen", command=lambda: change_theme("scidgreen"))
-    themesmenu.add_command(label="Scidgrey", command=lambda: change_theme("scidgrey"))
-    themesmenu.add_command(label="Scidmint", command=lambda: change_theme("scidmint"))
-    themesmenu.add_command(label="Scidpink", command=lambda: change_theme("scidpink"))
-    themesmenu.add_command(label="Scidpurple", command=lambda: change_theme("scidpurple"))
-    themesmenu.add_command(label="Scidsand", command=lambda: change_theme("scidsand"))
+    # Added the ability for the user to change themes from the cascading file menu
+    themes_menu = Menu(menubar, tearoff=0)
+    themes_menu.add_command(label="Alt", command=lambda: change_theme("alt"))
+    themes_menu.add_command(label="Aqua", command=lambda: change_theme("aqua"))
+    themes_menu.add_command(label="Clam", command=lambda: change_theme("clam"))
+    themes_menu.add_command(label="Classic", command=lambda: change_theme("classic"))
+    themes_menu.add_command(label="Default", command=lambda: change_theme("default"))
+    themes_menu.add_command(label="Equilux", command=lambda: change_theme("equilux"))
+    themes_menu.add_separator()
+    themes_menu.add_command(label="Scidblue", command=lambda: change_theme("scidblue"))
+    themes_menu.add_command(label="Scidgreen", command=lambda: change_theme("scidgreen"))
+    themes_menu.add_command(label="Scidgrey", command=lambda: change_theme("scidgrey"))
+    themes_menu.add_command(label="Scidmint", command=lambda: change_theme("scidmint"))
+    themes_menu.add_command(label="Scidpink", command=lambda: change_theme("scidpink"))
+    themes_menu.add_command(label="Scidpurple", command=lambda: change_theme("scidpurple"))
+    themes_menu.add_command(label="Scidsand", command=lambda: change_theme("scidsand"))
 
-    filemenu.add_cascade(label='Themes', menu=themesmenu)
-    filemenu.add_separator()  # pretty
+    filemenu.add_cascade(label='Change Theme', menu=themes_menu)
+    filemenu.add_separator()
     filemenu.add_command(label="Exit", command=root.quit)
 
     editmenu = Menu(menubar, tearoff=0)  # create another menu to add some stuff too
     editmenu.add_command(label="Undo", command=donothing)
-    
+
     menubar.add_cascade(label="File", menu=filemenu)  # add file to menu bar
     # On macOS there are some default things added to this menu, but are not added to the same menu
-    # under File. 
+    # under File.
     menubar.add_cascade(label='Edit', menu=editmenu)  # add edit to menu bar too, for fun
 
     # Run the program with UI
     root.config(menu=menubar)
-    root.geometry("800x500")
+    root.geometry("1600x1000")
     root.minsize(800, 500)
+    # add this to ensure app comes to front on start up
+    # might be os depended, not sure
+    # todo test on windows to ensure app comes to front
+    root.lift()
+    root.attributes('-topmost', True)
+    root.after_idle(root.attributes, '-topmost', False)
+    # start GUI
     root.mainloop()
 
 
@@ -419,8 +483,10 @@ if __name__ == '__main__':
             db_location = Path("vulnDB.db")
             if not db_location.exists():
                 df.DBFunctions.build_db()
-                # Maybe abstract this out for user controller importing
+                # Uses default file nvdcve-1.0-2019.json, user can import more through file menu
                 df.DBFunctions.import_NVD_JSON()
+                # Uses default file official-cpe-dictionary_v2.3.xml unless specified otherwise
+                df.DBFunctions.import_cve_verison_matches()
 
             main()
         else:
@@ -429,12 +495,15 @@ if __name__ == '__main__':
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
     else:
         if not is_root():
-            # todo ensure works on pi and test further
-            # recreates process with AppleScript, sudo, or other appropriate command
-            # attempts graphical escalation first
+            # does not work on Kali Pi as elevate has a related open bug and PR in progress
+            # https://github.com/barneygale/elevate/pull/4
             elevate()
         db_location = Path("vulnDB.db")
         if not db_location.exists():
             df.DBFunctions.build_db()
             df.DBFunctions.import_NVD_JSON()
+            # Uses default file official-cpe-dictionary_v2.3.xml unless specified otherwise
+            # This also takes a minute or to to import before app starts
+            df.DBFunctions.import_cve_verison_matches()
+
         main()

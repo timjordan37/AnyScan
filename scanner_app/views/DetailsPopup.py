@@ -1,6 +1,14 @@
 import tkinter as tk
 import util.DBFunctions as dbf
 
+from tkinter import ttk
+
+"""
+The following class creates a popup window when the user double clicks on a CVE listed in the 'Vulnerabilities' tab.
+The popup window displays various information about the selected CVE so that the user has more insight as to how 
+severe a specific vulnerability is.
+"""
+
 
 class DetailsPopup:
     """Details pop up displays information about the selected CVE"""
@@ -53,89 +61,93 @@ class DetailsPopup:
     def new_popup(self):
 
         # Creating the Popup Window
-        popup = tk.Toplevel(padx=10, pady=10)
-        popup.wm_title("Vulnerability Details")
+        root = tk.Toplevel(padx=10, pady=10)
+        root.wm_title("Vulnerability Details")
+        top_level_frame = ttk.Frame(root)
+        top_level_frame.grid(row=0, column=0, sticky="nsew")
+        root.grid_columnconfigure(0, weight=1)
+        root.grid_rowconfigure(0, weight=1)
 
         # Adding the fields to the popup
-        vuln_id_label = tk.Label(popup, text="Vulnerability ID: ")
-        vuln_id_entry = tk.Label(popup, text=self.vuln_id)
+        vuln_id_label = ttk.Label(top_level_frame, text="Vulnerability ID: ")
+        vuln_id_entry = ttk.Label(top_level_frame, text=self.vuln_id)
         vuln_id_label.grid(column=0, row=0, padx=5, pady=5)
         vuln_id_entry.grid(column=1, row=0, padx=5, pady=5)
 
-        cve_name_label = tk.Label(popup, text="CPE Name: ")
-        cve_name_entry = tk.Label(popup, text=self.cve_name)
+        cve_name_label = ttk.Label(top_level_frame, text="CPE Name: ")
+        cve_name_entry = ttk.Label(top_level_frame, text=self.cve_name)
         cve_name_label.grid(column=0, row=1, padx=5, pady=5)
         cve_name_entry.grid(column=1, row=1, padx=5, pady=5)
 
-        description_label = tk.Label(popup, text="Description: ")
-        description_entry = tk.Text(popup, width=60, height=5, wrap="word")
+        description_label = ttk.Label(top_level_frame, text="Description: ")
+        description_entry = tk.Text(top_level_frame, width=60, height=5, wrap="word")
         description_entry.insert("1.0", self.description)
         description_label.grid(column=0, row=2, padx=5, pady=5)
         description_entry.grid(column=1, row=2, padx=5, pady=5)
 
-        attack_vector_label = tk.Label(popup, text="Attack Vector: ")
-        attack_vector_entry = tk.Label(popup, text=self.attack_vector)
+        attack_vector_label = ttk.Label(top_level_frame, text="Attack Vector: ")
+        attack_vector_entry = ttk.Label(top_level_frame, text=self.attack_vector)
         attack_vector_label.grid(column=0, row=3, padx=5, pady=5)
         attack_vector_entry.grid(column=1, row=3, padx=5, pady=5)
 
-        attack_complexity_label = tk.Label(popup, text="Attack Complexity: ")
-        attack_complexity_entry = tk.Label(popup, text=self.attack_complexity)
+        attack_complexity_label = ttk.Label(top_level_frame, text="Attack Complexity: ")
+        attack_complexity_entry = ttk.Label(top_level_frame, text=self.attack_complexity)
         attack_complexity_label.grid(column=0, row=4, padx=5, pady=5)
         attack_complexity_entry.grid(column=1, row=4, padx=5, pady=5)
 
-        custom_score_label = tk.Label(popup, text="Custom Score: ")
-        custom_score_entry = tk.Entry(popup, textvariable=self.custom_score)
+        custom_score_label = ttk.Label(top_level_frame, text="Custom Score: ")
+        custom_score_entry = ttk.Entry(top_level_frame, textvariable=self.custom_score)
         custom_score_entry.insert(0, self.custom_score)
         custom_score_label.grid(column=0, row=5, padx=5, pady=5)
         custom_score_entry.grid(column=1, row=5, padx=5, pady=5)
 
-        custom_score_reason_label = tk.Label(popup, text="Custom Score Reason: ")
-        custom_score_reason_entry = tk.Entry(popup, textvariable=self.custom_score_reason)
+        custom_score_reason_label = ttk.Label(top_level_frame, text="Custom Score Reason: ")
+        custom_score_reason_entry = ttk.Entry(top_level_frame, textvariable=self.custom_score_reason)
         custom_score_reason_entry.insert(0,self.custom_score_reason)
         custom_score_reason_label.grid(column=0, row=7, padx=5, pady=5)
         custom_score_reason_entry.grid(column=1, row=7, padx=5, pady=5)
 
-        privileges_required_label = tk.Label(popup, text="Privileges Required: ")
-        privileges_required_entry = tk.Label(popup, text=self.privileges_required)
+        privileges_required_label = ttk.Label(top_level_frame, text="Privileges Required: ")
+        privileges_required_entry = ttk.Label(top_level_frame, text=self.privileges_required)
         privileges_required_label.grid(column=0, row=8, padx=5, pady=5)
         privileges_required_entry.grid(column=1, row=8, padx=5, pady=5)
 
-        user_interaction_label = tk.Label(popup, text="User Interaction: ")
-        user_interaction_entry = tk.Label(popup, text=self.user_interaction)
+        user_interaction_label = ttk.Label(top_level_frame, text="User Interaction: ")
+        user_interaction_entry = ttk.Label(top_level_frame, text=self.user_interaction)
         user_interaction_label.grid(column=0, row=9, padx=5, pady=5)
         user_interaction_entry.grid(column=1, row=9, padx=5, pady=5)
 
-        confidentiality_impact_label = tk.Label(popup, text="Confidentiality Impact: ")
-        confidentiality_impact_entry = tk.Label(popup, text=self.confidentiality_impact)
+        confidentiality_impact_label = ttk.Label(top_level_frame, text="Confidentiality Impact: ")
+        confidentiality_impact_entry = ttk.Label(top_level_frame, text=self.confidentiality_impact)
         confidentiality_impact_label.grid(column=0, row=10, padx=5, pady=5)
         confidentiality_impact_entry.grid(column=1, row=10, padx=5, pady=5)
 
-        integrity_impact_label = tk.Label(popup, text="Integrity Impact: ")
-        integrity_impact_entry = tk.Label(popup, text=self.integrity_impact)
+        integrity_impact_label = ttk.Label(top_level_frame, text="Integrity Impact: ")
+        integrity_impact_entry = ttk.Label(top_level_frame, text=self.integrity_impact)
         integrity_impact_label.grid(column=0, row=11, padx=5, pady=5)
         integrity_impact_entry.grid(column=1, row=11, padx=5, pady=5)
 
-        availability_impact_label = tk.Label(popup, text="Availability Impact: ")
-        availability_impact_entry = tk.Label(popup, text=self.availability_impact)
+        availability_impact_label = ttk.Label(top_level_frame, text="Availability Impact: ")
+        availability_impact_entry = ttk.Label(top_level_frame, text=self.availability_impact)
         availability_impact_label.grid(column=0, row=12, padx=5, pady=5)
         availability_impact_entry.grid(column=1, row=12, padx=5, pady=5)
 
-        base_score_label = tk.Label(popup, text="Base Score: ")
-        base_score_entry = tk.Label(popup, text=self.base_score)
+        base_score_label = ttk.Label(top_level_frame, text="Base Score: ")
+        base_score_entry = ttk.Label(top_level_frame, text=self.base_score)
         base_score_label.grid(column=0, row=13, padx=5, pady=5)
         base_score_entry.grid(column=1, row=13, padx=5, pady=5)
 
-        base_severity_label = tk.Label(popup, text="Base Severity: ")
-        base_severity_entry = tk.Label(popup, text=self.base_severity)
+        base_severity_label = ttk.Label(top_level_frame, text="Base Severity: ")
+        base_severity_entry = ttk.Label(top_level_frame, text=self.base_severity)
         base_severity_label.grid(column=0, row=14, padx=5, pady=5)
         base_severity_entry.grid(column=1, row=14, padx=5, pady=5)
 
-        exploitability_score_label = tk.Label(popup, text="Exploitability Score: ")
-        exploitability_score_entry = tk.Label(popup, text=self.exploitability_score)
+        exploitability_score_label = ttk.Label(top_level_frame, text="Exploitability Score: ")
+        exploitability_score_entry = ttk.Label(top_level_frame, text=self.exploitability_score)
         exploitability_score_label.grid(column=0, row=15, padx=5, pady=5)
         exploitability_score_entry.grid(column=1, row=15, padx=5, pady=5)
 
-        update_button = tk.Button(popup, text="Update Vulnerability", command=self.update_vuln())
+        update_button = ttk.Button(top_level_frame, text="Update Vulnerability", command=self.update_vuln())
         update_button.grid(columnspan=2, row=16, padx=5, pady=5)
 
 

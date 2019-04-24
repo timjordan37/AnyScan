@@ -1,6 +1,12 @@
 import sqlite3
 import json
 from pathlib import Path
+import xml.etree.ElementTree as ET
+
+"""
+This class sets up our database and the various other search functions that we use in order to filter through our 
+data and display it properly to the user via the application.
+"""
 
 
 class DBFunctions:
@@ -12,9 +18,6 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         device_info = (deviceName, deviceManufacturer, cpeURI)
-
-        print('Inside DBFunctions save_device')
-        print(device_info)
 
         try:
             cursor.execute('''INSERT INTO Devices VALUES(?, ?, ?)''', device_info)
@@ -62,9 +65,9 @@ class DBFunctions:
     # Updates a Vulnerability in the DB
     @staticmethod
     def update_vuln(vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
-                           customScoreReason, privilegesRequired,
-                           userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
-                           baseScore, baseSeverity, exploitabilityScore):
+                    customScoreReason, privilegesRequired,
+                    userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
+                    baseScore, baseSeverity, exploitabilityScore):
         conn = sqlite3.connect("vulnDB.db")
         cursor = conn.cursor()
 
@@ -91,7 +94,6 @@ class DBFunctions:
                         exploitabilityScore = ? 
                         WHERE VulnID = ?''', vulnerability_info)
         conn.commit()
-
 
     # Saves a scan to the database
     @staticmethod
@@ -133,6 +135,12 @@ class DBFunctions:
             cpeURI TEXT, 
             cveName TEXT, 
             PRIMARY KEY(cpeURI, cveName))''')
+        cursor.execute('''CREATE TABLE CPEVersions (
+                    cpe22 TEXT, 
+                    cpe23 TEXT, 
+            PRIMARY KEY(cpe22,cpe23),
+            UNIQUE (cpe22, cpe23))''')
+        # todo is there a reason this commit is here and below? Do we need 2?
         conn.commit()
         cursor.execute('''CREATE TABLE Vulnerabilities (VulnID INTEGER PRIMARY KEY, 
             cveName TEXT,
@@ -157,7 +165,8 @@ class DBFunctions:
             ip TEXT, 
             macAddress TEXT, 
             osFamily TEXT, 
-            osGen TEXT, name TEXT, 
+            osGen TEXT, 
+            name TEXT, 
             vendor TEXT, 
             ScanID INTEGER, 
             FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
@@ -174,6 +183,12 @@ class DBFunctions:
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID), 
             FOREIGN KEY(Model) REFERENCES Devices(Model), 
             FOREIGN KEY(ScanID) REFERENCES ScanHistory(ScanID))''')
+        conn.commit()
+        cursor.execute('''CREATE TABLE CVE_By_Host (HostID INTEGER,
+            VulnID INTEGER,
+            PRIMARY KEY(HostID, VulnID),
+            FOREIGN KEY(HostID) REFERENCES Hosts(HostID),
+            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID)''')
         conn.commit()
 
     @staticmethod
@@ -200,17 +215,39 @@ class DBFunctions:
         conn.commit()
 
     @staticmethod
+    def save_cve_by_host(hostID, cve):
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        host_cve = (hostID, cve)
+        cursor.execute('''INSERT INTO CVE_By_Host VALUES(?,?)''', host_cve)
+        conn.commit()
+
+    @staticmethod
     def save_cpeVuln(cpe, cve):
         """Saves a new cpe\cve combo into the cpeVulns table
         :param cpe: cpe to import to db
-        :param cve; cve to import to db
+        :param cve: cve to import to db
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
         cpeVuln = (cpe, cve)
 
-        cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
+        # todo cpe version change
+        cpe_test = cpe[0:7]
+        if cpe_test != 'cpe:2.3':
+            error = f'\nCPE version 2.2: {cpe}\n'
+            print(error)
+            # update version to 2.3 if not already
+            cpe = DBFunctions.cpe_version_reference(cpe)
+            print(DBFunctions.cpe_version_reference(cpe))
+
+        try:
+            cursor.execute('''INSERT INTO CPEVulns VALUES (?, ?)''', cpeVuln)
+        except sqlite3.IntegrityError:
+            # only works for python3.6 or greater
+            error = f'Combo already exist in DB:\nCVE {cve} \nCPE: {cpe}'
+            print(error)
         conn.commit()
 
     def query_cves(cpe_dict):
@@ -219,102 +256,18 @@ class DBFunctions:
         :param cpe_dict: cpe dictionary in the form {host0 : [cpe, list0], host1: [cpe, list1]
         """
         conn = sqlite3.connect('vulnDB.db')
-        cves = []
-        test_data = set()
         cursor = conn.cursor()
+        cves = []
         print("CVE Query HERE")
 
-        # CP = ["cpe:2.3:o:juniper:junos:12.1x46:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d15:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d35:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d40:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d45:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d50:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d55:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d60:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.1x46:d65:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d15:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3x48:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x49:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x49:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x49:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d20:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d21:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d30:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d32:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d33:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d34:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d61:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d62:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1x53:d63:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:*:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r3:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r4:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r8:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1:r9:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r3:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r4:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r5:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r7:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.2:r8:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:15.1:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:*:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r1:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r2:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r3:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r4:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r5:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r6:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r7:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r8:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:12.3:r9:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:*:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d10:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d15:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d16:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d25:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d26:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d27:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d35:*:*:*:*:*:*",
-        #         "cpe:2.3:o:juniper:junos:14.1x53:d50:*:*:*:*:*:*"]
-        #
-        # for cps in CP:
-        #     cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cps,))
-        #     test_str = cursor.fetchone()
-        #     if test_str:
-        #         cves.append(test_str[1])
-        #     else:
-        #         print("NOT FOUND")
-        # return cves
-        # todo delete static testing to test on imported db
-
-        cursor.execute('''SELECT cveName FROM CPEvulns''')
-        for row in cursor:
-            test_data.add(row[0])
-
-        return test_data
-
-        # for hList in cpe_dict:
-        #     for cpe in cpe_dict[hList]:
-        #         cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
-        #         vul = cursor.fetchone()
-        #         if vul:
-        #             cves.append(vul[1])
-        # return all the fun stuff
-        # return cves
+        for hList in cpe_dict:
+            for cpe in cpe_dict[hList]:
+                cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
+                vul = cursor.fetchone()
+                if vul:
+                    DBFunctions.save_cve_by_host(hList, vul[1])
+                    cves.append(vul[1])
+        return cves
 
     @staticmethod
     def query_vulns(cve):
@@ -324,7 +277,6 @@ class DBFunctions:
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        print("Vuln Query HERE")
         cursor.execute("""SELECT * FROM Vulnerabilities WHERE cveName IS (?)""", (cve,))
         return cursor.fetchone()
 
@@ -350,15 +302,22 @@ class DBFunctions:
 
     # Imports Data from NVD JSON file
     @staticmethod
-    def import_NVD_JSON():
+    def import_NVD_JSON(json_fp=None):
+        if not json_fp:
+            # default file I've been using for testing. We could get rid of this for release
+            json_fp = Path("nvdcve-1.0-2019.json")
+            print(json_fp)
+        else:
+            # todo test for correct file type
+            json_fp = Path(json_fp)
+            print(json_fp)
 
-        json_fp = Path("nvdcve-1.0-2019.json")
         nvd_json = json.loads(json_fp.read_text())
         cve_items_list = nvd_json['CVE_Items']
 
         i = 0
         for cve in cve_items_list:
-            cve_detail = cve_items_list[i]
+            cve_detail = cve_items_list[i] # can't this just be cve?
             cve_meta_data = cve_detail.get("cve").get("CVE_data_meta")
 
             description_data = cve_detail.get("cve").get("description").get("description_data")
@@ -378,21 +337,38 @@ class DBFunctions:
                                                cvssV3['baseScore'], cvssV3['baseSeverity'],
                                                baseMetric['exploitabilityScore'])
             except:
+                # todo determine why this always errors
                 DBFunctions.save_vulnerability(cve_meta_data['ID'], description, "N/A", "N/A", "", "", "N/A",
                                                "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
             for item in cpe_list:
                 try:
                     cpe_match = item['cpe_match']
-                    for item in cpe_match:
+                    for match in cpe_match:
                         try:
-                            cpe_URI = item['cpe23Uri']
+                            cpe_URI = match['cpe23Uri']
                         except:
-                            cpe_URI = item['cpe22Uri']
+                            cpe_URI = match['cpe22Uri']
                         DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
-                except:
-                    print("No CPE Matches")
+                except KeyError:
+                    print('No CPE Match for ', cpe_URI)
 
             i += 1
+
+    @staticmethod
+    def import_cve_verison_matches(nvd_file='official-cpe-dictionary_v2.3.xml'):
+        # assumes the default file is available
+        tree = ET.parse(nvd_file)
+        root = tree.getroot()
+        # cursor for DB addition
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+
+        # get matches accoridng to xml namespace and adds to DB
+        for cpe in root.findall('{http://cpe.mitre.org/dictionary/2.0}cpe-item'):
+            tmp = cpe.find('{http://scap.nist.gov/schema/cpe-extension/2.3}cpe23-item')
+            pair = (cpe.attrib['name'], tmp.attrib['name'])
+            cursor.execute('''INSERT INTO CPEVersions VALUES(?, ?)''', pair)
+            conn.commit()
 
     # Retrieves all data for specified ScanID
     @staticmethod
@@ -435,7 +411,6 @@ class DBFunctions:
             results.add(row[0])
 
         return results
-
 
     @staticmethod
     def get_all_devices():
@@ -482,6 +457,7 @@ class DBFunctions:
         return cursor.fetchall()
 
     """Vulnerabilities Methods"""
+
     @staticmethod
     def get_all_vulns():
         """Query the database for all saved vulnerabilities
@@ -490,5 +466,57 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
-        cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities""", ())
+        cursor.execute("""SELECT VulnID, cveName, CVSSScore, baseScore, baseSeverity from Vulnerabilities ORDER BY 
+        CVSSScore DESC""", ())
         return cursor.fetchall()
+
+    @staticmethod
+    def cpe_version_reference(cpe22):
+        """Given the 2.2 version of a cpe return the 2.3 version
+
+        :param cpe22: assumed to be a valid cpe2.2
+        :return: CPE v2.3 given v2.2
+        """
+
+        conn = sqlite3.connect('vulnDB.db')
+        cursor = conn.cursor()
+        # needs the comma at the end so you are passing
+        # a tuple with 1 string not a sequence of chars
+        cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 = ?""", (cpe22,))
+
+        cpe23 = cursor.fetchone()
+        if cpe23:
+            return cpe23[0]
+
+
+# TESTING
+if __name__=="__main__":
+    # quick unit testing, I'm sure python has something built in I could use
+    cpes_version_test = {
+        'cpe:/a:zzcms:zzcms:6.0', # yes
+        'cpe:/a:zzcms:zzcms:6.1', # yes
+        'cpe:/a:zzcms:zzcms:7.0', # yes
+        'cpe:/a:zzcms:zzcms:7.1', # yes
+        'cpe:/a:zzcms:zzcms:7.2', # yes
+        'cpe:/a:zzcms:zzcms:8.0', # yes
+        'cpe:/a:zzcms:zzcms:8.1', # yes
+        'cpe:/a:zzcms:zzcms:8.2', # yes
+        'cpe:/a:zzcms:zzcms:8.3', # yes
+        'cpe:/a:zzcms:zzcms:2018', # yes
+        'cpe:/a:zzcms:zzcms:2019', # yes
+        'thisshouldntwork', # no
+        'cpe:/a:zzzcms:zz.1', # no
+        'cpe:/a:zzzcms:zzzphp:1.6', # no
+        'cpe:/a:zzzs:zzzphp:1.6.1', # no
+        'cpeazzzcms:zphp:1.6.1', # no
+        'cpe:/a:%240.99_kindle_books_project:%240.99_kindle_books:6::~~~android~~' # yes
+    }
+
+    for item in cpes_version_test:
+        print('Test item: ', item)
+        item = DBFunctions.cpe_version_reference(item)
+        if item:
+            print('Found: ', item)
+        else:
+            print('Not valid')
+

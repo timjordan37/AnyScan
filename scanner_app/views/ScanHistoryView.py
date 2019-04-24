@@ -4,6 +4,13 @@ from views.TableView import TableView
 from util import DBFunctions as dbf
 from tkinter import ttk
 
+"""
+This class is responsible for generating the UI displayed on the 'Scan History' tab of the application.
+It will create search fields so that users can search for a specific previous scan and view the scan details 
+if they wish to do so.  It will also compile a list of all previous scans that have been run and place them 
+in a table organized by ID, Duration, Date and Host Count.  Users can opt out of using the search fields and 
+can manually select any previous scan from this table.
+"""
 
 class ScanHistoryView:
 
@@ -26,6 +33,7 @@ class ScanHistoryView:
 
         frame = ttk.Frame(parent_frame)
         frame.grid(row=0, column=0, sticky="nsew")
+        frame.grid_rowconfigure(6, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
         # header label
@@ -88,7 +96,7 @@ class ScanHistoryView:
         for scan in all_scans:
             data.append(list(scan))
 
-        self.table_view = TableView(frame, 6, sections_tuple, data)
+        self.table_view = TableView(frame, 6, sections_tuple, data[::-1])
 
         return frame
 
@@ -148,7 +156,7 @@ class TreeColumns(enum.Enum):
     @staticmethod
     def display_name_for_column(col):
         display_names = {
-            0: "id",
+            0: "ID",
             1: "Duration",
             2: "Date",
             3: "Host Count"
