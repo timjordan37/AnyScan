@@ -65,7 +65,7 @@ def main():
     def reset_left_header_label():
         """Update left header with number of hosts scanned"""
         host_count = DataShare.get_hosts_total()
-        host_count_text = f"({host_count}) Hosts Scanned".format()
+        host_count_text = "({host_count}) Hosts Scanned".format()
         left_frame_header_label_var.set(host_count_text)
 
     def reload_hosts_tableview():
