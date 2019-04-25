@@ -146,8 +146,6 @@ def main():
 
         DataShare.set_cpes(cpe_list)
         cves = df.DBFunctions.query_cves(cpe_list)
-        print ('Main 149 CVEs found, maybe: ')
-        print(cves)
 
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
