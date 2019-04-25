@@ -142,10 +142,12 @@ def main():
                 if item.get_ip() == ip:
                     cpe_list[item.get_id()] = cpe_list.pop(ip)
 
+
         df.DBFunctions.save_cve_by_host(cpe_list)
 
         DataShare.set_cpes(cpe_list)
         cves = df.DBFunctions.query_cves(cpe_list)
+
 
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
@@ -215,6 +217,7 @@ def main():
         # for each host scanned
         for host_raw in data:
             host_id = host_raw[0]
+
             ip = host_raw[1]
             state = "Old Host"
             mac = host_raw[2]
@@ -224,6 +227,7 @@ def main():
             vendor = host_raw[6]
 
             curr_hosts.append(Host(host_id, ip, state, name, os_family, os_gen, vendor, mac))
+
 
         set_host(curr_hosts)
 

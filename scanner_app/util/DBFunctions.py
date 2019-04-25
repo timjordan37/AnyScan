@@ -237,6 +237,7 @@ class DBFunctions:
             PRIMARY KEY(HostID, VulnID),
             FOREIGN KEY(HostID) REFERENCES Hosts(HostID),
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID))''')
+
         conn.commit()
 
     @staticmethod
@@ -335,6 +336,7 @@ class DBFunctions:
         if vulns:
             for host, vuln in vulns.items():
                 cves.append(vuln)
+
         return cves
 
     @staticmethod
