@@ -199,7 +199,6 @@ class Scanner:
             raise ScannerError("ERROR: A scan has not yet been conducted!")
 
     def query_db_cves(self):
-        #todo check if this is even used
         if self._scanned:
             df.DBFunctions.query_cves(self.get_cpes())
 

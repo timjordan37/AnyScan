@@ -358,8 +358,7 @@ class DBFunctions:
         cursor3 = conn.cursor()
         # cursor4 = conn.cursor()
 
-        # todo change query to needed data
-        #
+
         cursor.execute("""SELECT ip FROM Hosts""")
         cursor2.execute("""SELECT macAddress FROM Hosts""")
         cursor3.execute("""SELECT name FROM Hosts""")
@@ -382,7 +381,6 @@ class DBFunctions:
             json_fp = Path("nvdcve-1.0-2019.json")
             print(json_fp)
         else:
-            # todo test for correct file type
             json_fp = Path(json_fp)
             print(json_fp)
 
@@ -582,8 +580,7 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
-        #todo why is this happening twice?
-        print('DBFunctions 582 cpe22: ', cpe22)
+        # Wild card to find closest match
         cpe22 += '%'
         print('DBFunctions 584 cpe22 updated: ', cpe22)
 

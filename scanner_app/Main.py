@@ -218,6 +218,7 @@ def main():
         # for each host scanned
         for host_raw in data:
             host_id = host_raw[0]
+
             ip = host_raw[1]
             state = "Old Host"
             mac = host_raw[2]
@@ -227,6 +228,7 @@ def main():
             vendor = host_raw[6]
 
             curr_hosts.append(Host(host_id, ip, state, name, os_family, os_gen, vendor, mac))
+
 
         set_host(curr_hosts)
 
@@ -241,7 +243,6 @@ def main():
         main_note_book.select(2)
         exploit_view.cve_var.set(cve)
         exploit_view.on_search()
-        # todo update exploit tab variables
 
     def on_host_tableview_select(event):
         """Click handler to update right ui when user clicks on a host in left box"""
@@ -475,8 +476,6 @@ def main():
     root.geometry("1600x1000")
     root.minsize(800, 500)
     # add this to ensure app comes to front on start up
-    # might be os depended, not sure
-    # todo test on windows to ensure app comes to front
     root.lift()
     root.attributes('-topmost', True)
     root.after_idle(root.attributes, '-topmost', False)
