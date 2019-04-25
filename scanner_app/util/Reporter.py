@@ -93,58 +93,40 @@ class Reporter:
         Story.append(NextPageTemplate('host'))
         # space for title page
         Story.append(PageBreak())
-        #todo add data to report per host
-        Story.append(Paragraph('test here' * 500, style))
+        # Host data
+        Story.append(Paragraph('Scanned Hosts ---------------------', self.styles['Heading2']))
+        for h in self._report['hosts']:
+            if h.get_display_val():
+                hname = f'Hostname: {h.get_display_name()}'
+                ip = f'IP Address: {h.get_ip()}'
+                mac = f'MAC Address: {h.get_mac_address()}'
+                Story.append(Paragraph(hname, style))
+                Story.append(Paragraph(ip, style))
+                Story.append(Paragraph(mac, style))
+                Story.append(Spacer(1, 0.2 * inch))
 
+        # Next Pages
         Story.append(PageBreak())
-        Story.append(Paragraph('test 2' * 500, style))
+
+        # cpe data
+        Story.append(Paragraph('CPEs ---------------------', self.styles['Heading2']))
+        for c in self._report['cpes']:
+            cpe = self._report['cpes'][c][0]
+            Story.append(Paragraph(cpe, style))
+            Story.append(Spacer(1, 0.2 * inch))
+
+        # Next Pages
+        Story.append(PageBreak())
+
+        # Vuln Data
+        Story.append(Paragraph('Vulnerabilities ---------------------', self.styles['Heading2']))
+        for v in self._report['vulns']:
+            Story.append(Paragraph(v, style))
 
         doc.addPageTemplates([PageTemplate(id='title', frames=standard_frame, onPage=self.title_page),
                               PageTemplate(id='host', frames=standard_frame, onPage=self.host_page)])
 
         doc.build(Story)
-
-
-
-        # create story with space first
-        # Story = [Spacer(1, 2 * inch)]
-        #
-        # # print styles to see what we can use
-        # # print('STYLES: ', self.styles.list())
-        #
-
-        #
-        # # Host data
-        # Story.append(Paragraph('Scanned Hosts ---------------------', self.styles['Heading2']))
-        # for h in self._report['hosts']:
-        #     if h.get_display_val():
-        #         hname = f'Hostname: {h.get_display_name()}'
-        #         ip = f'IP Address: {h.get_ip()}'
-        #         mac = f'MAC Address: {h.get_mac_address()}'
-        #         Story.append(Paragraph(hname, style))
-        #         Story.append(Paragraph(ip, style))
-        #         Story.append(Paragraph(mac, style))
-        #         Story.append(Spacer(1, 0.2 * inch))
-        #
-        # # Next Pages
-        # Story.append(PageBreak())
-        #
-        # # cpe data
-        # Story.append(Paragraph('CPEs ---------------------', self.styles['Heading2']))
-        # for c in self._report['cpes']:
-        #     cpe = self._report['cpes'][c][0]
-        #     Story.append(Paragraph(cpe, style))
-        #     Story.append(Spacer(1, 0.2 * inch))
-        #
-        # # Next Pages
-        # Story.append(PageBreak())
-        #
-        # # Vuln Data
-        # Story.append(Paragraph('Vulnerabilities ---------------------', self.styles['Heading2']))
-        # for v in self._report['vulns']:
-        #     Story.append(Paragraph(v, style))
-        #
-        # doc.build(Story, onFirstPage=self.title_page, onLaterPages=self.scan_page)
 
     def print(self):
         print(self._report)

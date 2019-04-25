@@ -45,16 +45,12 @@ class ScanDetailsView:
         """Click hanlder for report button"""
         print("User clicked 'Report'")
 
-        #todo get correct data from current scan
-        # vulnerabilities = DBFunctions.
-
         vulnerabilities = DataShare.get_vulns()
         cpes = DataShare.get_cpes()
         scanned_hosts = DataShare.get_hosts()
 
         #if vulnerabilities and cpes and scanned_hosts:
         if True:
-            #todo use scan information to give report data per host
             report = {
                 'hosts': scanned_hosts,
                 'cpes': cpes,
