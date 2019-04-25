@@ -93,6 +93,7 @@ class Reporter:
         Story.append(NextPageTemplate('host'))
         # space for title page
         Story.append(PageBreak())
+        
         # Host data
         Story.append(Paragraph('Scanned Hosts ---------------------', self.styles['Heading2']))
         for h in self._report['hosts']:
@@ -105,23 +106,23 @@ class Reporter:
                 Story.append(Paragraph(mac, style))
                 Story.append(Spacer(1, 0.2 * inch))
 
-        # Next Pages
-        Story.append(PageBreak())
-
         # cpe data
         Story.append(Paragraph('CPEs ---------------------', self.styles['Heading2']))
-        for c in self._report['cpes']:
-            cpe = self._report['cpes'][c][0]
-            Story.append(Paragraph(cpe, style))
-            Story.append(Spacer(1, 0.2 * inch))
-
-        # Next Pages
-        Story.append(PageBreak())
+        if self._report['cpes']:
+            for c in self._report['cpes']:
+                cpe = self._report['cpes'][c][0]
+                Story.append(Paragraph(cpe, style))
+                Story.append(Spacer(1, 0.2 * inch))
+        else:
+            Story.append(Paragraph('No CPEs found', style))
 
         # Vuln Data
         Story.append(Paragraph('Vulnerabilities ---------------------', self.styles['Heading2']))
-        for v in self._report['vulns']:
-            Story.append(Paragraph(v, style))
+        if self._report['vulns']:
+            for v in self._report['vulns']:
+                Story.append(Paragraph(v, style))
+        else:
+            Story.append(Paragraph('No vulnerabilities found.', style))
 
         doc.addPageTemplates([PageTemplate(id='title', frames=standard_frame, onPage=self.title_page),
                               PageTemplate(id='host', frames=standard_frame, onPage=self.host_page)])
