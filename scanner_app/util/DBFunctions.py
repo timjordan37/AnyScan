@@ -332,10 +332,7 @@ class DBFunctions:
         conn.commit()
         conn.close()
 
-        if vulns:
-            for host, vuln in vulns.items():
-                cves.append(vuln)
-        return cves
+        return vulns
 
     @staticmethod
     def query_vulns(cve):

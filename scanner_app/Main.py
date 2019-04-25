@@ -142,12 +142,13 @@ def main():
                 if item.get_ip() == ip:
                     cpe_list[item.get_id()] = cpe_list.pop(ip)
 
-        df.DBFunctions.save_cve_by_host(cpe_list)
 
         DataShare.set_cpes(cpe_list)
-        cves = df.DBFunctions.query_cves(cpe_list)
-        print ('Main 149 CVEs found, maybe: ')
-        print(cves)
+        cves_with_host = df.DBFunctions.query_cves(cpe_list)
+
+        for i in cves_with_host:
+            for j in i:
+                df.DBFunctions.save_cve_by_host(i, j)
 
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
