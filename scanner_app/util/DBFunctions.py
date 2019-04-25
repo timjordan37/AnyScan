@@ -334,7 +334,6 @@ class DBFunctions:
 
         if vulns:
             for host, vuln in vulns.items():
-                DBFunctions.save_cve_by_host(host, vuln)
                 cves.append(vuln)
         return cves
 

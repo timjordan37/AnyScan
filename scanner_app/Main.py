@@ -108,8 +108,7 @@ def main():
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
         hosts = scan_host_entry_var.get()
         scanner = Scanner(hosts, ports)
-        #todo why are we setting hosts here and below
-        # and why if I delete this line do I get scanner errors
+
         set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
         set_cpes_vulns(scanner.get_cpes())
 
@@ -133,7 +132,6 @@ def main():
             temp = Host(id_host[0], id_host[1], "Old Host", id_host[5], id_host[3], id_host[4], id_host[6], id_host[2])
             hosts_with_ID.append(temp)
 
-        #todo setting hosts again?
         set_host(hosts_with_ID)
 
         ip_list = [*DataShare.get_cpes()]
@@ -143,6 +141,8 @@ def main():
             for item in hosts_with_ID:
                 if item.get_ip() == ip:
                     cpe_list[item.get_id()] = cpe_list.pop(ip)
+
+        df.DBFunctions.save_cve_by_host(cpe_list)
 
         DataShare.set_cpes(cpe_list)
         cves = df.DBFunctions.query_cves(cpe_list)
