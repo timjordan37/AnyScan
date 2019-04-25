@@ -7,6 +7,13 @@ This class handles threading that is done during the entire scanning period of t
 
 class SThread(threading.Thread):
     def __init__(self, threadID, name, counter, completion):
+        """Create SThread object given thread ID, name, counter, and completion
+
+        :param threadID: ID of thread
+        :param name: name of thread
+        :param counter: interval to wait
+        :param completion: function to run after counter
+        """
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
@@ -14,6 +21,7 @@ class SThread(threading.Thread):
         self.completion = completion
 
     def run(self):
+        """Run thread"""
         print
         "Starting " + self.name
         self.completion()

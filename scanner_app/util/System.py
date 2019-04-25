@@ -1,10 +1,14 @@
+"""
+This System class will contain a Singleton class to manage the user settings per user session
+"""
 import enum
 import configparser
 
-"""This System class will contain a Singleton class to manage the user settings per user session"""
-
 
 class ScanType(enum.Enum):
+    """
+    Enumerated constant to represent ScanType
+    """
     full_scan = 0
     script_scan = 1
     udp_scan = 2
@@ -35,6 +39,9 @@ class ScanType(enum.Enum):
 
 
 class SortType(enum.Enum):
+    """
+    Enumerated constant to represent SortType
+    """
     alphaASC = 0
     alphaDESC = 1
 
@@ -56,6 +63,9 @@ class SortType(enum.Enum):
 
 
 class PdfSize(enum.Enum):
+    """
+    Enumerated constant to represent PdfSize
+    """
     letter = 0
     a4 = 1
 
@@ -77,6 +87,9 @@ class PdfSize(enum.Enum):
 
 
 class SettingKey:
+    """
+    Represents optional application settings
+    """
     # Dictionary Keys
     setting_file_name = "settings.ini"
     config_key = "DEFAULT"
@@ -94,7 +107,9 @@ class SettingKey:
 
 
 class Settings:
-    """Properties"""
+    """
+    Properties
+    """
     __instance = None
 
     """Methods"""
@@ -107,7 +122,9 @@ class Settings:
     #     return Settings.__instance
 
     def __init__(self):
-        """ Virtually private constructor. """
+        """
+        Virtually private constructor.
+        """
         if Settings.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
@@ -115,6 +132,8 @@ class Settings:
 
     @staticmethod
     def init_config():
+        """Setup configuration and save to file
+        """
         if not Settings.does_settings_file_exist():
             config = configparser.ConfigParser()
             config[SettingKey.config_key] = {
@@ -130,6 +149,10 @@ class Settings:
 
     @staticmethod
     def does_settings_file_exist():
+        """Check if settings file exist
+
+        :return: true if file does exist
+        """
         config = configparser.ConfigParser()
 
         #  We need two 'not's here because 'not variable' will check if the file does not exist, and we want to know if
@@ -138,6 +161,10 @@ class Settings:
 
     @staticmethod
     def get_settings_dict():
+        """Get settings dictionary
+
+        :return: dictionary of settings keys
+        """
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         return config[SettingKey.config_key]
@@ -148,6 +175,10 @@ class Settings:
 
     @staticmethod
     def get_scan_type():
+        """
+
+        :return: selected scan type, default is detect OS scan
+        """
         if SettingKey.scan_type not in Settings.get_settings_dict():
             return ScanType.detect_os_service_scan
 
@@ -156,6 +187,10 @@ class Settings:
 
     @staticmethod
     def set_scan_type(new_scan_type):
+        """
+
+        :param new_scan_type: scan type to update settings to
+        """
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.scan_type] = str(new_scan_type.value)
@@ -166,6 +201,10 @@ class Settings:
 
     @staticmethod
     def get_host_sort_type():
+        """
+
+        :return: selected sort type, default is ascending
+        """
         if SettingKey.host_sort_type not in Settings.get_settings_dict():
             return SortType.alphaASC
 
@@ -174,6 +213,10 @@ class Settings:
 
     @staticmethod
     def set_host_sort_type(new_sort_type):
+        """
+
+        :param new_sort_type: host sort to update settings to
+        """
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.host_sort_type] = str(new_sort_type.value)
@@ -184,6 +227,10 @@ class Settings:
 
     @staticmethod
     def get_vuln_sort_type():
+        """
+
+        :return: selected sort type, default is ascending
+        """
         if SettingKey.vuln_sort_type not in Settings.get_settings_dict():
             return SortType.alphaASC
 
@@ -192,6 +239,10 @@ class Settings:
 
     @staticmethod
     def set_vuln_sort_type(new_sort_type):
+        """
+
+        :param new_sort_type: vuln sort to update settings to
+        """
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.vuln_sort_type] = str(new_sort_type.value)
@@ -202,6 +253,10 @@ class Settings:
 
     @staticmethod
     def get_pdf_size():
+        """
+
+        :return: selected pdf size, default is letter
+        """
         if SettingKey.pdf_size not in Settings.get_settings_dict():
             return PdfSize.letter
         pdf_size_raw = Settings.get_settings_dict()[SettingKey.pdf_size]
@@ -209,6 +264,10 @@ class Settings:
 
     @staticmethod
     def set_pdf_size(new_pdf_size):
+        """
+
+        :param new_pdf_size: pdf size to update settings to
+        """
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.pdf_size] = str(new_pdf_size.value)
@@ -217,12 +276,20 @@ class Settings:
 
     @staticmethod
     def get_theme():
+        """
+
+        :return: selected theme setting, default is equilux
+        """
         if SettingKey.theme not in Settings.get_settings_dict():
             return "equilux"
         return Settings.get_settings_dict()[SettingKey.theme]
 
     @staticmethod
     def set_theme(theme):
+        """
+
+        :param theme: theme to update settings to
+        """
         config = configparser.ConfigParser()
         config.read(SettingKey.setting_file_name)
         config[SettingKey.config_key][SettingKey.theme] = theme

@@ -18,37 +18,56 @@ class Scanner:
     _scanned = False
 
     def __init__(self, ips, ports):
+        """Create Scanner object given IP and port ranges to scan"""
         self._ips = ips
         self._ports = ports
         self._scanner = nmap.PortScanner()
 
     def host_discover(self):
-        """Scans for live host that respond to pings"""
+        """Scans for live host that respond to pings
+
+        :return nmap host discovery scan data
+        """
         self._scanned = True
         return self._scanner.scan(self._ips, arguments='-sP')
 
     def full_scan(self):
-        """Performs a full TCP scan with service discovery, good for initial scans"""
+        """Performs a full TCP scan with service discovery, good for initial scans
+
+        :return nmap full scan data
+        """
         self._scanned = True
         return self._scanner.scan(self._ips, self._ports, arguments='-sV -sS -T4')
 
     def script_scan(self):
-        """Runs default scripts without host discovery. All host assumed up."""
+        """Runs default scripts without host discovery. All host assumed up.
+
+        :return nmap script scan data
+        """
         self._scanned = True
         return self._scanner.scan(self._ips, self._ports, arguments='-Pn -sn -sC')
 
     def udp_scan(self):
-        """Runs a UDP scan good for DNS, SNMP, and DHCP. Typically takes longer than a TCP scan"""
+        """Runs a UDP scan good for DNS, SNMP, and DHCP. Typically takes longer than a TCP scan
+
+        :return nmap UDP scan data
+        """
         self._scanned = True
         return self._scanner.scan(self._ips, self._ports, arguments='-sU')
 
     def fast_scan(self):
-        """Quick scan of small port range with default arguments"""
+        """Quick scan of small port range with default arguments
+
+        :return nmap fast scan data
+        """
         self._scanned = True
         return self._scanner.scan(self._ips, self._ports)
 
     def detect_os_service_scan(self):
-        """Runs scan to detemine OS and running service of given host"""
+        """Runs scan to detemine OS and running service of given host
+
+        :return nmap detect OS scan data
+        """
         self._scanned = True
         return self._scanner.scan(self._ips, self._ports, arguments='-A')
 
@@ -57,6 +76,7 @@ class Scanner:
 
         :param result: scan results dictionary
         :param host: host ip to get os details from
+        :return [name, OS family, OS generation] of scan data or ["","",""]
         """
         if "osmatch" in result['scan'][host] and len(result['scan'][host]["osmatch"]) > 0:
             name = result['scan'][host]["osmatch"][0]["name"]
@@ -77,6 +97,7 @@ class Scanner:
         :param result: scan results dictionary
         :param host: host ip to get vendor from
         :param mac: mac address to get vendor from
+        :return vendor data of given host
         """
         if "vendor" in result['scan'][host] and mac in result['scan'][host]['vendor']:
             return result['scan'][host]['vendor'][mac]
@@ -88,6 +109,7 @@ class Scanner:
 
         :param result: scan results dictionary
         :param host: host ip to get mac from
+        :return mac address of given host
         """
         if "mac" in result['scan'][host]["addresses"]:
             return result['scan'][host]["addresses"]["mac"]
@@ -97,7 +119,10 @@ class Scanner:
     """Runs a scan of the given type"""
 
     def get_scan_details(self, scan_type):
-        """Runs scan to detemine OS and running service of given host"""
+        """Runs scan to determine OS and running service of given host
+
+        :return array of host data found in scan
+        """
         result = None
         # Check scan type
         if scan_type == System.ScanType.full_scan:
@@ -130,7 +155,10 @@ class Scanner:
         return hosts
 
     def get_os_service_scan_details(self):
-        """Runs scan to detemine OS and running service of given host"""
+        """Runs scan to determine OS and running service of given host
+
+        :return array of host data found in scan
+        """
         self._scanned = True
         result = self._scanner.scan(self._ips, self._ports, arguments='-A')
         hosts = []
@@ -152,7 +180,11 @@ class Scanner:
         return hosts
 
     def get_cpes(self):
-        """Returns CPEs found from scan"""
+        """Returns CPEs found from scan
+
+        :return dictionary of CPEs found via nmap scan
+        :raises ScannerError is no scan has been conducted yet
+        """
         full_cpes = {}
         host_cpes = []
         if self._scanned:
@@ -171,14 +203,21 @@ class Scanner:
             df.DBFunctions.query_cves(self.get_cpes())
 
     def get_hosts(self):
-        """Return all hosts found during scan"""
+        """Return all hosts found during scan
+
+        :return all hosts found via nmap scan
+        :raises ScannerError is no scan has been conducted yet
+        """
         if self._scanned:
             return self._scanner.all_hosts()
         else:
             raise ScannerError("ERROR: A scan has not yet been conducted!")
 
     def get_csv(self):
-        """Return lastest scan information in csv format"""
+        """Return latest scan information in csv format
+
+        :return csv scan data
+        """
         if self._scanned:
             return self._scanner.csv()
 

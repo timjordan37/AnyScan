@@ -11,10 +11,17 @@ data and display it properly to the user via the application.
 
 class DBFunctions:
 
-    # todo create docstrings for all functions
     # Saves a new device to the database
     @staticmethod
     def save_device(deviceName, deviceManufacturer, cpeURI):
+        """Save a found device to the database with device name, manufacturer, and cpe
+
+        :param deviceName:
+        :param deviceManufacturer:
+        :param cpeURI: device cpe found via nmap scan
+        :return true if device saved successfully
+        """
+
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         device_info = (deviceName, deviceManufacturer, cpeURI)
@@ -33,6 +40,26 @@ class DBFunctions:
                            customScoreReason, privilegesRequired,
                            userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                            baseScore, baseSeverity, exploitabilityScore):
+        """Save a Vulnerability to the database given various details
+
+        :param cveName:
+        :param description:
+        :param CVSSScore:
+        :param attackVector:
+        :param attackComplexity:
+        :param customScore:
+        :param customScoreReason: logic associated with deviating from standard score
+        :param privilegesRequired:
+        :param userInteraction:
+        :param confidentialityImpact:
+        :param integrityImpact:
+        :param availibilityImpact:
+        :param baseScore:
+        :param baseSeverity:
+        :param exploitabilityScore:
+        :return true if vulnerability was saved successfully
+        """
+
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
 
@@ -62,12 +89,32 @@ class DBFunctions:
 
         return True
 
-    # Updates a Vulnerability in the DB
+    # todo CVSSScore isn't used. is this an issue or can we get rid of it?
     @staticmethod
     def update_vuln(vulnID, cveName, description, CVSSScore, attackVector, attackComplexity, customScore,
                     customScoreReason, privilegesRequired,
                     userInteraction, confidentialityImpact, integrityImpact, availibilityImpact,
                     baseScore, baseSeverity, exploitabilityScore):
+        """Update a vulnerability in the database given arious details
+
+        :param vulnID:
+        :param cveName:
+        :param description:
+        :param CVSSScore:
+        :param attackVector:
+        :param attackComplexity:
+        :param customScore:
+        :param customScoreReason:
+        :param privilegesRequired:
+        :param userInteraction:
+        :param confidentialityImpact:
+        :param integrityImpact:
+        :param availibilityImpact:
+        :param baseScore:
+        :param baseSeverity:
+        :param exploitabilityScore:
+        :return
+        """
         conn = sqlite3.connect("vulnDB.db")
         cursor = conn.cursor()
 
@@ -102,6 +149,7 @@ class DBFunctions:
 
         :param Date: date of scan to be imported
         :param Duration: time scan took to complete
+        :return id of last row inserted into scan history table
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
@@ -136,8 +184,8 @@ class DBFunctions:
             cveName TEXT, 
             PRIMARY KEY(cpeURI, cveName))''')
         cursor.execute('''CREATE TABLE CPEVersions (
-                    cpe22 TEXT, 
-                    cpe23 TEXT, 
+                    cpe22 TEXT NOT NULL, 
+                    cpe23 TEXT NOT NULL, 
             PRIMARY KEY(cpe22,cpe23),
             UNIQUE (cpe22, cpe23))''')
         # todo is there a reason this commit is here and below? Do we need 2?
@@ -188,7 +236,8 @@ class DBFunctions:
             VulnID INTEGER,
             PRIMARY KEY(HostID, VulnID),
             FOREIGN KEY(HostID) REFERENCES Hosts(HostID),
-            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID)''')
+            FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID))''')
+
         conn.commit()
 
     @staticmethod
@@ -233,7 +282,6 @@ class DBFunctions:
 
         cpeVuln = (cpe, cve)
 
-        # todo cpe version change
         cpe_test = cpe[0:7]
         if cpe_test != 'cpe:2.3':
             error = f'\nCPE version 2.2: {cpe}\n'
@@ -250,6 +298,7 @@ class DBFunctions:
             print(error)
         conn.commit()
 
+    @staticmethod
     def query_cves(cpe_dict):
         """query DB for CVEs according to CPEs found by scanner
 
@@ -258,15 +307,36 @@ class DBFunctions:
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         cves = []
-        print("CVE Query HERE")
+        vulns = {}
+        print("\nDBFunctions 309 query_cves\n")
 
         for hList in cpe_dict:
             for cpe in cpe_dict[hList]:
+                print('CPE: ', cpe)
+
+                cpe_test = cpe[0:7]
+                if cpe_test != 'cpe:2.3':
+                    error = f'DBFunctions 317 CPE version 2.2: {cpe}'
+                    print(error)
+                    # update version to 2.3 if not already
+                    cpe = DBFunctions.cpe_version_reference(cpe)
+                    print('DBFunciton 321 CPE23: ', cpe)
+
+
                 cursor.execute("""SELECT * FROM CPEVulns WHERE cpeURI IS (?)""", (cpe,))
-                vul = cursor.fetchone()
-                if vul:
-                    DBFunctions.save_cve_by_host(hList, vul[1])
-                    cves.append(vul[1])
+                value = cursor.fetchone()
+                if value:
+                    vulns[hList] = value[1]
+                    print('Host: ', hList)
+                    print('Vuln: ', value)
+
+        conn.commit()
+        conn.close()
+
+        if vulns:
+            for host, vuln in vulns.items():
+                cves.append(vuln)
+
         return cves
 
     @staticmethod
@@ -274,6 +344,7 @@ class DBFunctions:
         """Query the database for a specific vulnerability
 
         :param cve: vulnerability to be searched for
+        :return vulnerabilities for the given CVE
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
@@ -282,14 +353,17 @@ class DBFunctions:
 
     @staticmethod
     def query_report_info():
+        """Gather information from database that is needed for report generation
+
+        :return tuple of IP, MAC addresses, and name of hosts from Hosts table
+        """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         cursor2 = conn.cursor()
         cursor3 = conn.cursor()
         # cursor4 = conn.cursor()
 
-        # todo change query to needed data
-        #
+
         cursor.execute("""SELECT ip FROM Hosts""")
         cursor2.execute("""SELECT macAddress FROM Hosts""")
         cursor3.execute("""SELECT name FROM Hosts""")
@@ -303,32 +377,33 @@ class DBFunctions:
     # Imports Data from NVD JSON file
     @staticmethod
     def import_NVD_JSON(json_fp=None):
+        """Imports json file from NVD into database
+
+        :param json_fp: file path of json file to be import. Default assumes working directory contains nvdcve-1.0-2019.json
+        """
         if not json_fp:
             # default file I've been using for testing. We could get rid of this for release
             json_fp = Path("nvdcve-1.0-2019.json")
             print(json_fp)
         else:
-            # todo test for correct file type
             json_fp = Path(json_fp)
             print(json_fp)
 
         nvd_json = json.loads(json_fp.read_text())
         cve_items_list = nvd_json['CVE_Items']
 
-        i = 0
         for cve in cve_items_list:
-            cve_detail = cve_items_list[i] # can't this just be cve?
-            cve_meta_data = cve_detail.get("cve").get("CVE_data_meta")
+            cve_meta_data = cve.get("cve").get("CVE_data_meta")
 
-            description_data = cve_detail.get("cve").get("description").get("description_data")
+            description_data = cve.get("cve").get("description").get("description_data")
             description = description_data[0].get("value")
 
-            configurations = cve_detail['configurations']
+            configurations = cve['configurations']
             cpe_list = configurations['nodes']
 
             try:
-                cvssV3 = cve_detail.get("impact").get("baseMetricV3").get("cvssV3")
-                baseMetric = cve_detail.get("impact").get("baseMetricV3")
+                cvssV3 = cve.get("impact").get("baseMetricV3").get("cvssV3")
+                baseMetric = cve.get("impact").get("baseMetricV3")
                 DBFunctions.save_vulnerability(cve_meta_data['ID'], description, cvssV3['attackVector'],
                                                cvssV3['attackComplexity'], "", "", cvssV3['privilegesRequired'],
                                                cvssV3['userInteraction'],
@@ -350,12 +425,14 @@ class DBFunctions:
                             cpe_URI = match['cpe22Uri']
                         DBFunctions.save_cpeVuln(cpe_URI, cve_meta_data['ID'])
                 except KeyError:
-                    print('No CPE Match for ', cpe_URI)
-
-            i += 1
+                    print('No CVE Match for CPE: ', cpe_URI)
 
     @staticmethod
     def import_cve_verison_matches(nvd_file='official-cpe-dictionary_v2.3.xml'):
+        """Imports xml file from NVD into database for cpe version matching
+
+        :param nvd_file: file path of xml file to import. Default assumes working directory contains official-cpe-dictionary_v2.3.xml
+        """
         # assumes the default file is available
         tree = ET.parse(nvd_file)
         root = tree.getroot()
@@ -373,16 +450,25 @@ class DBFunctions:
     # Retrieves all data for specified ScanID
     @staticmethod
     def retrieve_scanID_data(scanID):
+        """Get the data from ScanHistory table given the scan id
+
+        :param scanID:
+        :return data associated with given scan id
+        """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        retrievalID = (scanID)
-        cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ? ''', retrievalID)
+        retrievalID = int(scanID)
+        cursor.execute('''SELECT * FROM ScanHistory WHERE ScanID = ?''', (retrievalID,))
         results = cursor.fetchall()
         return results
 
     # Retrieves scanIDs and Dates for all Scans
     @staticmethod
     def retrieve_scan_history():
+        """Get the all data from the Scanhistory table
+
+        :return all data saved into the ScanHistory table
+        """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         cursor.execute('''SELECT ScanID, ScanDate FROM ScanHistory''')
@@ -392,6 +478,10 @@ class DBFunctions:
     # Deletes specified ScanID
     @staticmethod
     def delete_scan_ID(scanID):
+        """Remove data from ScanHistory table given the scan id
+
+        :param scanID:
+        """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
         deleteID = (scanID)
@@ -401,6 +491,7 @@ class DBFunctions:
     def get_full_cve():
         """Returns all unique CVEs in database
 
+        :return all cves in database
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
@@ -415,6 +506,8 @@ class DBFunctions:
     @staticmethod
     def get_all_devices():
         """Query the database for all saved devices
+
+        :return model and manufacturer for all devices in Device table
         """
 
         conn = sqlite3.connect('vulnDB.db')
@@ -426,6 +519,8 @@ class DBFunctions:
     @staticmethod
     def get_all_scans():
         """Query the database for all saved scans
+
+        :return data for all scans saved
         """
 
         conn = sqlite3.connect('vulnDB.db')
@@ -442,6 +537,10 @@ class DBFunctions:
     @staticmethod
     def get_all_where(query_str, query_params):
         """Query the database for all saved entiries with the given string and params
+
+        :param query_str: query to be executed
+        :param query_params: parameters needed to properly execute given query
+        :return data returned depends on the database query given
         """
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
@@ -461,6 +560,8 @@ class DBFunctions:
     @staticmethod
     def get_all_vulns():
         """Query the database for all saved vulnerabilities
+
+        :return all vulnerabilities saved into the database
         """
 
         conn = sqlite3.connect('vulnDB.db')
@@ -478,11 +579,15 @@ class DBFunctions:
         :return: CPE v2.3 given v2.2
         """
 
+        if not cpe22:
+            return
+
         conn = sqlite3.connect('vulnDB.db')
         cursor = conn.cursor()
-        # needs the comma at the end so you are passing
-        # a tuple with 1 string not a sequence of chars
-        cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 = ?""", (cpe22,))
+
+        # Wild card to find closest match
+        cpe22 += '%'
+        cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 LIKE ?""", (cpe22,))
 
         cpe23 = cursor.fetchone()
         if cpe23:

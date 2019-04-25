@@ -1,11 +1,12 @@
 import tkinter as tk
+import enum
 from datetime import date
 from tkinter.filedialog import asksaveasfilename
 from tkinter import simpledialog
 from views import VulnPopup as vp, SettingsPopup as sp
 from util.Reporter import Reporter
 from util.DataShare import DataShare
-import enum
+from util.DBFunctions import DBFunctions
 from views.TableView import TableView
 from tkinter import ttk
 
@@ -43,11 +44,13 @@ class ScanDetailsView:
     def on_report(self):
         """Click hanlder for report button"""
         print("User clicked 'Report'")
+
         vulnerabilities = DataShare.get_vulns()
         cpes = DataShare.get_cpes()
         scanned_hosts = DataShare.get_hosts()
 
-        if vulnerabilities and cpes and scanned_hosts:
+        #if vulnerabilities and cpes and scanned_hosts:
+        if True:
             report = {
                 'hosts': scanned_hosts,
                 'cpes': cpes,

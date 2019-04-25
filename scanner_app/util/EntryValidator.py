@@ -1,3 +1,8 @@
+"""
+Simple class for integer validation.
+"""
+
+
 class Validator:
 
     @staticmethod

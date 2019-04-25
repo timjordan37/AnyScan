@@ -108,6 +108,7 @@ def main():
         ports = f'{port_start_entry_var.get()}-{port_end_entry_var.get()}'
         hosts = scan_host_entry_var.get()
         scanner = Scanner(hosts, ports)
+
         set_host(scanner.get_scan_details(System.Settings.get_scan_type()))
         set_cpes_vulns(scanner.get_cpes())
 
@@ -141,8 +142,12 @@ def main():
                 if item.get_ip() == ip:
                     cpe_list[item.get_id()] = cpe_list.pop(ip)
 
+
+        df.DBFunctions.save_cve_by_host(cpe_list)
+
         DataShare.set_cpes(cpe_list)
-        df.DBFunctions.query_cves(cpe_list)
+        cves = df.DBFunctions.query_cves(cpe_list)
+
 
         update_left_header_label(f"Scan finished in {timedelta} seconds")
         STimer.do_after(reset_left_header_label, 2)
@@ -164,7 +169,10 @@ def main():
 
     def set_cpes_vulns(c):
         """Set vulnerabilities from cps"""
+        print("Main 172 set_cpes_vulns   cpes:\n")
+        print(c)
         DataShare.set_cpes(c)
+
 
         # Sort according to the Vulnerability Sort Setting
         reverse_sort = False
@@ -173,6 +181,7 @@ def main():
             reverse_sort = True
 
         sorted_vulns = sorted(df.DBFunctions.query_cves(c), reverse=reverse_sort)
+        print('From Main 184, sorted_vulns: ', sorted_vulns)
         DataShare.set_vulns(sorted_vulns)
         # reload ui
 
@@ -188,17 +197,27 @@ def main():
         params = (id,)
 
         data = df.DBFunctions.get_all_where(query, params)
+        test = df.DBFunctions.retrieve_scanID_data(id)
+        print('\n\n\n\nGetting Data\n')
         print(data)
+        print('\n')
+        print(test)
         # these need to be set, but not sure if the cpes and vulns are differentiate
         # by scans like hosts are
         # todo: set cpes and vulns in DataShare
+        print('\n\n\n\nCPES')
+        #todo this changes depending on if a scan has been run
         print(DataShare.get_cpes())
+        print('\n\nVULNS')
+        #todo these are 2.2 cpes...
         print(DataShare.get_vulns())
+        print('\n\n\n\n')
 
         curr_hosts = []
         # for each host scanned
         for host_raw in data:
-            host_ID = host_raw[0]
+            host_id = host_raw[0]
+
             ip = host_raw[1]
             state = "Old Host"
             mac = host_raw[2]
@@ -207,7 +226,8 @@ def main():
             name = host_raw[5]
             vendor = host_raw[6]
 
-            curr_hosts.append(Host(host_ID, ip, state, name, os_family, os_gen, vendor, mac))
+            curr_hosts.append(Host(host_id, ip, state, name, os_family, os_gen, vendor, mac))
+
 
         set_host(curr_hosts)
 
@@ -222,7 +242,6 @@ def main():
         main_note_book.select(2)
         exploit_view.cve_var.set(cve)
         exploit_view.on_search()
-        # todo update exploit tab variables
 
     def on_host_tableview_select(event):
         """Click handler to update right ui when user clicks on a host in left box"""
@@ -456,8 +475,6 @@ def main():
     root.geometry("1600x1000")
     root.minsize(800, 500)
     # add this to ensure app comes to front on start up
-    # might be os depended, not sure
-    # todo test on windows to ensure app comes to front
     root.lift()
     root.attributes('-topmost', True)
     root.after_idle(root.attributes, '-topmost', False)
