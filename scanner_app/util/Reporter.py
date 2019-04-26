@@ -110,9 +110,10 @@ class Reporter:
         Story.append(Paragraph('CPEs ---------------------', self.styles['Heading2']))
         if self._report['cpes']:
             for c in self._report['cpes']:
-                cpe = self._report['cpes'][c][0]
-                Story.append(Paragraph(cpe, style))
-                Story.append(Spacer(1, 0.2 * inch))
+                if self._report['cpes'][c][0]:
+                    cpe = self._report['cpes'][c][0]
+                    Story.append(Paragraph(cpe, style))
+                    Story.append(Spacer(1, 0.2 * inch))
         else:
             Story.append(Paragraph('No CPEs found', style))
 
