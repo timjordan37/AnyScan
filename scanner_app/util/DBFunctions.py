@@ -237,7 +237,6 @@ class DBFunctions:
             PRIMARY KEY(HostID, VulnID),
             FOREIGN KEY(HostID) REFERENCES Hosts(HostID),
             FOREIGN KEY(VulnID) REFERENCES Vulnerabilities(VulnID))''')
-
         conn.commit()
 
     @staticmethod
@@ -333,11 +332,7 @@ class DBFunctions:
         conn.commit()
         conn.close()
 
-        if vulns:
-            for host, vuln in vulns.items():
-                cves.append(vuln)
-
-        return cves
+        return vulns
 
     @staticmethod
     def query_vulns(cve):
@@ -587,6 +582,10 @@ class DBFunctions:
 
         # Wild card to find closest match
         cpe22 += '%'
+        print('DBFunctions 584 cpe22 updated: ', cpe22)
+
+        # needs the comma at the end so you are passing
+        # a tuple with 1 string not a sequence of chars
         cursor.execute("""SELECT cpe23 FROM CPEVersions where cpe22 LIKE ?""", (cpe22,))
 
         cpe23 = cursor.fetchone()
