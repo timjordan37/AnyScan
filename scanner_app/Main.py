@@ -304,7 +304,7 @@ def main():
     root.ttkStyle = ThemedStyle()
     theme = System.Settings.get_theme()
     root.ttkStyle.set_theme(theme)
-    root.title("GlenTest")
+    root.title("AnyScan")
     root.grid_rowconfigure(0, weight=1)
     root.grid_columnconfigure(1, weight=1)
 
